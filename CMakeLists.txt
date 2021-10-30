@@ -20,5 +20,8 @@ add_library(student SHARED
 )
 
 target_link_libraries(student
-  ${OpenCV_LIBRARIES}  
+  ${OpenCV_LIBRARIES}
 )
+
+# Executable to test the implemented functions
+add_executable(functions-testing src/main.cpp src/dubins.cpp src/utils.cpp)
