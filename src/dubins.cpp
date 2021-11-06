@@ -301,7 +301,7 @@ DubinsCurve *Dubins::findShortestPath(double x0, double y0, double th0, double x
     return curve;
 };
 
-DubinsCurve **Dubins::multipointShortestPath(Point **points, uint numberOfPoints) {
+DubinsCurve **Dubins::multipointShortestPath(Point **points, int numberOfPoints) {
     std::cout << "INPUT: \n";
     std::cout << "X\tY\tTHETA\n";
     for (int i = 0; i < numberOfPoints; i++)
@@ -335,12 +335,12 @@ DubinsCurve **Dubins::multipointShortestPath(Point **points, uint numberOfPoints
 
     // I create an empty matrix L that will store intermediate results
     double **L = new double*[numberOfPoints];
-    for (uint i = 0; i < numberOfPoints; i++) {
+    for (int i = 0; i < numberOfPoints; i++) {
         L[i] = new double[K];
     }
     // The length of the portion of the path after the last point is simply 0, otherwise I set the value to -1
-    for (uint n  = 0; n < numberOfPoints; n++) {
-        for (uint i = 0; i < K; i++) {
+    for (int n  = 0; n < numberOfPoints; n++) {
+        for (int i = 0; i < K; i++) {
             if (n == numberOfPoints-1)
                 L[n][i] = 0;
             else
@@ -351,19 +351,19 @@ DubinsCurve **Dubins::multipointShortestPath(Point **points, uint numberOfPoints
     // I create an empty matrix S that will tell me which angle each configuration of L wants to finish with
     // Used to recreate the complete solution after having discovered which is the best path
     int **S = new int*[numberOfPoints];
-    for (uint i = 0; i < numberOfPoints; i++) {
+    for (int i = 0; i < numberOfPoints; i++) {
         S[i] = new int[K];
     }
     // I fill S with values -1 - just to debug, when we are ready we can remove it
-    for (uint n  = 0; n < numberOfPoints; n++) {
-        for (uint i = 0; i < K; i++) {
+    for (int n  = 0; n < numberOfPoints; n++) {
+        for (int i = 0; i < K; i++) {
             S[n][i] = -1;
         }
     }
 
     // ALGORITHM - FIRST STEP
     // For the last two points, we already know the end angle
-    for (uint i = 0; i < K; i++)
+    for (int i = 0; i < K; i++)
     {
         DubinsCurve *curve = findShortestPath(points[numberOfPoints-2]->x, points[numberOfPoints-2]->y, points[numberOfPoints-2]->th != -1 ? points[numberOfPoints-2]->th : i, points[numberOfPoints-1]->x, points[numberOfPoints-1]->y, points[numberOfPoints-1]->th);
         if (L[numberOfPoints-2][i] == -1 || L[numberOfPoints-2][i] > curve->L) {
@@ -375,9 +375,9 @@ DubinsCurve **Dubins::multipointShortestPath(Point **points, uint numberOfPoints
     // ALGORITHM - ITERATIVE COMPUTATION
     for (int n = numberOfPoints-3; n >= 0; n--)
     {
-        for (uint i = 0; i < K; i++)
+        for (int i = 0; i < K; i++)
         {
-            for (uint j = 0; j < K; j++)
+            for (int j = 0; j < K; j++)
             {
                 int actual_i_angle = points[n]->th != -1 ? points[n]->th : ANGLES[i];
                 DubinsCurve *curve = findShortestPath(points[n]->x, points[n]->y, actual_i_angle, points[n+1]->x, points[n+1]->y, ANGLES[j]);
@@ -429,9 +429,9 @@ DubinsCurve **Dubins::multipointShortestPath(Point **points, uint numberOfPoints
     std::cout << "\n\n";
 
     // Find the maximum length and the corresponding index in the first row of L
-    uint maxIndex;
+    int maxIndex;
     double maxLength = -INFINITY;
-    for (uint i = 0; i < K; i++)
+    for (int i = 0; i < K; i++)
     {
         if (L[0][i] > maxLength) {
             maxIndex = i;
@@ -458,3 +458,137 @@ DubinsCurve **Dubins::multipointShortestPath(Point **points, uint numberOfPoints
 
     return result;
 };
+
+bool intersLineLine (Point p1, Point p2, Point p3, Point p4, std::vector<Point> &pts, std::vector<double> &ts){
+    pts.clear();
+    ts.clear();
+    double minX1 = std::min(p1.x, p2.x);
+    double minY1 = std::min(p1.y, p2.y);
+    double maxX1 = std::max(p1.x, p2.x);
+    double maxY1 = std::max(p1.y, p2.y);
+
+    double minX2 = std::min(p3.x, p4.x);
+    double minY2 = std::min(p3.y, p4.y);
+    double maxX2 = std::max(p3.x, p4.x);
+    double maxY2 = std::max(p3.y, p4.y);
+
+    if(maxX2 < minX1 || minX2 > maxX1 || maxY2 < minY1 || minY2 > maxY1){
+        return;
+    }
+
+    double q[2] = {p1.x, p1.y};
+    double s[2] = {(p2.x - p1.x), (p2.y - p1.y)};
+
+    double p[2] = {p3.x, p3.y};
+    double r[2] = {(p4.x - p3.x), (p4.y - p3.x)};
+
+    double diffPQ[3] = {(p1.x - p3.x), (p1.y - p3.y)};
+
+    double crossRS;
+    double crossDiffR;
+    double crossDiffS;
+
+    cross_product(r, s, crossRS);
+    cross_product(diffPQ, r, crossDiffR);
+    cross_product(diffPQ, s, crossDiffS);
+
+    if(crossRS == 0 && crossDiffR == 0){
+        double dotRR = dot2D(r, r);
+        double dotSR = dot2D(s, r);
+        double t0 = dot2D(diffPQ, r) / dotRR;
+        double t1 = t0 + dotSR / dotRR;
+        if(dotSR < 0){
+            if(t0 >= 0 && t1 <= 1){
+                ts.push_back(std::max(t1,0.0));
+                ts.push_back(std::min(t0,1.0));
+            }
+        }else{
+            if(t1 >= 0 && t0 <= 1){
+                ts.push_back(std::max(t0,0.0));
+                ts.push_back(std::min(t1,1.0));
+            }
+        }   
+    }else{
+        if(crossRS == 0 && crossDiffR != 0){
+            return;
+        }else{
+            double t = crossDiffS/crossRS;
+            double u = crossDiffR/crossRS;
+            if(t >= 0 && t <= 1 && u >= 0 && u <=1){
+                ts.push_back(t);
+            }
+        }
+    }
+    for(int i = 0; i < 2; i++){
+        double temp[2] = {(ts[i] * r[0]), (ts[i] * r[1])};
+        double pt[2] = {};
+        pt[0] = temp[0] + p[0];
+        pt[1] = temp[1] + p[1];
+        Point point = {pt[0], pt[1]};
+        pts.push_back(point); 
+    }
+    if(pts.empty()){
+        return false;
+    }else{
+        return true;
+    }
+}
+
+bool intersCircleLine(double a, double b, double r, Point point1, Point point2, std::vector<Point> &pts, std::vector<double> &t){
+    pts.clear();
+    t.clear();
+    double p1 = 2 * point1.x * point2.x;
+    double p2 = 2 * point1.y * point2.y;
+    double p3 = 2 * a * point1.x;
+    double p4 = 2 * a * point2.x;
+    double p5 = 2 * b * point1.y;
+    double p6 = 2 * b * point2.y;
+
+    double c1 = pow(point1.x, 2) + pow(point2.x, 2) - p1 + pow(point1.y, 2) + pow(point2.y, 2) - p2;
+    double c2 = -2 * pow(point2.x, 2) + p1 - p3 + p4 - 2 * pow(point2.y, 2) + p2 - p5 + p6;
+    double c3 = pow(point2.x, 2) - p4 + pow(a, 2) + pow(point2.y, 2) - p6 + pow(b, 2) - pow(r, 2);
+
+    double delta = pow(c2, 2) - 4 * c1 * c3;
+
+    double t1;
+    double t2;
+
+    if(delta < 0){
+        return;
+    }else{
+        if(delta > 0){
+            double deltaSq = sqrt(delta);
+            t1 = (-c2 + deltaSq) / (2 * c1);
+            t2 = (-c2 - deltaSq) / (2 * c1);
+        }else{
+            t1 = -c2/(2 * c1);
+            t2 = t1;
+        }
+    }
+
+    double x;
+    double y;
+
+    if(t1 >= 0 && t1 <= 1){
+        x = point1.x * t1 + point2.x * (1-t1);
+        y = point1.y * t1 + point2.y * (1-t1);
+        Point point = {x, y};
+        pts.push_back(point);
+        t.push_back(t1);
+    }
+
+    if(t2 >= 0 && t2 <= 1 && t2 != t1){
+        x = point1.x * t2 + point2.x * (1-t2);
+        y = point1.y * t2 + point2.x * (1-t2);
+        Point point = {x, y};
+        pts.push_back(point);
+        t.push_back(t2);
+    }
+    //std::sort(t.begin(), t.end());
+    //We are still missing the last two matlab lines, couldn't figure out how to do them
+    if(pts.empty()){
+        return false;
+    }else{
+        return true;
+    }
+}

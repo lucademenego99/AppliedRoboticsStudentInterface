@@ -24,5 +24,7 @@ struct Point
 double sinc(double t);
 double mod2pi(double angle);
 double rangeSymm(double angle);
+void cross_product(double vector_a[], double vector_b[], double temp);
+double dot2D(double vector_a[], double vector_b[]);
 
 #endif

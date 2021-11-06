@@ -146,7 +146,9 @@ public:
     Dubins() = default;
     explicit Dubins(double k_max, double discritizer_size);
     DubinsCurve *findShortestPath(double x0, double y0, double th0, double xf, double yf, double thf);
-    DubinsCurve **multipointShortestPath(Point **points, uint numberOfPoints);
+    DubinsCurve **multipointShortestPath(Point **points, int numberOfPoints);
+    bool intersCircleLine(double a, double b, double r, Point point1, Point point2, std::vector<Point> &pts, std::vector<double> &t);
+    bool intersLineLine (Point p1, Point p2, Point p3, Point p4, std::vector<Point> &pts, std::vector<double> &ts);
 };
 
 #endif

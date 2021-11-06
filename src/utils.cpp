@@ -41,3 +41,12 @@ double rangeSymm(double ang)
     }
     return out;
 }
+
+void cross_product(double vector_a[], double vector_b[], double temp) {
+   temp = vector_a[0]*vector_b[1] - vector_a[1]*vector_b[0];
+}
+
+double dot2D(double vector_a[], double vector_b[]){
+    double temp = vector_a[0] * vector_b[0] + vector_a[1] * vector_b[1];
+    return temp;
+}

@@ -4,8 +4,8 @@ project(student_proect)
 ## Compile as C++11, supported in ROS Kinetic and newer
 add_compile_options(-std=c++11)
 
-find_package(OpenCV REQUIRED )
-find_package(project_interface REQUIRED )
+##find_package(OpenCV REQUIRED )
+##find_package(project_interface REQUIRED )
 
 ## Specify additional locations of header files
 include_directories(
