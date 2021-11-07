@@ -9,7 +9,7 @@
 double sinc(double t)
 {
     double s;
-    if (abs(t) < 0.002)
+    if (std::abs(t) < 0.002)
     {
         s = 1 - pow(t, 2) / 6 * (1 - pow(t, 2) / 20);
     }
