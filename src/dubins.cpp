@@ -675,19 +675,28 @@ bool Dubins::intersCircleLine(Point circleCenter, double r, Point point1, Point 
         }
     }
 
+    std::vector<std::pair<Point, double>> intersections = std::vector<std::pair<Point, double>>();
+
     if (t1 >= 0 && t1 <= 1)
     {
-        pts.push_back(Point((point1.x * t1) + (point2.x * (1 - t1)), (point1.y * t1) + (point2.y * (1 - t1))));
-        t.push_back(t1);
+        intersections.push_back(std::pair<Point, double>(Point((point1.x * t1) + (point2.x * (1 - t1)), (point1.y * t1) + (point2.y * (1 - t1))), t1));
     }
 
     if (t2 >= 0 && t2 <= 1 && t2 != t1)
     {
-        pts.push_back(Point((point1.x * t2) + (point2.x * (1 - t2)), (point1.y * t2) + (point2.x * (1 - t2))));
-        t.push_back(t2);
+        intersections.push_back(std::pair<Point, double>(Point((point1.x * t2) + (point2.x * (1 - t2)), (point1.y * t2) + (point2.x * (1 - t2))), t2));
     }
 
-    std::sort(t.begin(), t.end());
+    // Sort the intersections using t values
+    std::sort(intersections.begin(), intersections.end(), [](const std::pair<Point, double> a, const std::pair<Point, double> b)
+              { return a.second < b.second; });
+
+    // Fill the resulting arrays
+    for (int i = 0; i < intersections.size(); i++)
+    {
+        pts.push_back(intersections[i].first);
+        t.push_back(intersections[i].second);
+    }
 
     return pts.empty() ? false : true;
 }
