@@ -1,5 +1,11 @@
 #include "../include/utils.hpp"
 
+/**
+ * @brief Implementation of function sinc(t)
+ * 
+ * @param t TODO
+ * @return double 1 for t==0, and sin(t)/t otherwise
+ */
 double sinc(double t)
 {
     double s;
@@ -14,6 +20,12 @@ double sinc(double t)
     return s;
 }
 
+/**
+ * @brief Normalize an angle (in range [0,2*pi))
+ * 
+ * @param ang Angle to normalize
+ * @return double Normalized angle
+ */
 double mod2pi(double ang)
 {
     double out = ang;
@@ -28,6 +40,12 @@ double mod2pi(double ang)
     return out;
 }
 
+/**
+ * @brief Normalize an angular difference (range (-pi, pi])
+ * 
+ * @param ang Angular difference to normalize
+ * @return double Normalized angular difference
+ */
 double rangeSymm(double ang)
 {
     double out = ang;
@@ -42,11 +60,26 @@ double rangeSymm(double ang)
     return out;
 }
 
-void cross_product(double vector_a[], double vector_b[], double temp) {
-   temp = vector_a[0]*vector_b[1] - vector_a[1]*vector_b[0];
+/**
+ * @brief Calculates the cross product between two Points
+ * 
+ * @param a First input point
+ * @param b Second input point
+ * @return double Cross product between provided points
+ */
+double crossProduct(Point a, Point b)
+{
+    return a.x * b.y - a.y * b.x;
 }
 
-double dot2D(double vector_a[], double vector_b[]){
-    double temp = vector_a[0] * vector_b[0] + vector_a[1] * vector_b[1];
-    return temp;
+/**
+ * @brief Calculates the dot product between two Points
+ * 
+ * @param a First input point
+ * @param b Second input point
+ * @return double Dot product between provided points
+ */
+double dot2D(Point a, Point b)
+{
+    return a.x * b.x + a.y * b.y;
 }
