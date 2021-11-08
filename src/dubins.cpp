@@ -684,7 +684,7 @@ bool Dubins::intersCircleLine(Point circleCenter, double r, Point point1, Point 
 
     if (t2 >= 0 && t2 <= 1 && t2 != t1)
     {
-        intersections.push_back(std::pair<Point, double>(Point((point1.x * t2) + (point2.x * (1 - t2)), (point1.y * t2) + (point2.x * (1 - t2))), t2));
+        intersections.push_back(std::pair<Point, double>(Point((point1.x * t2) + (point2.x * (1 - t2)), (point1.y * t2) + (point2.y * (1 - t2))), t2));
     }
 
     // Sort the intersections using t values
@@ -696,6 +696,144 @@ bool Dubins::intersCircleLine(Point circleCenter, double r, Point point1, Point 
     {
         pts.push_back(intersections[i].first);
         t.push_back(intersections[i].second);
+    }
+
+    return pts.empty() ? false : true;
+}
+
+/**
+ * @brief Find if there is an intersection between an arc and a segment
+ * 
+ * @param arc Arc of a Dubins curve
+ * @param point1 First point used to define the segment
+ * @param point2 Second point used to define the segment
+ * @param pts Array of intersection points this function has found (passed by ref.)
+ * @param t Coefficient to normalize the segment (passed by ref.)
+ * @return true If an intersection has been found
+ * @return false If an intersection has not been found
+ */
+bool Dubins::intersArcLine(DubinsArc *arc, Point point1, Point point2, std::vector<Point> &pts, std::vector<double> &t)
+{
+
+    // Find the circle containing the provided arc
+    // Get the perpendicular lines of point1's line and points2's line
+    // (we can calculate them because point1 and point2 also contain the angle, that in our case will be the slope)
+    // Their intersection will be the center of the circle
+
+    // Calculate the slope of the two perpendicular lines
+    double m1 = tan(-1 / arc->th0);
+    double m2 = tan(-1 / arc->dubins_line->th);
+
+    Point circleCenter = Point(-1, -1);
+
+    // Limit case: the slope is the same
+    if (abs(m1 - m2) < 1.e-1 || abs(m1 + m2) < 1.e-1)
+    {
+        if (arc->x0 == arc->dubins_line->x && arc->y0 == arc->dubins_line->y)
+        {
+            // The two points are the same, no intersection?
+            return false;
+        }
+        else
+        {
+            // The segment between the two points forms the diagonal of the circle
+            // This means the center is in the middle
+            circleCenter.x = (arc->x0 + arc->dubins_line->x) / 2;
+            circleCenter.y = (arc->y0 + arc->dubins_line->y) / 2;
+        }
+    }
+    else
+    {
+        // Intersection between the two perpendicular lines
+        circleCenter.x = ((m2 * arc->x0) - (m1 * arc->dubins_line->x) + arc->dubins_line->y - arc->y0) / (m2 - m1);
+        circleCenter.y = -1 / (m1) * (circleCenter.x - arc->x0) + arc->y0;
+    }
+
+    // Having the center, we can easily find the radius
+    double r = sqrt(pow(arc->x0 - circleCenter.x, 2) + pow(arc->y0 - circleCenter.y, 2));
+
+    // Initialize the resulting arrays as empty arrays
+    pts.clear();
+    t.clear();
+
+    double p1 = 2 * point1.x * point2.x;
+    double p2 = 2 * point1.y * point2.y;
+    double p3 = 2 * circleCenter.x * point1.x;
+    double p4 = 2 * circleCenter.x * point2.x;
+    double p5 = 2 * circleCenter.y * point1.y;
+    double p6 = 2 * circleCenter.y * point2.y;
+
+    double c1 = pow(point1.x, 2) + pow(point2.x, 2) - p1 + pow(point1.y, 2) + pow(point2.y, 2) - p2;
+    double c2 = -2 * pow(point2.x, 2) + p1 - p3 + p4 - 2 * pow(point2.y, 2) + p2 - p5 + p6;
+    double c3 = pow(point2.x, 2) - p4 + pow(circleCenter.x, 2) + pow(point2.y, 2) - p6 + pow(circleCenter.y, 2) - pow(r, 2);
+
+    double delta = pow(c2, 2) - (4 * c1 * c3);
+
+    double t1;
+    double t2;
+
+    if (delta < 0)
+    {
+        // There is no solution (we are not dealing with complex numbers)
+        return false;
+    }
+    else
+    {
+        if (delta > 0)
+        {
+            // Two points of intersection
+            double deltaSq = sqrt(delta);
+            t1 = (-c2 + deltaSq) / (2 * c1);
+            t2 = (-c2 - deltaSq) / (2 * c1);
+        }
+        else
+        {
+            // If the delta is 0 we have just one point of intersection
+            t1 = -c2 / (2 * c1);
+            t2 = t1;
+        }
+    }
+
+    std::vector<std::pair<Point, double>> intersections = std::vector<std::pair<Point, double>>();
+
+    if (t1 >= 0 && t1 <= 1)
+    {
+        intersections.push_back(std::pair<Point, double>(Point((point1.x * t1) + (point2.x * (1 - t1)), (point1.y * t1) + (point2.y * (1 - t1))), t1));
+    }
+
+    if (t2 >= 0 && t2 <= 1 && t2 != t1)
+    {
+        intersections.push_back(std::pair<Point, double>(Point((point1.x * t2) + (point2.x * (1 - t2)), (point1.y * t2) + (point2.y * (1 - t2))), t2));
+    }
+
+    // Sort the intersections using t values
+    std::sort(intersections.begin(), intersections.end(), [](const std::pair<Point, double> a, const std::pair<Point, double> b)
+              { return a.second < b.second; });
+
+    // Fill the resulting arrays
+    for (int i = 0; i < intersections.size(); i++)
+    {
+        // Check if the intersection is inside the arc provided at the beginning
+        double intersectionTh = (atan2(intersections[i].first.y - circleCenter.y, intersections[i].first.x - circleCenter.x));
+        double firstTh = (atan2(arc->y0 - circleCenter.y, arc->x0 - circleCenter.x));
+        double secondTh = (atan2(arc->dubins_line->y - circleCenter.y, arc->dubins_line->x - circleCenter.x));
+
+        if (firstTh > secondTh)
+        {
+            if (intersectionTh <= firstTh && intersectionTh >= secondTh)
+            {
+                pts.push_back(intersections[i].first);
+                t.push_back(intersections[i].second);
+            }
+        }
+        else
+        {
+            if (intersectionTh >= firstTh && intersectionTh <= secondTh)
+            {
+                pts.push_back(intersections[i].first);
+                t.push_back(intersections[i].second);
+            }
+        }
     }
 
     return pts.empty() ? false : true;

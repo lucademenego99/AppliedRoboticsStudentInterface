@@ -262,11 +262,24 @@ public:
      * @param point1 First point used to define the segment
      * @param point2 Second point used to define the segment
      * @param pts Array of intersection points this function has found (passed by ref.)
-     * @param t ??? (passed by ref.)
+     * @param t Coefficient to normalize the segment (passed by ref.)
      * @return true If an intersection has been found
      * @return false If an intersection has not been found
      */
     bool intersCircleLine(Point circleCenter, double r, Point point1, Point point2, std::vector<Point> &pts, std::vector<double> &t);
+
+    /**
+     * @brief Find if there is an intersection between an arc and a segment
+     * 
+     * @param arc Arc of a Dubins curve
+     * @param point1 First point used to define the segment
+     * @param point2 Second point used to define the segment
+     * @param pts Array of intersection points this function has found (passed by ref.)
+     * @param t Coefficient to normalize the segment (passed by ref.)
+     * @return true If an intersection has been found
+     * @return false If an intersection has not been found
+     */
+    bool intersArcLine(DubinsArc *arc, Point point1, Point point2, std::vector<Point> &pts, std::vector<double> &t);
 
     /**
      * @brief Find if there is an intersection between two segments

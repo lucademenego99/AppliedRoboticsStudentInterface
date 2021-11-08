@@ -133,5 +133,25 @@ int main(int argc, char *argv[])
     //     }
     // }
 
+    // DubinsArc *arc = new DubinsArc(0, 0, -1.57, 1, 3.1416);
+    // std::cout << "ARC:\n"
+    //           << arc->x0 << " , " << arc->y0 << " , " << arc->th0 << "\n";
+    // std::cout << arc->dubins_line->x << " , " << arc->dubins_line->y << " , " << arc->dubins_line->th << "\n";
+    // bool res = dubins.intersArcLine(arc, Point(0, -0.5), Point(3, 1), intersections, ts);
+    // std::cout << "\n\nRES: " << res << "\n";
+    // if (res)
+    // {
+    //     std::cout << "Intersections: \n";
+    //     for (int i = 0; i < intersections.size(); i++)
+    //     {
+    //         std::cout << intersections[i].x << " ; " << intersections[i].y << "\n";
+    //     }
+    //     std::cout << "\nTs: \n";
+    //     for (int i = 0; i < ts.size(); i++)
+    //     {
+    //         std::cout << ts[i] << "\n";
+    //     }
+    // }
+
     return 0;
 }
