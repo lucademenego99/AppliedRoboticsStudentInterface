@@ -20,9 +20,9 @@ Paths enlarge(IntPoint* points, int offset){
 
 void printSolution(Paths solution){
     printf("solution size = %d\n", (int)solutions.size());
-    for(unsigned i = 0; i < solution.size(); i++){
+    for(unsigned int i = 0; i < solution.size(); i++){
         Path path = solution.at(i);
-        for(unsigned j = 1; j < path.size(); j++){
+        for(unsigned int j = 1; j < path.size(); j++){
             cv::line(plot, cv::Point2f(path.at(j-1).X, path.at(j-1).Y), cv::Points2f(path.at(j).X, path.at(j).Y), cv::Scalar(255,255,0), 2);
         }
     }

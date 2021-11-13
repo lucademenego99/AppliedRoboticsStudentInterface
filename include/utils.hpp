@@ -3,6 +3,8 @@
 
 #define _USE_MATH_DEFINES
 #include <cmath>
+#include <vector>
+#include <cstddef>
 
 /**
  * @brief A point structure, that can be used as:
@@ -14,20 +16,56 @@ struct Point
 {
     double x, y, th;
 
-    Point(double i_x, double i_y)
-    {
-        x = i_x;
-        y = i_y;
-        th = -1;
-    }
-
-    Point(double i_x, double i_y, double i_th)
-    {
-        x = i_x;
-        y = i_y;
-        th = i_th;
-    }
+    Point(double x = -1, double y = -1, double th = -1): x(x), y(y), th(th) {}
 };
+
+/**
+ * @brief A configuration of the robot along the path, represented by x, y, orientation and curvature
+ * 
+ */
+struct Pose 
+{
+  float s, x, y, theta, kappa;
+
+  Pose(float s, float x, float y, float theta, float kappa):
+    s(s), x(x), y(y), theta(theta), kappa(kappa)
+  {}
+
+  Pose(): 
+    Pose(0, 0, 0, 0, 0)
+  {}
+
+  float distance(float _x, float _y)
+  {
+    return std::hypot(x-_x, y-_y);
+  }
+};
+
+/**
+ * @brief A sequence of sampled robot configurations composing a (discretization of the) path
+ * 
+ */
+struct Path 
+{
+  std::vector<Pose> points;
+  
+  Path(std::vector<Pose> const & points):
+    points(points)
+  {}
+
+  Path()
+  {}
+  
+  bool empty() { return points.empty(); }
+  size_t size() { return points.size(); }
+  void setPoints(const std::vector<Pose>& points) { this->points = points; }
+};
+
+/**
+ * @brief A polygon, expessed as a list of 2D points
+ * 
+ */
+typedef std::vector<Point> Polygon;
 
 /**
  * @brief Implementation of function sinc(t)

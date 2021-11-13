@@ -1,5 +1,7 @@
-#include "../include/dubins.hpp"
+#include "dubins.hpp"
 #include <iostream>
+
+using namespace student;
 
 int main(int argc, char *argv[])
 {

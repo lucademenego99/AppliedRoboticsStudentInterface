@@ -1,8 +1,10 @@
-#include "../include/dubins.hpp"
+#include "dubins.hpp"
 
 #include <iostream>
 #include <cfloat>
 #include <algorithm>
+
+using namespace student;
 
 /**
  * @brief Construct a new Dubins:: Dubins object
@@ -354,7 +356,7 @@ DubinsCurve *Dubins::findShortestPath(double x0, double y0, double th0, double x
  * @param numberOfPoints The number of points provided
  * @return DubinsCurve** Resulting array of curves that together represent the shortest path
  */
-DubinsCurve **Dubins::multipointShortestPath(Point **points, int numberOfPoints)
+DubinsCurve **Dubins::multipointShortestPath(Point **points, unsigned int numberOfPoints)
 {
     std::cout << "INPUT: \n";
     std::cout << "X\tY\tTHETA\n";
@@ -385,14 +387,14 @@ DubinsCurve **Dubins::multipointShortestPath(Point **points, int numberOfPoints)
 
     // I create an empty matrix L that will store intermediate results
     double **L = new double *[numberOfPoints];
-    for (int i = 0; i < numberOfPoints; i++)
+    for (unsigned int i = 0; i < numberOfPoints; i++)
     {
         L[i] = new double[K];
     }
     // The length of the portion of the path after the last point is simply 0, otherwise I set the value to -1
-    for (int n = 0; n < numberOfPoints; n++)
+    for (unsigned int n = 0; n < numberOfPoints; n++)
     {
-        for (int i = 0; i < K; i++)
+        for (unsigned int i = 0; i < K; i++)
         {
             if (n == numberOfPoints - 1)
                 L[n][i] = 0;
@@ -404,14 +406,14 @@ DubinsCurve **Dubins::multipointShortestPath(Point **points, int numberOfPoints)
     // I create an empty matrix S that will tell me which angle each configuration of L wants to finish with
     // Used to recreate the complete solution after having discovered which is the best path
     int **S = new int *[numberOfPoints];
-    for (int i = 0; i < numberOfPoints; i++)
+    for (unsigned int i = 0; i < numberOfPoints; i++)
     {
         S[i] = new int[K];
     }
     // I fill S with values -1 - just to debug, when we are ready we can remove it
-    for (int n = 0; n < numberOfPoints; n++)
+    for (unsigned int n = 0; n < numberOfPoints; n++)
     {
-        for (int i = 0; i < K; i++)
+        for (unsigned int i = 0; i < K; i++)
         {
             S[n][i] = -1;
         }
@@ -419,7 +421,7 @@ DubinsCurve **Dubins::multipointShortestPath(Point **points, int numberOfPoints)
 
     // ALGORITHM - FIRST STEP
     // For the last two points, we already know the end angle
-    for (int i = 0; i < K; i++)
+    for (unsigned int i = 0; i < K; i++)
     {
         DubinsCurve *curve = findShortestPath(points[numberOfPoints - 2]->x, points[numberOfPoints - 2]->y, points[numberOfPoints - 2]->th != -1 ? points[numberOfPoints - 2]->th : i, points[numberOfPoints - 1]->x, points[numberOfPoints - 1]->y, points[numberOfPoints - 1]->th);
         if (L[numberOfPoints - 2][i] == -1 || L[numberOfPoints - 2][i] > curve->L)
@@ -432,9 +434,9 @@ DubinsCurve **Dubins::multipointShortestPath(Point **points, int numberOfPoints)
     // ALGORITHM - ITERATIVE COMPUTATION
     for (int n = numberOfPoints - 3; n >= 0; n--)
     {
-        for (int i = 0; i < K; i++)
+        for (unsigned int i = 0; i < K; i++)
         {
-            for (int j = 0; j < K; j++)
+            for (unsigned int j = 0; j < K; j++)
             {
                 int actual_i_angle = points[n]->th != -1 ? points[n]->th : multipointAngles[i];
                 DubinsCurve *curve = findShortestPath(points[n]->x, points[n]->y, actual_i_angle, points[n + 1]->x, points[n + 1]->y, multipointAngles[j]);
@@ -493,9 +495,9 @@ DubinsCurve **Dubins::multipointShortestPath(Point **points, int numberOfPoints)
     std::cout << "\n\n";
 
     // Find the maximum length and the corresponding index in the first row of L
-    int maxIndex;
+    unsigned int maxIndex;
     double maxLength = -INFINITY;
-    for (int i = 0; i < K; i++)
+    for (unsigned int i = 0; i < K; i++)
     {
         if (L[0][i] > maxLength)
         {
