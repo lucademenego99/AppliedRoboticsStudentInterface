@@ -1,15 +1,35 @@
-#include "../include/dubins.hpp"
+#include "dubins.hpp"
 
 #include <iostream>
 #include <cfloat>
+#include <algorithm>
 
-// Constructor
+using namespace student;
+
+/**
+ * @brief Construct a new Dubins:: Dubins object
+ * 
+ * @param k_max Bound on maximum path curvature
+ * @param discritizer_size Given a path of infinite points, what is the discritizer size? Expressed in meters
+ */
 Dubins::Dubins(double k_max, double discritizer_size)
 {
     this->k_max = k_max;
     this->discritizer_size = discritizer_size;
 };
 
+/**
+ * @brief Check the validity of a provided Dubins solution
+ * 
+ * @param curve_segments Resulting curve segments representing the final solution
+ * @param k0 TODO
+ * @param k1 TODO
+ * @param k2 TODO
+ * @param th0 Starting angle
+ * @param thf Final angle
+ * @return true If the solution is valid
+ * @return false If the solution is not valid
+ */
 bool Dubins::checkValidity(CurveSegmentsResult *curve_segments, double k0, double k1, double k2, double th0, double thf)
 {
     double x0 = -1;
@@ -27,6 +47,17 @@ bool Dubins::checkValidity(CurveSegmentsResult *curve_segments, double k0, doubl
     return (sqrt(eq1 * eq1 + eq2 * eq2 + eq3 * eq3) < 1.e-2 && Lpos);
 };
 
+/**
+ * @brief Scale the input parameters to standard form (x0: -1, y0: 0, xf: 1, yf: 0)
+ * 
+ * @param x0 Starting x position
+ * @param y0 Starting y position
+ * @param th0 Starting angle
+ * @param xf Final x position
+ * @param yf Final y position
+ * @param thf Final angle
+ * @return ParametersResult* Scaled parameters
+ */
 ParametersResult *Dubins::scaleToStandard(double x0, double y0, double th0, double xf, double yf, double thf)
 {
     double dx = xf - x0;
@@ -40,6 +71,13 @@ ParametersResult *Dubins::scaleToStandard(double x0, double y0, double th0, doub
     return new ParametersResult(sc_th0, sc_thf, sc_k_max, lambda);
 }
 
+/**
+ * @brief Return to the initial scaling
+ * 
+ * @param lambda TODO
+ * @param curve_segments Current scaled parameters of our problem
+ * @return CurveSegmentsResult* 
+ */
 CurveSegmentsResult *Dubins::scaleFromStandard(double lambda, CurveSegmentsResult *curve_segments)
 {
     return new CurveSegmentsResult(true, curve_segments->s1 * lambda, curve_segments->s2 * lambda, curve_segments->s3 * lambda);
@@ -173,6 +211,17 @@ CurveSegmentsResult *Dubins::useLRL(double scaled_th0, double scaled_thf, double
     return new CurveSegmentsResult(true, s1, s2, s3);
 }
 
+/**
+ * @brief Find the shortest path between a starting and a final position
+ * 
+ * @param x0 Starting x position
+ * @param y0 Starting y position
+ * @param th0 Starting angle
+ * @param xf Final x position
+ * @param yf Final y position
+ * @param thf Final angle
+ * @return DubinsCurve* Resulting curve representing the shortest path
+ */
 DubinsCurve *Dubins::findShortestPath(double x0, double y0, double th0, double xf, double yf, double thf)
 {
     ParametersResult *scaled_parameters = scaleToStandard(x0, y0, th0, xf, yf, thf);
@@ -223,7 +272,6 @@ DubinsCurve *Dubins::findShortestPath(double x0, double y0, double th0, double x
             break;
         }
 
-
         double current_L = curve_segments->s1 + curve_segments->s2 + curve_segments->s3;
 
         if (curve_segments->ok && current_L < best_L)
@@ -238,7 +286,7 @@ DubinsCurve *Dubins::findShortestPath(double x0, double y0, double th0, double x
         curve_segments = nullptr;
     }
 
-    // std::cout << "BEST CURVE SEGMENTS:\n" 
+    // std::cout << "BEST CURVE SEGMENTS:\n"
     //           << best_curve_segments->s1 << "\n"
     //           << best_curve_segments->s2 << "\n"
     //           << best_curve_segments->s3 << "\n";
@@ -301,7 +349,15 @@ DubinsCurve *Dubins::findShortestPath(double x0, double y0, double th0, double x
     return curve;
 };
 
-DubinsCurve **Dubins::multipointShortestPath(Point **points, uint numberOfPoints) {
+/**
+ * @brief Find the shortest path between two points, given a set of intermediate points our path must pass through
+ * 
+ * @param points An array of points we have to pass through
+ * @param numberOfPoints The number of points provided
+ * @return DubinsCurve** Resulting array of curves that together represent the shortest path
+ */
+DubinsCurve **Dubins::multipointShortestPath(Point **points, unsigned int numberOfPoints)
+{
     std::cout << "INPUT: \n";
     std::cout << "X\tY\tTHETA\n";
     for (int i = 0; i < numberOfPoints; i++)
@@ -309,7 +365,6 @@ DubinsCurve **Dubins::multipointShortestPath(Point **points, uint numberOfPoints
         std::cout << points[i]->x << "\t" << points[i]->y << "\t" << points[i]->th << "\n";
     }
     std::cout << "\n";
-    
 
     // NOTES
     // Dj(th_j, th_j+1) is the length of the optimal solution of the two points dubins problem connecting P_j with P_j+1
@@ -323,25 +378,25 @@ DubinsCurve **Dubins::multipointShortestPath(Point **points, uint numberOfPoints
 
     // INITIALIZATION
     // Init the final result
-    DubinsCurve **result = new DubinsCurve*[numberOfPoints-1];
+    DubinsCurve **result = new DubinsCurve *[numberOfPoints - 1];
     // Init the result of the multipoint problem: an array of optimal angles
     double *minimizingAngles = new double[numberOfPoints];
 
-    // I define what are the angles I'm going to consider during the computation
-    // const double ANGLES[] = {0, M_PI/2, M_PI, 3.0/2*M_PI};
-    const double ANGLES[] = {0, M_PI/4, M_PI/2, 3.0/4*M_PI, M_PI, 5.0/4*M_PI, 3.0/2*M_PI, 7.0/4*M_PI};
-    const int K = std::extent<decltype(ANGLES)>::value;
+    const int K = std::extent<decltype(multipointAngles)>::value;
     std::cout << "VALUE OF K: " << K << "\n\n";
 
     // I create an empty matrix L that will store intermediate results
-    double **L = new double*[numberOfPoints];
-    for (uint i = 0; i < numberOfPoints; i++) {
+    double **L = new double *[numberOfPoints];
+    for (unsigned int i = 0; i < numberOfPoints; i++)
+    {
         L[i] = new double[K];
     }
     // The length of the portion of the path after the last point is simply 0, otherwise I set the value to -1
-    for (uint n  = 0; n < numberOfPoints; n++) {
-        for (uint i = 0; i < K; i++) {
-            if (n == numberOfPoints-1)
+    for (unsigned int n = 0; n < numberOfPoints; n++)
+    {
+        for (unsigned int i = 0; i < K; i++)
+        {
+            if (n == numberOfPoints - 1)
                 L[n][i] = 0;
             else
                 L[n][i] = -1;
@@ -350,44 +405,51 @@ DubinsCurve **Dubins::multipointShortestPath(Point **points, uint numberOfPoints
 
     // I create an empty matrix S that will tell me which angle each configuration of L wants to finish with
     // Used to recreate the complete solution after having discovered which is the best path
-    int **S = new int*[numberOfPoints];
-    for (uint i = 0; i < numberOfPoints; i++) {
+    int **S = new int *[numberOfPoints];
+    for (unsigned int i = 0; i < numberOfPoints; i++)
+    {
         S[i] = new int[K];
     }
     // I fill S with values -1 - just to debug, when we are ready we can remove it
-    for (uint n  = 0; n < numberOfPoints; n++) {
-        for (uint i = 0; i < K; i++) {
+    for (unsigned int n = 0; n < numberOfPoints; n++)
+    {
+        for (unsigned int i = 0; i < K; i++)
+        {
             S[n][i] = -1;
         }
     }
 
     // ALGORITHM - FIRST STEP
     // For the last two points, we already know the end angle
-    for (uint i = 0; i < K; i++)
+    for (unsigned int i = 0; i < K; i++)
     {
-        DubinsCurve *curve = findShortestPath(points[numberOfPoints-2]->x, points[numberOfPoints-2]->y, points[numberOfPoints-2]->th != -1 ? points[numberOfPoints-2]->th : i, points[numberOfPoints-1]->x, points[numberOfPoints-1]->y, points[numberOfPoints-1]->th);
-        if (L[numberOfPoints-2][i] == -1 || L[numberOfPoints-2][i] > curve->L) {
-            L[numberOfPoints-2][i] = curve->L;
+        DubinsCurve *curve = findShortestPath(points[numberOfPoints - 2]->x, points[numberOfPoints - 2]->y, points[numberOfPoints - 2]->th != -1 ? points[numberOfPoints - 2]->th : i, points[numberOfPoints - 1]->x, points[numberOfPoints - 1]->y, points[numberOfPoints - 1]->th);
+        if (L[numberOfPoints - 2][i] == -1 || L[numberOfPoints - 2][i] > curve->L)
+        {
+            L[numberOfPoints - 2][i] = curve->L;
         }
         delete curve;
     }
 
     // ALGORITHM - ITERATIVE COMPUTATION
-    for (int n = numberOfPoints-3; n >= 0; n--)
+    for (int n = numberOfPoints - 3; n >= 0; n--)
     {
-        for (uint i = 0; i < K; i++)
+        for (unsigned int i = 0; i < K; i++)
         {
-            for (uint j = 0; j < K; j++)
+            for (unsigned int j = 0; j < K; j++)
             {
-                int actual_i_angle = points[n]->th != -1 ? points[n]->th : ANGLES[i];
-                DubinsCurve *curve = findShortestPath(points[n]->x, points[n]->y, actual_i_angle, points[n+1]->x, points[n+1]->y, ANGLES[j]);
-                if (n == 0 && ((L[n][0] > curve->L + L[n+1][j]) || L[n][0] == -1)) {
+                int actual_i_angle = points[n]->th != -1 ? points[n]->th : multipointAngles[i];
+                DubinsCurve *curve = findShortestPath(points[n]->x, points[n]->y, actual_i_angle, points[n + 1]->x, points[n + 1]->y, multipointAngles[j]);
+                if (n == 0 && ((L[n][0] > curve->L + L[n + 1][j]) || L[n][0] == -1))
+                {
                     // If it's the first two points, we already know the initial angle
-                    L[n][0] = curve->L + L[n+1][j];
+                    L[n][0] = curve->L + L[n + 1][j];
                     S[n][0] = j;
-                } else if (L[n][i] > curve->L + L[n+1][j] || L[n][i] == -1) {
+                }
+                else if (L[n][i] > curve->L + L[n + 1][j] || L[n][i] == -1)
+                {
                     // Default case: I update the optimal solution
-                    L[n][i] = curve->L + L[n+1][j];
+                    L[n][i] = curve->L + L[n + 1][j];
                     S[n][i] = j;
                 }
                 delete curve;
@@ -403,9 +465,11 @@ DubinsCurve **Dubins::multipointShortestPath(Point **points, uint numberOfPoints
         std::cout << "k=" << i << "\t";
     }
     std::cout << "\n";
-    for (int n  = 0; n < numberOfPoints; n++) {
+    for (int n = 0; n < numberOfPoints; n++)
+    {
         std::cout << "POINT=" << n << "\t";
-        for (int i = 0; i < K; i++) {
+        for (int i = 0; i < K; i++)
+        {
             std::cout << L[n][i] << "\t";
         }
         std::cout << "\n";
@@ -419,9 +483,11 @@ DubinsCurve **Dubins::multipointShortestPath(Point **points, uint numberOfPoints
         std::cout << "k=" << i << "\t";
     }
     std::cout << "\n";
-    for (int n  = 0; n < numberOfPoints; n++) {
+    for (int n = 0; n < numberOfPoints; n++)
+    {
         std::cout << "POINT=" << n << "\t";
-        for (int i = 0; i < K; i++) {
+        for (int i = 0; i < K; i++)
+        {
             std::cout << S[n][i] << "\t";
         }
         std::cout << "\n";
@@ -429,25 +495,26 @@ DubinsCurve **Dubins::multipointShortestPath(Point **points, uint numberOfPoints
     std::cout << "\n\n";
 
     // Find the maximum length and the corresponding index in the first row of L
-    uint maxIndex;
+    unsigned int maxIndex;
     double maxLength = -INFINITY;
-    for (uint i = 0; i < K; i++)
+    for (unsigned int i = 0; i < K; i++)
     {
-        if (L[0][i] > maxLength) {
+        if (L[0][i] > maxLength)
+        {
             maxIndex = i;
             maxLength = L[0][i];
-        }   
+        }
     }
 
     std::cout << "MINIMUM LENGTH FOUND: " << L[0][maxIndex] << "\n\n";
 
     minimizingAngles[0] = points[0]->th;
-    for (int i = 0; i < numberOfPoints-2; i++)
+    for (int i = 0; i < numberOfPoints - 2; i++)
     {
-        minimizingAngles[i+1] = ANGLES[S[i][maxIndex]];
+        minimizingAngles[i + 1] = multipointAngles[S[i][maxIndex]];
         maxIndex = S[i][maxIndex];
     }
-    minimizingAngles[numberOfPoints-1] = points[numberOfPoints-1]->th;
+    minimizingAngles[numberOfPoints - 1] = points[numberOfPoints - 1]->th;
 
     std::cout << "MINIMIZING ANGLES: \n";
     for (int i = 0; i < numberOfPoints; i++)
@@ -458,3 +525,318 @@ DubinsCurve **Dubins::multipointShortestPath(Point **points, uint numberOfPoints
 
     return result;
 };
+
+/**
+ * @brief Find if there is an intersection between two segments
+ * 
+ * @param p1 First point used to define the first segment
+ * @param p2 Second point used to define the first segment
+ * @param p3 First point used to define the second segment
+ * @param p4 Second point used to define the second segment
+ * @param pts Array of intersection points this function has found (passed by ref.)
+ * @param ts Coefficients to normalize the segments (passed by ref.)
+ * @return true If an intersection has been found
+ * @return false If an intersection has not been found
+ */
+bool Dubins::intersLineLine(Point p1, Point p2, Point p3, Point p4, std::vector<Point> &pts, std::vector<double> &ts)
+{
+    // Initialize the resulting arrays as empty arrays
+    pts.clear();
+    ts.clear();
+
+    // Define min and max coordinates of the first segment
+    double minX1 = std::min(p1.x, p2.x);
+    double minY1 = std::min(p1.y, p2.y);
+    double maxX1 = std::max(p1.x, p2.x);
+    double maxY1 = std::max(p1.y, p2.y);
+
+    // Define min and max coordinates of the second segment
+    double minX2 = std::min(p3.x, p4.x);
+    double minY2 = std::min(p3.y, p4.y);
+    double maxX2 = std::max(p3.x, p4.x);
+    double maxY2 = std::max(p3.y, p4.y);
+
+    // If there is no way these segments will intersect, we just return false without computing anything
+    if (maxX2 < minX1 || minX2 > maxX1 || maxY2 < minY1 || minY2 > maxY1)
+    {
+        return false;
+    }
+
+    Point q = Point(p1.x, p1.y);
+    Point s = Point((p2.x - p1.x), (p2.y - p1.y));
+
+    Point p = Point(p3.x, p3.y);
+    Point r = Point((p4.x - p3.x), (p4.y - p3.y));
+
+    Point diffPQ = Point((p1.x - p3.x), (p1.y - p3.y));
+
+    double crossRS = crossProduct(r, s);
+    double crossDiffR = crossProduct(diffPQ, r);
+    double crossDiffS = crossProduct(diffPQ, s);
+
+    if (crossRS == 0 && crossDiffR == 0)
+    {
+        double dotRR = dot2D(r, r);
+        double dotSR = dot2D(s, r);
+        double t0 = dot2D(diffPQ, r) / dotRR;
+        double t1 = t0 + (dotSR / dotRR);
+        if (dotSR < 0)
+        {
+            if (t0 >= 0 && t1 <= 1)
+            {
+                ts.push_back(std::max(t1, 0.0));
+                ts.push_back(std::min(t0, 1.0));
+            }
+        }
+        else
+        {
+            if (t1 >= 0 && t0 <= 1)
+            {
+                ts.push_back(std::max(t0, 0.0));
+                ts.push_back(std::min(t1, 1.0));
+            }
+        }
+    }
+    else
+    {
+        if (crossRS == 0 && crossDiffR != 0)
+        {
+            return false;
+        }
+        else
+        {
+            double t = crossDiffS / crossRS;
+            double u = crossDiffR / crossRS;
+            if (t >= 0 && t <= 1 && u >= 0 && u <= 1)
+            {
+                ts.push_back(t);
+            }
+        }
+    }
+    for (int i = 0; i < ts.size(); i++)
+    {
+        pts.push_back(Point((ts[i] * r.x) + p.x, (ts[i] * r.y) + p.y));
+    }
+
+    return pts.empty() ? false : true;
+}
+
+/**
+ * @brief Find if there is an intersection between a circle and a segment
+ * 
+ * @param circleCenter Center of the input circle
+ * @param r Radius of the input circle
+ * @param point1 First point used to define the segment
+ * @param point2 Second point used to define the segment
+ * @param pts Array of intersection points this function has found (passed by ref.)
+ * @param t Coefficient to normalize the segment (passed by ref.)
+ * @return true If an intersection has been found
+ * @return false If an intersection has not been found
+ */
+bool Dubins::intersCircleLine(Point circleCenter, double r, Point point1, Point point2, std::vector<Point> &pts, std::vector<double> &t)
+{
+    // Initialize the resulting arrays as empty arrays
+    pts.clear();
+    t.clear();
+
+    double p1 = 2 * point1.x * point2.x;
+    double p2 = 2 * point1.y * point2.y;
+    double p3 = 2 * circleCenter.x * point1.x;
+    double p4 = 2 * circleCenter.x * point2.x;
+    double p5 = 2 * circleCenter.y * point1.y;
+    double p6 = 2 * circleCenter.y * point2.y;
+
+    double c1 = pow(point1.x, 2) + pow(point2.x, 2) - p1 + pow(point1.y, 2) + pow(point2.y, 2) - p2;
+    double c2 = -2 * pow(point2.x, 2) + p1 - p3 + p4 - 2 * pow(point2.y, 2) + p2 - p5 + p6;
+    double c3 = pow(point2.x, 2) - p4 + pow(circleCenter.x, 2) + pow(point2.y, 2) - p6 + pow(circleCenter.y, 2) - pow(r, 2);
+
+    double delta = pow(c2, 2) - (4 * c1 * c3);
+
+    double t1;
+    double t2;
+
+    if (delta < 0)
+    {
+        // There is no solution (we are not dealing with complex numbers)
+        return false;
+    }
+    else
+    {
+        if (delta > 0)
+        {
+            // Two points of intersection
+            double deltaSq = sqrt(delta);
+            t1 = (-c2 + deltaSq) / (2 * c1);
+            t2 = (-c2 - deltaSq) / (2 * c1);
+        }
+        else
+        {
+            // If the delta is 0 we have just one point of intersection
+            t1 = -c2 / (2 * c1);
+            t2 = t1;
+        }
+    }
+
+    std::vector<std::pair<Point, double>> intersections = std::vector<std::pair<Point, double>>();
+
+    if (t1 >= 0 && t1 <= 1)
+    {
+        intersections.push_back(std::pair<Point, double>(Point((point1.x * t1) + (point2.x * (1 - t1)), (point1.y * t1) + (point2.y * (1 - t1))), t1));
+    }
+
+    if (t2 >= 0 && t2 <= 1 && t2 != t1)
+    {
+        intersections.push_back(std::pair<Point, double>(Point((point1.x * t2) + (point2.x * (1 - t2)), (point1.y * t2) + (point2.y * (1 - t2))), t2));
+    }
+
+    // Sort the intersections using t values
+    std::sort(intersections.begin(), intersections.end(), [](const std::pair<Point, double> a, const std::pair<Point, double> b)
+              { return a.second < b.second; });
+
+    // Fill the resulting arrays
+    for (int i = 0; i < intersections.size(); i++)
+    {
+        pts.push_back(intersections[i].first);
+        t.push_back(intersections[i].second);
+    }
+
+    return pts.empty() ? false : true;
+}
+
+/**
+ * @brief Find if there is an intersection between an arc and a segment
+ * 
+ * @param arc Arc of a Dubins curve
+ * @param point1 First point used to define the segment
+ * @param point2 Second point used to define the segment
+ * @param pts Array of intersection points this function has found (passed by ref.)
+ * @param t Coefficient to normalize the segment (passed by ref.)
+ * @return true If an intersection has been found
+ * @return false If an intersection has not been found
+ */
+bool Dubins::intersArcLine(DubinsArc *arc, Point point1, Point point2, std::vector<Point> &pts, std::vector<double> &t)
+{
+
+    // Find the circle containing the provided arc
+    // Get the perpendicular lines of point1's line and points2's line
+    // (we can calculate them because point1 and point2 also contain the angle, that in our case will be the slope)
+    // Their intersection will be the center of the circle
+
+    // Calculate the slope of the two perpendicular lines
+    double m1 = tan(-1 / arc->th0);
+    double m2 = tan(-1 / arc->dubins_line->th);
+
+    Point circleCenter = Point(-1, -1);
+
+    // Limit case: the slope is the same
+    if (abs(m1 - m2) < 1.e-1 || abs(m1 + m2) < 1.e-1)
+    {
+        if (arc->x0 == arc->dubins_line->x && arc->y0 == arc->dubins_line->y)
+        {
+            // The two points are the same, no intersection?
+            return false;
+        }
+        else
+        {
+            // The segment between the two points forms the diagonal of the circle
+            // This means the center is in the middle
+            circleCenter.x = (arc->x0 + arc->dubins_line->x) / 2;
+            circleCenter.y = (arc->y0 + arc->dubins_line->y) / 2;
+        }
+    }
+    else
+    {
+        // Intersection between the two perpendicular lines
+        circleCenter.x = ((m2 * arc->x0) - (m1 * arc->dubins_line->x) + arc->dubins_line->y - arc->y0) / (m2 - m1);
+        circleCenter.y = -1 / (m1) * (circleCenter.x - arc->x0) + arc->y0;
+    }
+
+    // Having the center, we can easily find the radius
+    double r = sqrt(pow(arc->x0 - circleCenter.x, 2) + pow(arc->y0 - circleCenter.y, 2));
+
+    // Initialize the resulting arrays as empty arrays
+    pts.clear();
+    t.clear();
+
+    double p1 = 2 * point1.x * point2.x;
+    double p2 = 2 * point1.y * point2.y;
+    double p3 = 2 * circleCenter.x * point1.x;
+    double p4 = 2 * circleCenter.x * point2.x;
+    double p5 = 2 * circleCenter.y * point1.y;
+    double p6 = 2 * circleCenter.y * point2.y;
+
+    double c1 = pow(point1.x, 2) + pow(point2.x, 2) - p1 + pow(point1.y, 2) + pow(point2.y, 2) - p2;
+    double c2 = -2 * pow(point2.x, 2) + p1 - p3 + p4 - 2 * pow(point2.y, 2) + p2 - p5 + p6;
+    double c3 = pow(point2.x, 2) - p4 + pow(circleCenter.x, 2) + pow(point2.y, 2) - p6 + pow(circleCenter.y, 2) - pow(r, 2);
+
+    double delta = pow(c2, 2) - (4 * c1 * c3);
+
+    double t1;
+    double t2;
+
+    if (delta < 0)
+    {
+        // There is no solution (we are not dealing with complex numbers)
+        return false;
+    }
+    else
+    {
+        if (delta > 0)
+        {
+            // Two points of intersection
+            double deltaSq = sqrt(delta);
+            t1 = (-c2 + deltaSq) / (2 * c1);
+            t2 = (-c2 - deltaSq) / (2 * c1);
+        }
+        else
+        {
+            // If the delta is 0 we have just one point of intersection
+            t1 = -c2 / (2 * c1);
+            t2 = t1;
+        }
+    }
+
+    std::vector<std::pair<Point, double>> intersections = std::vector<std::pair<Point, double>>();
+
+    if (t1 >= 0 && t1 <= 1)
+    {
+        intersections.push_back(std::pair<Point, double>(Point((point1.x * t1) + (point2.x * (1 - t1)), (point1.y * t1) + (point2.y * (1 - t1))), t1));
+    }
+
+    if (t2 >= 0 && t2 <= 1 && t2 != t1)
+    {
+        intersections.push_back(std::pair<Point, double>(Point((point1.x * t2) + (point2.x * (1 - t2)), (point1.y * t2) + (point2.y * (1 - t2))), t2));
+    }
+
+    // Sort the intersections using t values
+    std::sort(intersections.begin(), intersections.end(), [](const std::pair<Point, double> a, const std::pair<Point, double> b)
+              { return a.second < b.second; });
+
+    // Fill the resulting arrays
+    for (int i = 0; i < intersections.size(); i++)
+    {
+        // Check if the intersection is inside the arc provided at the beginning
+        double intersectionTh = (atan2(intersections[i].first.y - circleCenter.y, intersections[i].first.x - circleCenter.x));
+        double firstTh = (atan2(arc->y0 - circleCenter.y, arc->x0 - circleCenter.x));
+        double secondTh = (atan2(arc->dubins_line->y - circleCenter.y, arc->dubins_line->x - circleCenter.x));
+
+        if (firstTh > secondTh)
+        {
+            if (intersectionTh <= firstTh && intersectionTh >= secondTh)
+            {
+                pts.push_back(intersections[i].first);
+                t.push_back(intersections[i].second);
+            }
+        }
+        else
+        {
+            if (intersectionTh >= firstTh && intersectionTh <= secondTh)
+            {
+                pts.push_back(intersections[i].first);
+                t.push_back(intersections[i].second);
+            }
+        }
+    }
+
+    return pts.empty() ? false : true;
+}

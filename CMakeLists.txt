@@ -24,4 +24,8 @@ target_link_libraries(student
 )
 
 # Executable to test the implemented functions
-add_executable(functions-testing src/main.cpp src/dubins.cpp src/utils.cpp)
+add_executable(functions-testing src/main.cpp src/dubins.cpp src/utils.cpp src/clipper.cpp src/clipper_addons.cpp)
+
+target_link_libraries(functions-testing
+  ${OpenCV_LIBRARIES}
+)
