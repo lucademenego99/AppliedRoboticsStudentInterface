@@ -1,73 +1,92 @@
 #include "dubins.hpp"
+#include "clipper_addons.hpp"
 #include <iostream>
 
 using namespace student;
+
+void shortestPathDubinsTest(Dubins dubins);
+void multipointDubinsTest(Dubins dubins);
+void intersectionsTest(Dubins dubins);
+void clipperTest();
 
 int main(int argc, char *argv[])
 {
     Dubins dubins = Dubins(10, 0.005);
 
-    /**
-     * SHORTEST PATH TESTS
-     * 
-     */
-    // double i_x0 = 0.6;
-    // double i_y0 = 1;
-    // double i_th0 = M_PI / 4;
-    // double i_xf = 3;
-    // double i_yf = 3;
-    // double i_thf = -M_PI / 2;
-    // std::cout << "\nINPUT: \n";
-    // std::cout << "x0 = " << i_x0 << "\n"
-    //           << "y0 = " << i_y0 << "\n"
-    //           << "th0 = " << i_th0 << "\n"
-    //           << "xf = " << i_xf << "\n"
-    //           << "yf = " << i_yf << "\n"
-    //           << "thf = " << i_thf << "\n\n";
-    // DubinsCurve *result = dubins.findShortestPath(i_x0, i_y0, i_th0, i_xf, i_yf, i_thf);
-    // if (!result) {
-    //     std::cout << "RESULT NOT VALID\n";
-    //     return 1;
-    // }
-    // std::cout << "RESULT: \n\n";
-    // std::cout << "L = " << result->L << "\n\n";
-    // std::cout << "a1 = \n"
-    //           << "\tL = " << result->a1->L << "\n"
-    //           << "\tk = " << result->a1->k << "\n"
-    //           << "\tx0 = " << result->a1->x0 << "\n"
-    //           << "\ty0 = " << result->a1->y0 << "\n"
-    //           << "\tth0 = " << result->a1->th0 << "\n"
-    //           << "\tdubins_line-x = " << result->a1->dubins_line->x << "\n"
-    //           << "\tdubins_line-y = " << result->a1->dubins_line->y << "\n"
-    //           << "\tdubins_line-th = " << result->a1->dubins_line->th << "\n\n";
-    // std::cout << "a2 = \n"
-    //           << "\tL = " << result->a2->L << "\n"
-    //           << "\tk = " << result->a2->k << "\n"
-    //           << "\tx0 = " << result->a2->x0 << "\n"
-    //           << "\ty0 = " << result->a2->y0 << "\n"
-    //           << "\tth0 = " << result->a2->th0 << "\n"
-    //           << "\tdubins_line-x = " << result->a2->dubins_line->x << "\n"
-    //           << "\tdubins_line-y = " << result->a2->dubins_line->y << "\n"
-    //           << "\tdubins_line-th = " << result->a2->dubins_line->th << "\n\n";
-    // std::cout << "a3 = \n"
-    //           << "\tL = " << result->a3->L << "\n"
-    //           << "\tk = " << result->a3->k << "\n"
-    //           << "\tx0 = " << result->a3->x0 << "\n"
-    //           << "\ty0 = " << result->a3->y0 << "\n"
-    //           << "\tth0 = " << result->a3->th0 << "\n"
-    //           << "\tdubins_line-x = " << result->a3->dubins_line->x << "\n"
-    //           << "\tdubins_line-y = " << result->a3->dubins_line->y << "\n"
-    //           << "\tdubins_line-th = " << result->a3->dubins_line->th << "\n\n";
+    // shortestPathDubinsTest(dubins);
 
-    /**
-     * MULTIPOINT DUBINS TESTS
-     * 
-     */
-    // Point **points = new Point *[3];
-    // points[0] = new Point(0.2, 0.2, 0);
-    // points[1] = new Point(0.9, 0.8);
-    // points[2] = new Point(1.4, 0.2, 0);
-    // dubins.multipointShortestPath(points, 3);
+    // multipointDubinsTest(dubins);
+
+    // intersectionsTest(dubins);
+
+    // clipperTest();
+
+    return 0;
+}
+
+void shortestPathDubinsTest(Dubins dubins)
+{
+    std::cout << "SHORTEST PATH TEST\n";
+    double i_x0 = 0.6;
+    double i_y0 = 1;
+    double i_th0 = M_PI / 4;
+    double i_xf = 3;
+    double i_yf = 3;
+    double i_thf = -M_PI / 2;
+    std::cout << "\nINPUT: \n";
+    std::cout << "x0 = " << i_x0 << "\n"
+              << "y0 = " << i_y0 << "\n"
+              << "th0 = " << i_th0 << "\n"
+              << "xf = " << i_xf << "\n"
+              << "yf = " << i_yf << "\n"
+              << "thf = " << i_thf << "\n\n";
+    DubinsCurve *result = dubins.findShortestPath(i_x0, i_y0, i_th0, i_xf, i_yf, i_thf);
+    if (!result)
+    {
+        std::cout << "RESULT NOT VALID\n";
+    }
+    else
+    {
+        std::cout << "RESULT: \n\n";
+        std::cout << "L = " << result->L << "\n\n";
+        std::cout << "a1 = \n"
+                  << "\tL = " << result->a1->L << "\n"
+                  << "\tk = " << result->a1->k << "\n"
+                  << "\tx0 = " << result->a1->x0 << "\n"
+                  << "\ty0 = " << result->a1->y0 << "\n"
+                  << "\tth0 = " << result->a1->th0 << "\n"
+                  << "\tdubins_line-x = " << result->a1->dubins_line->x << "\n"
+                  << "\tdubins_line-y = " << result->a1->dubins_line->y << "\n"
+                  << "\tdubins_line-th = " << result->a1->dubins_line->th << "\n\n";
+        std::cout << "a2 = \n"
+                  << "\tL = " << result->a2->L << "\n"
+                  << "\tk = " << result->a2->k << "\n"
+                  << "\tx0 = " << result->a2->x0 << "\n"
+                  << "\ty0 = " << result->a2->y0 << "\n"
+                  << "\tth0 = " << result->a2->th0 << "\n"
+                  << "\tdubins_line-x = " << result->a2->dubins_line->x << "\n"
+                  << "\tdubins_line-y = " << result->a2->dubins_line->y << "\n"
+                  << "\tdubins_line-th = " << result->a2->dubins_line->th << "\n\n";
+        std::cout << "a3 = \n"
+                  << "\tL = " << result->a3->L << "\n"
+                  << "\tk = " << result->a3->k << "\n"
+                  << "\tx0 = " << result->a3->x0 << "\n"
+                  << "\ty0 = " << result->a3->y0 << "\n"
+                  << "\tth0 = " << result->a3->th0 << "\n"
+                  << "\tdubins_line-x = " << result->a3->dubins_line->x << "\n"
+                  << "\tdubins_line-y = " << result->a3->dubins_line->y << "\n"
+                  << "\tdubins_line-th = " << result->a3->dubins_line->th << "\n\n";
+    }
+}
+
+void multipointDubinsTest(Dubins dubins)
+{
+    std::cout << "MULTIPOINT SHORTEST PATH TEST\n";
+    Point **points = new Point *[3];
+    points[0] = new Point(0.2, 0.2, 0);
+    points[1] = new Point(0.9, 0.8);
+    points[2] = new Point(1.4, 0.2, 0);
+    dubins.multipointShortestPath(points, 3);
 
     // Point **points = new Point *[5];
     // points[0] = new Point(0.2, 0.2, M_PI);
@@ -95,29 +114,29 @@ int main(int argc, char *argv[])
     // points[1] = new Point(0.4, 0.2);
     // points[2] = new Point(0.6, 0.2, 0);
     // dubins.multipointShortestPath(points, 3);
+}
 
-    /**
-     * INTERSECTIONS TESTS
-     * 
-     */
-    // std::vector<Point> intersections = std::vector<Point>();
-    // std::vector<double> ts = std::vector<double>();
+void intersectionsTest(Dubins dubins)
+{
+    std::cout << "INTERSECTIONS TEST\n";
+    std::vector<Point> intersections = std::vector<Point>();
+    std::vector<double> ts = std::vector<double>();
 
-    // bool res = dubins.intersLineLine(Point(1, 1), Point(66.57, 0.367), Point(56.01, 18.22), Point(56.01, 0.067), intersections, ts);
-    // std::cout << "RES: " << res << "\n";
-    // if (res)
-    // {
-    //     std::cout << "Intersections: \n";
-    //     for (int i = 0; i < intersections.size(); i++)
-    //     {
-    //         std::cout << intersections[i].x << " ; " << intersections[i].y << "\n";
-    //     }
-    //     std::cout << "\nTs: \n";
-    //     for (int i = 0; i < ts.size(); i++)
-    //     {
-    //         std::cout << ts[i] << "\n";
-    //     }
-    // }
+    bool res = dubins.intersLineLine(Point(1, 1), Point(66.57, 0.367), Point(56.01, 18.22), Point(56.01, 0.067), intersections, ts);
+    std::cout << "RES: " << res << "\n";
+    if (res)
+    {
+        std::cout << "Intersections: \n";
+        for (int i = 0; i < intersections.size(); i++)
+        {
+            std::cout << intersections[i].x << " ; " << intersections[i].y << "\n";
+        }
+        std::cout << "\nTs: \n";
+        for (int i = 0; i < ts.size(); i++)
+        {
+            std::cout << ts[i] << "\n";
+        }
+    }
 
     // bool res = dubins.intersCircleLine(Point(2, 2), 1, Point(0, 0), Point(4, 4), intersections, ts);
     // std::cout << "RES: " << res << "\n";
@@ -154,6 +173,22 @@ int main(int argc, char *argv[])
     //         std::cout << ts[i] << "\n";
     //     }
     // }
+}
 
-    return 0;
+void clipperTest()
+{
+    std::cout << "CLIPPER TEST\n";
+    ClipperLib::IntPoint *points = new ClipperLib::IntPoint[9];
+    points[0] = ClipperLib::IntPoint(348, 257);
+    points[1] = ClipperLib::IntPoint(364, 148);
+    points[2] = ClipperLib::IntPoint(362, 148);
+    points[3] = ClipperLib::IntPoint(326, 241);
+    points[4] = ClipperLib::IntPoint(295, 219);
+    points[5] = ClipperLib::IntPoint(258, 88);
+    points[6] = ClipperLib::IntPoint(440, 129);
+    points[7] = ClipperLib::IntPoint(370, 196);
+    points[8] = ClipperLib::IntPoint(372, 275);
+
+    ClipperLib::Paths paths = enlarge(points, 7.0);
+    printSolution(points, paths);
 }

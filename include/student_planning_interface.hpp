@@ -3,8 +3,9 @@
 #include "utils.hpp"
 #include <string>
 
-namespace student {
-/**
+namespace student
+{
+    /**
  * @brief Plan a safe and fast path in the arena
  * 
  * @param borders border of the arena [m]
@@ -19,10 +20,10 @@ namespace student {
  * @return true The returned path is valid
  * @return false The returned path is not valid
  */
-bool planPath(const Polygon& borders, const std::vector<Polygon>& obstacle_list, 
-              const std::vector<std::pair<int,Polygon>>& victim_list, 
-              const Polygon& gate, const float x, const float y, const float theta, 
-              Path& path,
-              const std::string& config_folder);
+    bool planPath(const Polygon &borders, const std::vector<Polygon> &obstacle_list,
+                  const std::vector<std::pair<int, Polygon>> &victim_list,
+                  const Polygon &gate, const float x, const float y, const float theta,
+                  Path &path,
+                  const std::string &config_folder);
 
 }

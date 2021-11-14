@@ -14,30 +14,30 @@
  */
 struct Point
 {
-    double x, y, th;
+  double x, y, th;
 
-    Point(double x = -1, double y = -1, double th = -1): x(x), y(y), th(th) {}
+  Point(double x = -1, double y = -1, double th = -1) : x(x), y(y), th(th) {}
 };
 
 /**
  * @brief A configuration of the robot along the path, represented by x, y, orientation and curvature
  * 
  */
-struct Pose 
+struct Pose
 {
   float s, x, y, theta, kappa;
 
-  Pose(float s, float x, float y, float theta, float kappa):
-    s(s), x(x), y(y), theta(theta), kappa(kappa)
-  {}
+  Pose(float s, float x, float y, float theta, float kappa) : s(s), x(x), y(y), theta(theta), kappa(kappa)
+  {
+  }
 
-  Pose(): 
-    Pose(0, 0, 0, 0, 0)
-  {}
+  Pose() : Pose(0, 0, 0, 0, 0)
+  {
+  }
 
   float distance(float _x, float _y)
   {
-    return std::hypot(x-_x, y-_y);
+    return std::hypot(x - _x, y - _y);
   }
 };
 
@@ -45,20 +45,21 @@ struct Pose
  * @brief A sequence of sampled robot configurations composing a (discretization of the) path
  * 
  */
-struct Path 
+struct Path
 {
   std::vector<Pose> points;
-  
-  Path(std::vector<Pose> const & points):
-    points(points)
-  {}
+
+  Path(std::vector<Pose> const &points) : points(points)
+  {
+  }
 
   Path()
-  {}
-  
+  {
+  }
+
   bool empty() { return points.empty(); }
   size_t size() { return points.size(); }
-  void setPoints(const std::vector<Pose>& points) { this->points = points; }
+  void setPoints(const std::vector<Pose> &points) { this->points = points; }
 };
 
 /**
