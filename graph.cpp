@@ -4,34 +4,15 @@
 #include <vector>
 #include "graph.hpp"
 
-/* Data structure to represent the graph in which we have
-   a Map with as keys structure Point and as values a vector 
-   of Edge
-*/
-typedef std::map<Point, std::vector<Edge>> DictG;
-/* We define the iterator to traverse the map */
-typedef DictG::const_iterator ItG;
-
-/* Data structure to represent the polygons that are present
-   in the arena: a Map which has as keys IDs and as values a vector
-   of Edge
-*/
-typedef std::map<int, std::vector<Edge>> DictP;
-/* We define the iterator to traverse the map */
-typedef DictP::const_iterator ItP
-
 /* Point struct, with a X and Y coordinate and an ID */
 
 /**
  * @brief Point constructor
  * @param x coordinate
  * @param Y coordinate
- * @param polygon_num the 
+ * @param polygon_id the ID of the polygon
 */
-Point::Point (x, y, polygon_num=-1){
-    this->x = x_coor;
-    this->y = y_coor;
-    this->polygon_id = polygon_num;
+Point::Point (double x_coor, double y_coor, int polygon_id = -1) : x(x_coor), y(y_coor), polygon_id(polygon_id){
 }
 
 /**
@@ -39,8 +20,8 @@ Point::Point (x, y, polygon_num=-1){
  * @param point Point that wants to be compared
  * @return boolean Either true or false depending on the result
  */
-boolean Point::eq (Point point){
-    return this != null && this->x == point.x && this->y == point.y;
+bool Point::eq (Point point){
+    return this != NULL && this->x == point.x && this->y == point.y;
 }
 
 /**
@@ -48,157 +29,199 @@ boolean Point::eq (Point point){
  * @param point Point that wants to be compared
  * @return boolean Either true or false depending on the result
  */
-boolean Point::notEq (Point point){
-    return !(this.equivalence(point));
+bool Point::notEq (Point point){
+    return !(eq(point));
 }
 
-/**
- * @brief Compares the hash of two points
- * @param point Point that wants to be compare
- * @return boolean Either true or false depending on the result
- */
-boolean Point::lt (Point point){
-    return std::hash(this) < std::hash(point);
-}
 /**
  * @brief Prints the coordinates of the point
  */
 void Point::print (){
-    cout<<"(%.2f, %.2f)"<< this->x, this->y;
-}
-
-//Hash method, not entirely sure
-/**
- * @brief Hash method
- * @return Xor of the hash of X and Y
- */
-boolean Point::hash (){
-    return this->x->hash() ^ this->y->hash();
+    std::cout<<"(%.2f, %.2f)"<< this->x, this->y;
 }
 
 /**
  * @brief Prints a more detailed representation
  */
 void Point::repr (){
-    cout<<"Point(%.2f, %.2f)"<<this->x, this->y;
+    std::cout<<"Point(%.2f, %.2f)"<<this->x, this->y;
 }
 
-
-
-Edge::Edge(Point p1, Point p2){
-    this.p1 = p1;
-    this.p2 = p2;
+bool Point::operator<(const Point &ob) const {
+    return x < ob.x || (x == ob.x && y < ob.y);
 }
 
+bool Point::operator==(const Point &ob) const{
+    return ob.x == x && ob.y == y && ob.polygon_id == polygon_id;
+}
+/**
+ * @brief Constructor for Edge
+ * @param p1 First point
+ * @param p2 Second point
+ */
+Edge::Edge(const Point point1, const Point point2): p1(point1) , p2(point2){
+}
+
+/**
+ * @brief Fetches the adjacent points to a certain point
+ * @param point Point we're interested in
+ * @return returns the adjacent
+ */
 Point Edge::get_adjacent(Point point){
-    if(point == this->p1){
+    if(point.eq(this->p1)){
         return this->p2;
     }
     return this->p1;
 }
 
-boolean Edge::contains (Point point){
-    return this->p1 == point || this->p2 == point;
+/**
+ * @brief Checks if a point is part of the edge
+ * @param point Point we need to find
+ * @return return whether or not the point is present
+ */
+bool Edge::contains (Point point){
+    return this->p1.eq(point) || this->p2.eq(point);
 }
-
-boolean Edge::eq (Edge edge){
-    if((this->p1 == edge->p1) && (this->p2 == edge->p2)){
+/**
+ * @brief Checks if two edges are qual
+ * @param edge The edge we want to compare
+ * @return true or false depending on the result of the check
+ */
+bool Edge::eq (Edge edge){
+    if((this->p1.eq(edge.p1)) && (this->p2.eq(edge.p2))){
         return true;
     }
-    if((this->p1 == edge->p2) && (this->p2 == edge->p1)){
+    if((this->p1.eq(edge.p2)) && (this->p2.eq(edge.p1))){
         return true;
     }
     return false;
 }
-
-boolean Edge::notEq (Edge edge){
-    return !(this.eq(edge));
+/**
+ * @brief Checks if two edges are not equal
+ * @param edge The edge we want to compare
+ * @result true or false depending on the result of the check
+ */
+bool Edge::notEq (Edge edge){
+    return !(eq(edge));
 }
-
+/**
+ * @brief Prints the basic information of the edge
+ */
 void Edge::print (){
-    cout<<"P1.x: %f"<< this.p1.x << endl;
-    cout<<"P1.y: %f"<< this.p1.y << endl;
-    cout<<"P2.x: %f"<< this.p2.x << endl;
-    cout<<"P2.y: %f"<< this.p2.y << endl;
+    std::cout<<"P1.x: %f"<< this->p1.x << std::endl;
+    std::cout<<"P1.y: %f"<< this->p1.y << std::endl;
+    std::cout<<"P2.x: %f"<< this->p2.x << std::endl;
+    std::cout<<"P2.y: %f"<< this->p2.y << std::endl;
 }
 
-//Not entirely sure whether or not this is correct
-boolean Edge::hash(){
-    return this.p1.hash() ^ this.p2.hash();
+bool Edge::operator==(const Edge &ob) const{
+    return ob.p1 == p1 && ob.p2 == p2;
 }
-
-Graph::Graph (DictP polygons){
+/**
+ * @brief Constructor of the graph
+ * @param polygons a map of polygons, keys are IDs and values the edges
+ * @returns the complete graph
+ */
+Graph::Graph (std::vector<std::vector<Point>> shapes){
     pid = 0;
-    for(ItP = polygons.begin(); ItP != polygons.end(); ItP++){
-        if(ItP[0] == ItP[-1] && ItP.size()>1){
-            ItP.pop_back();
+    for(std::vector<Point> it : shapes){
+        //Inserire if ...
+        if(it[0] == it[it.size()-1] && it.size() > 1){
+            it.pop_back();
         }
-        for(Point p in ItP){
-            auto it = find(Itp.begin(), ItP.end(), p);
-            Point sibling_point = ItP[(it->first)%ItP.size()];
-            Edge edge = new Edge(p, sibling_point);
-            if(ItP.size() > 2){
+        int count = 0;
+        for(Point p : it){
+            Point siblingPoint = it[(count + 1)%(it.size())]; 
+            Edge edge = Edge(p, siblingPoint);
+            if((it.size()) > 2){
                 p.polygon_id = pid;
-                sibling_point.polygon_id = pid;
-                this->polygons[pid].push_back(edge);
+                siblingPoint.polygon_id = pid;
+                auto f = polygons.find(pid);
+                f->second.push_back(edge);
             }
-            this.add_edge(edge);
+            add_edge(edge); 
+            count++;
         }
-        if(polygon.size() > 2){
+        if(it.size() > 2){
             pid += 1;
         }
     }
 }
-
-void Graph::get_adjacent_points(Point point, std::vector<Edge> edges){
-    for(Edge e in this->graph[point]){
-        Edge e1 = e.get_adjacent(point);
-        edges.push_back(e1);
+/**
+ * @brief returns the adjacent edges to a certain point
+ * @param point the point we want to consider
+ * @param edges an empty list to fill with the edges that have been found
+ */
+void Graph::get_adjacent_points(Point point, std::vector<Point> &points){
+    for(Edge e : this->graph[point]){
+        Point p1 = e.get_adjacent(point);
+        points.push_back(p1); 
     }
 }
-
+/**
+ * @brief returns a list of all the points in the map
+ * @param points the empty vector of points
+ */
 void Graph::get_points(std::vector<Point> &points){
-    for(ItG it(this->graph.begin()); it != this->graph.end(); it++){
-        Point point = new Point(it->first.first, it->first.second);
-        points.push_back(point);
+    std::map<Point, std::vector<Edge>>::iterator it;
+    for(it =this->graph.begin(); it != this->graph.end(); it++){
+        //Point point = new Point(it->first.x, it->first.y);  //DEVO FORSE AGGIUNGERE UN COSTRUTTORE COL POLYGON ID
+        points.push_back(it->first);
     }
 }
-
+/**
+ * @brief returns all the edges
+ * @param edges the empty vector of edges
+ */
 void Graph::get_edges(std::vector<Edge> &edges){
-    for(Edge e in this->edges){
-        edges.pushback(e);
+    for(Edge e : this->edges){
+        edges.push_back(e);
     }
 }
-
+/**
+ * @brief adds an edge to the list of edges
+ * @param edge the one we want to insert
+ */
 void Graph::add_edge(Edge edge){
-    Point point = new Point(edge.p1, edge.p2);
-    this->graph[point].push_back(edge);
-    this->edges.push_back(edge);
+    Point point1 = Point(edge.p1.x, edge.p1.y);
+    Point point2 = Point(edge.p2.x, edge.p2.y);
+    //Aggiungere find
+    graph[point1].push_back(edge);
+    graph[point2].push_back(edge);
+    edges.push_back(edge);
 }
-
+/**
+ * @brief get every edge associated to a point
+ * @param point point we want to search
+ * @param edges empty vector to fill
+ */
 void Graph::getItems(Point point, std::vector<Edge> &edges){
-    if(this->graph[point] != null){
-        for(Edge e in this->graph[point]){
-            edges.push_back(e)
+    if(graph.find(point) != graph.end()){
+        for(Edge e : this->graph[point]){
+            edges.push_back(e);
         }
-    }else{
-        edges = null;
     }
 }
-
-int Graph::containsP (Point point, std::vector<Edge> &edges){
-    if(this->graph.count(point)){
-        auto search = this->graph.find(point);
+/** 
+ * @brief checks if the map contains a point, if it does returns the edges of that point
+ * @param point the point we need to check
+ * @param edges the empty vector to fill
+ */
+void Graph::containsP (Point point, std::vector<Edge> &edges){
+    if(graph.count(point) > 1){
+        auto search = graph.find(point);
         edges = search->second;
     }
-    edges = null;
-
 }
-
-int Graph::containsE (Edge e, Edge edge){
-    if(std::find(this->edges.begin(), this->edges.end(), e) != vec.end()){
-        auto search = std::find(this->edges.begin(), this->edges.end(), e);
-        edge = search->second;
+/**
+ * @brief checks if the vector of edges contains a specific edge, returns it after retrieving it
+ * @param e the edge we are looking for
+ * @param edge the element we are look
+ */
+void Graph::containsE (Edge e, Edge &edge){
+    if(std::find(edges.begin(), edges.end(), e) != edges.end()){
+        std::vector<Edge>::iterator it = std::find(edges.begin(), edges.begin(), e);
+        int index = std::distance(edges.begin(), it);
+        edge = edges.at(index);
     }
-    edge = null;
 }

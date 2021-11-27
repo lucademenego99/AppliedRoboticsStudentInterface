@@ -9,13 +9,13 @@ class Point{
         int polygon_id;
 
         //Methods
-        Point (x, y, polygon_num=-1);
-        boolean eq (Point point);
-        boolean notEq (Point point);
-        boolean lt (Point point);
+        Point (double x_coor, double y_coor, int polygon_id);
+        bool eq (Point point);
+        bool notEq (Point point);
         void print ();
-        boolean hash();
         void repr();
+        bool operator<(const Point &ob) const;
+        bool operator==(const Point &ob) const;
 };
 
 class Edge {
@@ -25,14 +25,30 @@ class Edge {
         Point p2;
 
         //Methods
-        Edge(Point p1, Point p2);
+        Edge(const Point point1, const Point point2);
         Point get_adjacent(Point point);
-        boolean contains (Point point);
-        boolean eq (Edge edge);
-        boolean notEq (Edge edge);
+        bool contains (Point point);
+        bool eq (Edge edge);
+        bool notEq (Edge edge);
         void print ();
-        boolean hash();
+        bool operator==(const Edge &ob) const;
 };
+
+/* Data structure to represent the graph in which we have
+   a Map with as keys structure Point and as values a vector 
+   of Edge
+*/
+typedef std::map<Point, std::vector<Edge>> DictG;
+/* We define the iterator to traverse the map */
+typedef DictG::const_iterator ItG;
+
+/* Data structure to represent the polygons that are present
+   in the arena: a Map which has as keys IDs and as values a vector
+   of Edge
+*/
+typedef std::map<int, std::vector<Edge>> DictP;
+/* We define the iterator to traverse the map */
+typedef DictP::const_iterator ItP;
 
 class Graph{
     public:
@@ -40,20 +56,20 @@ class Graph{
         //Struct for graph
         DictG graph;
         //Set of edges
-        std::vector<Edges> edges;
+        std::vector<Edge> edges;
         int pid;
         //Struct for polygons
         DictP polygons;
         
         //Methods
-        Graph (DictP polygons);
-        void get_adjacent_points(Point point, std::vector<Edge> edges);
+        Graph (std::vector<std::vector<Point>> polygons);
+        void get_adjacent_points(Point point, std::vector<Point> &points);
         void get_points(std::vector<Point> &points);
         void get_edges(std::vector<Edge> &edges);
         void add_edge(Edge edge);
         void getItems(Point point, std::vector<Edge> &edges);
-        int containsP (Point point, std::vector<Edge> &edges);
-        int Graph::containsE (Edge e, Edge edge);
-}
+        void containsP (Point point, std::vector<Edge> &edges);
+        void containsE (Edge e, Edge &edge);
+};
 
 #endif
