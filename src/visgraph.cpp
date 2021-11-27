@@ -1,13 +1,16 @@
 #include <iostream>
 #include "visgraph.hpp"
+#include "open_edges.hpp"
+#include "graph.hpp"
 #include <math.h>
+#include <algorithm>
 
 #define _USE_MATH_DEFINES
 
 using namespace student;
 using namespace std;
 
-Graph *VisGraph::computeVisibilityGraph(vector<vector<Point> > points) {
+Graph VisGraph::computeVisibilityGraph(vector<Point> points) {
     Graph result = new Graph(points);
     for (int i = 0; i < points.size(); i++) {
         vector<Point> visibleVertices = getVisibleVertices(points[i], result);
@@ -25,11 +28,21 @@ vector<Point> VisGraph::getVisibleVertices(Point point, Graph graph) {
     // TODO: sort points according to the clockwise angle that the half line from
     // [point] to each vertex makes with the positive x-axis. In case of ties,
     // vertices closer to [point] should come before vertices farther.
+    double (*angle)(Point a, Point b) = &VisGraph::getAngle;
+    double (*distance)(Point a, Point b) = &VisGraph::edgeDistance;
+    sort(points.begin(), points.end(), [point, angle, distance](const Point &lhs, const Point &rhs) -> bool {
+        double angleLhs = (*angle)(point, lhs);
+        double angleRhs = (*angle)(point, rhs);
+        if (angleLhs == angleRhs) {
+            return (*distance)(point, lhs) < (*distance)(point, rhs);
+        }
+        return angleLhs < angleRhs;
+    });
 
-    OpenEdges openEdges = new OpenEdges();
+    OpenEdges openEdges = OpenEdges();
     Point pointInf = Point(INF, point.y);
     for (int i = 0; i < edges.size(); i++) {
-        if (!(edges[i].p1 == point || edges[i].p2 == point)) {
+        if (!(edges[i].p1.equal(point) || edges[i].p2.equal(point))) {
             if (edgeIntersect(point, pointInf, edges[i])) {
                 if (!onSegment(point, edge.p1, pointInf) && !onSegment(point, edge.p2, pointInf)) {
                     openEdges.insert(point, pointInf, edges[i]);
@@ -39,42 +52,44 @@ vector<Point> VisGraph::getVisibleVertices(Point point, Graph graph) {
     }
 
     vector<Point> visible;
-    Point prev;
+    Point prev = Point(-1, -1);
     bool prevVisible = false;
 
     for (int i = 0; i < points.size(); i++) {
-        if (points[i] != point) {
-            if (angle(point, points[i] > M_PI) {
+        if (!points[i].equal(point)) {
+            if (getAngle(point, points[i]) > M_PI) {
                 break;
             }
 
             // Update open edges - remove clock wise edges incident on p
             if (openEdges.size > 0) {
-                for (int j = 0; j < graph.at(points[i]).size(); j++) {
-                    if (getOrientation(point, p, graph.at(points[i])[j]) == CW) {
-                        openEdges.delete(point, points[i], graph.at(points[i])[j]);
+                vector<Edge> edges = graph.edgesAt(points[i]);
+                for (int j = 0; j < edges.size(); j++) {
+                    if (getOrientation(point, points[i], edges[j].getAdjacent(points[i])) == CW) {
+                        openEdges.delete(point, points[i], edges[j]);
                     }
                 }
             }
 
             bool isVisible = false;
 
-            if (prev == nullptr || getOrientation(point, prev, points[i] != COLLINEAR || !onSegment(point, prev, points[i]))) {
+            if (prev.equal(Point(-1, -1)) || getOrientation(point, prev, points[i]) != COLLINEAR || !onSegment(point, prev, points[i])) {
                 if (openEdges.size() == 0) {
                     isVisible = true;
                 } else if (!edgeIntersect(point, points[i], openEdges.smallest())) {
                     isVisible = true;
                 }
             }
-            // For collinear points, if previous point was not visible, p is not
             else if (!prevVisible) {
+                // For collinear points, if previous point was not visible, p is not
                 isVisible = false;
             } else {
                 // For collinear points, if previous point was visible, we need to check
                 // that the edge from prev to p does not intersect any open edge
                 isVisible = true;
-                for (int j = 0; j < graph.at(points[i]).size(); j++) {
-                    if ((prev != graph.at(points[i]).p1 && prev != graph.at(points[i]).p2) && edgeIntersect(prev, points[i], graph.at(points[i]))) {
+                vector<Edge> edges = graph.edgesAt(points[i]);
+                for (int j = 0; j < edges.size(); j++) {
+                    if (!(prev.equal(edges[j].p1)) && !(prev.equal(edges[j].p2)) && edgeIntersect(prev, points[i], edges[j])) {
                         isVisible = false;
                         break;
                     }
@@ -85,10 +100,76 @@ vector<Point> VisGraph::getVisibleVertices(Point point, Graph graph) {
             }
 
             // Check if the visible edge is interior to its polygon
+            if (isVisible && !graph.getAdjacentPoints(point).contains(points[i])) {
+                isVisible = !edgeInPolygon(point, points[i], graph);
+            }
 
+            if (isVisible) {
+                visible.push_back(points[i]);
+            }
 
+            // Update open edges - Add counter clock wise edges incident on points[i]
+            vector<Edge> edges = graph.edgesAt(points[i]);
+            for (int j = 0; j < edges.size(); j++)
+            {
+                if (!edges[j].contains(point) && getOrientation(point, points[i], edges[j].getAdjacent(points[i])) == CCW) {
+                    openEdges.insert(point, points[i], edges[j]);
+                }
+            }
+
+            prev = points[i];
+            prevVisible = isVisible;
         }
     }
+
+    return visible;
+}
+
+bool VisGraph::polygonCrossing(Point p1, vector<Edge> polygonEdges) {
+    Point p2 = Point(INF, p1.y);
+    int intersectCount = 0;
+    for (int i = 0; i < polygonEdges.size(); i++)
+    {
+        if(!(p1.y < polygonEdges[i].p1.y && p1.y < polygonEdges[i].p2.y)
+            && !(p1.y > polygonEdges[i].p1.y && p1.y > polygonEdges[i].p2.y)
+            && !(p1.x > polygonEdges[i].p1.x && p1.x > polygonEdges[i].p2.x)) {
+                // Deal with points collinear to p1
+                bool edgeP1Collinear = (getOrientation(p1, polygonEdges[i].p1, p2) == COLLINEAR);
+                bool edgeP2Collinear = (getOrientation(p1, polygonEdges[i].p2, p2) == COLLINEAR);
+                if (!edgeP1Collinear || !edgeP2Collinear) {
+                    if (edgeP1Collinear || edgeP2Collinear) {
+                        Point collinearPoint = edgeP1Collinear ? polygonEdges[i].p1 : polygonEdges[i].p2;
+                        if (polygonEdges[i].getAdjacent(collinearPoint).y > p1.y) {
+                            intersectCount += 1;
+                        }
+                    } else if (edgeIntersect(p1, p2, polygonEdges[i])) {
+                        intersectCount += 1;
+                    }
+                }
+            }
+    }
+    return !(intersectCount % 2 == 0);
+}
+
+bool VisGraph::edgeInPolygon(Point p1, Point p2, Graph graph) {
+    if (p1.polygon_id != p2.polygon_id) {
+        return false;
+    }
+    if (p1.polygon_id == -1 || p2.polygon_id == -1) {
+        return false;
+    }
+    Point midPoint = Point((p1.x + p2.x) / 2, (p1.y + p2.y) / 2);
+    return polygonCrossing(midPoint, graph.polygons[p1.polygon_id]);
+}
+
+bool VisGraph::pointInPolygon(Point p, Graph graph) {
+    for (int i = 0; i < graph.polygons.size(); i++)
+    {
+        if (polygonCrossing(p, graph.polygons[i])) {
+            return graph.polygons[i];
+        }
+    }
+    return -1;
 }
 
 /**
@@ -170,4 +251,41 @@ double VisGraph::getAngle(Point center, Point point) {
     if (dy < 0)
         return (2 * M_PI) + atan(dy / dx);
     return atan(dy / dx);
+}
+
+double VisGraph::getAngle2(Point a, Point b, Point c) {
+    double aValue = pow(c.x - b.x, 2) + pow(c.y - b.y, 2);
+    double bValue = pow(c.x - a.x, 2) + pow(c.y - a.y, 2);
+    double cValue = pow(b.x - a.x, 2) + pow(a.y - a.y, 2);
+    double cosValue = (aValue + cValue - bValue) / (2.0 * sqrt(aValue) * sqrt(cValue));
+    return acos(int(cosValue * T) / (1.0 * T2));
+}
+
+Point VisGraph::getIntersectPoint(Point p1, Point p2, Edge edge) {
+    if (edge.contains(p1)) return p1;
+    if (edge.contains(p2)) return p2;
+    if (edge.p1.x == edge.p2.x) {
+        if (p1.x == p2.x) return Point(-1, -1);
+        double pSlope = double(p1.y - p2.y) / (p1.x - p2.x);
+        double intersectX = edge.p1.x;
+        double intersectY = pSlope * (intersectX - p1.x) + p1.y;
+        return Point(intersectX, intersectY);
+    }
+
+    double pSlope = double(p1.y - p2.y) / (p1.x - p2.x);
+    double eSlope = double(edge.p1.y - edge.p2.y) / (edge.p1.x - edge.p2.x);
+    if (eSlope == pSlope)
+        return Point(-1, -1);
+    double intersectX = ((eSlope * edge.p1.x) - (pSlope * p1.x) + p1.y - edge.p1.y) / (eSlope - pSlope);
+    double intersectY = eSlope * (intersectX - edge.p1.x) + edge.p1.y;
+    return Point(intersectX, intersectY);
+}
+
+double VisGraph::edgeDistance(Point p1, Point p2) {
+    return sqrt(pow(p2.x - p1.x, 2) + pow(p2.y - p1.y, 2));
+}
+
+double VisGraph::pointEdgeDistance(Point p1, Point p2, Edge edge) {
+    Point intersectPoint = getIntersectPoint(p1, p2, edge);
+    return (!intersectPoint.equal(Point(-1, -1))) ? edgeDistance(p1, intersectPoint) : 0;
 }

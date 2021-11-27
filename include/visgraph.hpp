@@ -26,7 +26,12 @@ namespace student
         std::vector<Point> getVisibleVertices(Point from, Graph graph);
         double getAngle(Point center, Point p);
         bool onSegment(Point p, Point q, Point r);
-        bool edgeIntersect(Point p1, Point q1, Edge edge);
+        int getOrientation(Point p, Point q, Point r);
+        bool polygonCrossing(Point p, std::vector<Edge> polygonEdges);
+        bool edgeInPolygon(Point p1, Point p2, Graph graph);
+        bool pointInPolygon(Point p, Graph graph);
+        double edgeDistance(Point p1, Point p2);
+        Point getIntersectPoint(Point p1, Point p2, Edge edge);
 
     public:
         /**
@@ -35,7 +40,10 @@ namespace student
      */
         VisGraph() = default;
 
-        Graph *computeVisibilityGraph(std::vector<std::vector<Point> > points);
+        bool edgeIntersect(Point p1, Point q1, Edge edge);
+        double pointEdgeDistance(Point p1, Point p2, Edge edge);
+        double getAngle2(Point a, Point b, Point c);
+        Graph computeVisibilityGraph(std::vector<Point> points);
     };
 
 }
