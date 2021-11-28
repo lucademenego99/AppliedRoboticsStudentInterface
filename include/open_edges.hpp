@@ -5,32 +5,24 @@
 #include "graph.hpp"
 #include "visgraph.hpp"
 
-namespace student
+namespace visgraph
 {
-    class OpenEdges {
-        private:
-            int getIndex(Point p1, Point p2, Edge edge);
+    class OpenEdges
+    {
+    private:
+        int getIndex(Point p1, Point p2, Edge edge);
+        bool lessThan(Point p1, Point p2, Edge edge1, Edge edge2);
 
-            bool lessThan(Point p1, Point p2, Edge edge1, Edge edge2);
+    public:
+        std::vector<Edge> openEdges;
+        VisGraph visGraph = VisGraph();
 
-        public:
-            std::vector<Edge> openEdges;
-            VisGraph visGraph;
-            
-            OpenEdges() {
-                openEdges.clear();
-                visGraph = VisGraph();
-            }
-
-            void insertEdge(Point p1, Point p2, Edge edge);
-
-            void deleteEdge(Point p1, Point p2, Edge edge);
-
-            Edge getSmallest();
-
-            Edge getEdge(int index);
+        OpenEdges();
+        void insertEdge(Point p1, Point p2, Edge edge);
+        void deleteEdge(Point p1, Point p2, Edge edge);
+        Edge getSmallest();
+        Edge getEdge(int index);
     };
 }
-
 
 #endif
