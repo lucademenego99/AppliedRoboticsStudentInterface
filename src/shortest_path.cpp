@@ -7,10 +7,15 @@
 
 namespace visgraph
 {
+    int edge_distance(Point p1, Point p2) {
+    // Return the Euclidean distance between two Points.
+        return sqrt((p2.x - p1.x)*(p2.x - p1.x) + (p2.y - p1.y)*(p2.y - p1.y));
+    }
+
     bool compare(const std::pair<Point, int>& a, const std::pair<Point, int>& b) {
-    if(a.second == b.second) return a.first < b.first;
-    else return a.second < b.second;
-}
+        if(a.second == b.second) return a.first < b.first;
+        else return a.second < b.second;
+    }
 
     //def dijkstra(graph, origin, destination, add_to_visgraph):
     //             DictG, Point, Point, DictG
@@ -45,7 +50,7 @@ namespace visgraph
                 elength = dist.find(v)->second + edge_distance(v, w);
                 if (dist.find(w) != dist.end()){
                     if(elength < dist.find(w)->second){
-                        throw ValueError;
+                        // error, throw ValueError;
                     }
                 }
                 else if (dist.find(w) == dist.end() || (q.find(w) != q.end() && elength < q.find(w)->second)) {
