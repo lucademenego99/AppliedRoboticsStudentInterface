@@ -1,16 +1,18 @@
-//#include "dubins.hpp"
-//#include "clipper_addons.hpp"
+#include "dubins.hpp"
+#include "clipper_addons.hpp"
 #include "graph.hpp"
+#include "visgraph.hpp"
+#include "open_edges.hpp"
 #include <iostream>
 
-//using namespace student;
-/*
+using namespace student;
+
 void shortestPathDubinsTest(Dubins dubins);
 void multipointDubinsTest(Dubins dubins);
 void intersectionsTest(Dubins dubins);
 void clipperTest();
-*/
 void structuresTest();
+void openEdgesTest();
 
 int main(int argc, char *argv[])
 {
@@ -24,95 +26,102 @@ int main(int argc, char *argv[])
 
     // clipperTest();
 
-    //structuresTest();
+    structuresTest();
 
+    // openEdgesTest();
 
     return 0;
 }
 
+void openEdgesTest() {
+    visgraph::OpenEdges openEdges = visgraph::OpenEdges();
+    visgraph::Edge edgeNull = openEdges.getEdge(3);
+    edgeNull.print();
+
+    openEdges.insertEdge(visgraph::Point(1.0, 1.0), visgraph::Point(2.0, 2.0), visgraph::Edge(visgraph::Point(2.0, 2.0), visgraph::Point(3.0, 3.0)));
+
+    visgraph::Edge edge = openEdges.getEdge(0);
+    edge.print();
+}
+
 void structuresTest(){
     std::cout << "STRUCTURES TEST\n";
-    Point p = Point(5, 6, 1);
+    visgraph::Point p = visgraph::Point(5, 6, 1);
     std::cout << "Point: \n";
     std::cout << "x = " << p.x << "\n"
               << "y = " << p.y << "\n"
-              << "polygon id = " << p.polygon_id << "\n";
-    Point p2 = Point(10, 5, 2);
-    Edge e = Edge(p, p2);
+              << "polygon id = " << p.polygonId << "\n";
+    visgraph::Point p2 = visgraph::Point(10, 5, 2);
+    visgraph::Edge e = visgraph::Edge(p, p2);
     std::cout << "x = " << e.p1.x << "\n"
               << "y = " << e.p1.y << "\n"
-              << "polygon id = " << e.p1.polygon_id << "\n";
+              << "polygon id = " << e.p1.polygonId << "\n";
     std::cout << "x = " << e.p2.x << "\n"
               << "y = " << e.p2.y << "\n"
-              << "polygon id = " << e.p2.polygon_id << "\n";
-    Point p3 = Point(5, 6, 1);
-    bool value = p3.eq(p);
+              << "polygon id = " << e.p2.polygonId << "\n";
+    visgraph::Point p3 = visgraph::Point(5, 6, 1);
+    bool value = p3 == p;
     std::cout << "1: Equals : " << value << "\n";
-    value = p3.eq(p2);
+    value = p3 == p2;
     std::cout << "2: Equals : " << value << "\n";
-    value = p3.notEq(p2);
+    value = !(p3 == p2);
     std::cout << "3: Equals : " << value << "\n";
 
     p.print();
     p.repr();
 
-    Edge e2 = Edge(p3, p2);
-    Point p5 = e2.get_adjacent(p2);
+    visgraph::Edge e2 = visgraph::Edge(p3, p2);
+    visgraph::Point p5 = e2.getAdjacent(p2);
     p5.print();
 
     value = e2.contains(p3);
     std::cout << "E2 contains E3? " << value << "\n";
 
-    value = e2.eq(e);
+    value = e2 == e;
     std::cout << "E2 eq E? " << value << "\n";
-    value = e2.notEq(e);
+    value = !(e2 == e);
     std::cout << "E2 notEq E? " << value << "\n";
 
     e2.print();
-    std::cout << "Easy\n";
-    std::vector<Point> points;
+    std::vector<visgraph::Point> points;
     points.push_back(p);
     points.push_back(p2);
     points.push_back(p3);
     points.push_back(p5);
 
-    std::cout << "I'm doing it\n";
-    std::vector<Point> points2;
+    std::vector<visgraph::Point> points2;
     points2.push_back(p3);
     points2.push_back(p5);
     points2.push_back(p);
     points2.push_back(p2);
-    std::vector<std::vector<Point>> shapes;
+    std::vector<std::vector<visgraph::Point>> shapes;
     shapes.push_back(points);
     shapes.push_back(points2);
-    std::cout << "I DID IT\n";
-    Graph graph = Graph(shapes);
-    std::vector<Point> results;
-    graph.get_adjacent_points(p2, results);
+    visgraph::Graph graph = visgraph::Graph(shapes);
+    std::vector<visgraph::Point> results = graph.getAdjacentPoints(p2);
     /*for(Point p : results){
         std::cout << "Get Adjacent: " << p.x << " + " << p.y << " + " << p.polygon_id << "\n";
     }*/
     results.clear();
-    graph.get_points(results);
+    results = graph.getPoints();
     /*for(Point p : results){
         std::cout << "Get points: " << p.x << " + " << p.y << " + " << p.polygon_id << "\n";
     }*/
-    std::vector<Edge> edges;
-    graph.get_edges(edges);
+    std::vector<visgraph::Edge> edges = graph.getEdges();
     /*for(Edge e : edges){
         e.print();
     }*/
     edges.clear();
-    graph.getItems(p, edges);
+    edges = graph.getItems(p);
     /*for(Edge e : edges){
         e.print();
     }*/
     edges.clear();
-    graph.containsP(p2,edges);
+    edges = graph.containsP(p2);
     /*for(Edge e : edges){
         e.print();
     }*/
-    Edge result = graph.containsE(e);
+    visgraph::Edge result = graph.containsE(e);
     result.print();
 }
 /*

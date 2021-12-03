@@ -1,5 +1,5 @@
-#ifndef DUBINSCURVES
-#define DUBINSCURVES
+#ifndef VISGRAPH
+#define VISGRAPH
 
 #include "utils.hpp"
 #include "graph.hpp"
