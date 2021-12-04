@@ -17,11 +17,20 @@ namespace visgraph
         vector<Point> allPoints = result.getPoints();
         for (int i = 0; i < allPoints.size(); i++)
         {
+            std::cout << "PUNTO CHE VEDE:\n";
+            allPoints[i].print();
             vector<Point> visibleVertices = getVisibleVertices(allPoints[i], result);
+            std::cout << "\nITERAZIONE " << i << "\n";
+            for (Point p : visibleVertices) {
+                p.print();
+                std::cout << std::endl;
+            }
+            std::cout << "\n\n\n";
             for (int j = 0; j < visibleVertices.size(); j++)
             {
                 result.addEdge(Edge(allPoints[i], visibleVertices[j]));
             }
+            // break;
         }
         return result;
     }
@@ -42,6 +51,12 @@ namespace visgraph
                  return angleLhs < angleRhs;
              });
 
+        // std::cout << "PUNTI IN ORDINE:\n";
+        // for (Point p : points) {
+        //     p.print();
+        //     std::cout << "\n";
+        // }
+
         OpenEdges openEdges = OpenEdges();
         Point pointInf = Point(INF, point.y);
         for (Edge edge : edges)
@@ -56,6 +71,12 @@ namespace visgraph
                     }
                 }
             }
+        }
+
+        std::cout << "\nNumero di edge primo for:\n";
+        for (Edge e : openEdges.openEdges) {
+            e.print();
+            std::cout << "\n";
         }
 
         vector<Point> visible;
@@ -107,8 +128,7 @@ namespace visgraph
                     // For collinear points, if previous point was visible, we need to check
                     // that the edge from prev to p does not intersect any open edge
                     isVisible = true;
-                    vector<Edge> edges = graph.getItems(p);
-                    for (Edge e : edges)
+                    for (Edge e : openEdges.openEdges)
                     {
                         if (!(prev == e.p1) && !(prev == e.p2) && edgeIntersect(prev, p, e))
                         {

@@ -13,6 +13,7 @@ void intersectionsTest(Dubins dubins);
 void clipperTest();
 void structuresTest();
 void openEdgesTest();
+void visgraphTest();
 
 int main(int argc, char *argv[])
 {
@@ -26,11 +27,36 @@ int main(int argc, char *argv[])
 
     // clipperTest();
 
-    structuresTest();
+    // structuresTest();
 
     // openEdgesTest();
 
+    visgraphTest();
+
     return 0;
+}
+
+void visgraphTest() {
+    std::vector<std::vector<visgraph::Point>> polygons;
+
+    std::vector<visgraph::Point> pol1 {visgraph::Point(1.0, 1.0), visgraph::Point(3.0, 3.0), visgraph::Point(3.0,1.0), visgraph::Point(1.0, 1.0)};
+    std::vector<visgraph::Point> pol2 {visgraph::Point(5.0, 5.0), visgraph::Point(7.0, 7.0), visgraph::Point(7.0,5.0), visgraph::Point(5.0, 5.0)};
+
+    polygons.push_back(pol1);
+    polygons.push_back(pol2);
+
+    // visgraph::Graph g = visgraph::Graph(polygons);
+
+    // std::vector<visgraph::Point> points = g.getPoints();
+
+    visgraph::VisGraph visg = visgraph::VisGraph();
+
+    visgraph::Graph g = visg.computeVisibilityGraph(polygons);
+
+    // std::vector<visgraph::Point> points = g.getPoints();
+    // for (visgraph::Point p : points) {
+    //     p.print();
+    // }
 }
 
 void openEdgesTest() {

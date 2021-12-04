@@ -129,10 +129,7 @@ std::vector<Point> Graph::getPoints(){
     std::vector<Point> points;
     std::map<Point, std::vector<Edge>>::iterator it;
     for(it = graph.begin(); it != graph.end(); it++){
-        for(Edge e : it->second){
-            points.push_back(e.p1);
-            points.push_back(e.p2);
-        } 
+        points.push_back(it->first);
     }
     return points;
 }
