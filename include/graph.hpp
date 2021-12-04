@@ -16,7 +16,6 @@ namespace visgraph
         //Methods
         Point(double x_coor, double y_coor, int polygonId = -1);
         void print();
-        void repr();
         bool operator<(const Point &ob) const;
         bool operator==(const Point &ob) const;
     };

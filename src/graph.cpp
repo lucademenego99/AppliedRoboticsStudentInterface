@@ -21,14 +21,7 @@ Point::Point (double x_coor, double y_coor, int polygonId) : x(x_coor), y(y_coor
  * @brief Prints the coordinates of the point
  */
 void Point::print (){
-    std::cout<<"( "<< this->x << ", " << this->y << ")";
-}
-
-/**
- * @brief Prints a more detailed representation
- */
-void Point::repr (){
-    std::cout<<"Point( "<<this->x << ", " << this->y << ")";
+    std::cout<<"Point( "<< x << "," << y << ")\n";
 }
 
 bool Point::operator<(const Point &ob) const {
@@ -71,10 +64,7 @@ bool Edge::contains (Point point){
  * @brief Prints the basic information of the edge
  */
 void Edge::print (){
-    std::cout<<"P1.x: "<< p1.x << "\n";
-    std::cout<<"P1.y: "<< p1.y << "\n";
-    std::cout<<"P2.x: "<< p2.x << "\n";
-    std::cout<<"P2.y: "<< p2.y << "\n";
+    std::cout << "Edge((" << p1.x << "," << p1.y << ")(" << p2.x << "," << p2.y << "))\n\n";
 }
 
 bool Edge::operator==(const Edge &ob) const{

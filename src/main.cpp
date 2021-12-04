@@ -45,18 +45,18 @@ void visgraphTest() {
     polygons.push_back(pol1);
     polygons.push_back(pol2);
 
-    // visgraph::Graph g = visgraph::Graph(polygons);
-
-    // std::vector<visgraph::Point> points = g.getPoints();
-
     visgraph::VisGraph visg = visgraph::VisGraph();
 
     visgraph::Graph g = visg.computeVisibilityGraph(polygons);
 
-    // std::vector<visgraph::Point> points = g.getPoints();
-    // for (visgraph::Point p : points) {
-    //     p.print();
-    // }
+    for (visgraph::Point p : g.getPoints()) {
+        p.print();
+    }
+    std::cout << "\n";
+    for (visgraph::Edge e : g.getEdges()) {
+        e.print();
+    }
+    std::cout << "\n";
 }
 
 void openEdgesTest() {
@@ -94,7 +94,6 @@ void structuresTest(){
     std::cout << "3: Equals : " << value << "\n";
 
     p.print();
-    p.repr();
 
     visgraph::Edge e2 = visgraph::Edge(p3, p2);
     visgraph::Point p5 = e2.getAdjacent(p2);

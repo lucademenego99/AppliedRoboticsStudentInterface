@@ -13,24 +13,16 @@ namespace visgraph
 {
     Graph VisGraph::computeVisibilityGraph(vector<vector<Point>> points)
     {
+        Graph initial = Graph(points);
         Graph result = Graph(points);
-        vector<Point> allPoints = result.getPoints();
+        vector<Point> allPoints = initial.getPoints();
         for (int i = 0; i < allPoints.size(); i++)
         {
-            std::cout << "PUNTO CHE VEDE:\n";
-            allPoints[i].print();
-            vector<Point> visibleVertices = getVisibleVertices(allPoints[i], result);
-            std::cout << "\nITERAZIONE " << i << "\n";
-            for (Point p : visibleVertices) {
-                p.print();
-                std::cout << std::endl;
-            }
-            std::cout << "\n\n\n";
+            vector<Point> visibleVertices = getVisibleVertices(allPoints[i], initial);
             for (int j = 0; j < visibleVertices.size(); j++)
             {
                 result.addEdge(Edge(allPoints[i], visibleVertices[j]));
             }
-            // break;
         }
         return result;
     }
@@ -40,6 +32,7 @@ namespace visgraph
         vector<Edge> edges = graph.getEdges();
         vector<Point> points = graph.getPoints();
 
+        // Sort the points in counter-clockwise order. If the angle is the same, take the closer ones.
         sort(points.begin(), points.end(), [&](const Point &lhs, const Point &rhs) -> bool
              {
                  double angleLhs = getAngle(point, lhs);
@@ -51,38 +44,31 @@ namespace visgraph
                  return angleLhs < angleRhs;
              });
 
-        // std::cout << "PUNTI IN ORDINE:\n";
-        // for (Point p : points) {
-        //     p.print();
-        //     std::cout << "\n";
-        // }
-
         OpenEdges openEdges = OpenEdges();
         Point pointInf = Point(INF, point.y);
         for (Edge edge : edges)
         {
-            if (!(edge.p1 == point || edge.p2 == point))
+            // If the point is not part of the edge we are considering
+            if (!(edge.contains(point)))
             {
+                // And if the line that starts from point and goes to the right (positive x axis) intersect the edge
                 if (edgeIntersect(point, pointInf, edge))
                 {
+                    // And if one of the points of the edge is on the line that starts from point and goes to the right
                     if (!onSegment(point, edge.p1, pointInf) && !onSegment(point, edge.p2, pointInf))
                     {
+                        // Add the edge inside the binary tree OpenEdges
                         openEdges.insertEdge(point, pointInf, edge);
                     }
                 }
             }
         }
 
-        std::cout << "\nNumero di edge primo for:\n";
-        for (Edge e : openEdges.openEdges) {
-            e.print();
-            std::cout << "\n";
-        }
+        vector<Point> visible;  // Final result: all the visible points from the point [point]
+        Point prev = Point(-1, -1); // Keep the previous point to understand what is the line that moves counter-clockwise (the one that at first was [point - pointInf])
+        bool prevVisible = false;   // Remember if the previous point was visible or not
 
-        vector<Point> visible;
-        Point prev = Point(-1, -1);
-        bool prevVisible = false;
-
+        // Loop through all points (expcept the point we are considering)
         for (Point p : points)
         {
             if (!(p == point))
@@ -91,13 +77,12 @@ namespace visgraph
                 {
                     break;
                 }
-
-                // Update open edges - remove clock wise edges incident on p
+                // Update open edges - remove clock wise edges because we already considered them (remember we are moving counter-clockwise)
                 if (openEdges.openEdges.size() > 0)
                 {
-                    vector<Edge> edges = graph.getItems(p);
-                    for (Edge e : edges)
+                    for (Edge e : graph.graph[p])
                     {
+                        // So check the orientation: if it's clockwise delete the edge from openEdges
                         if (getOrientation(point, p, e.getAdjacent(p)) == CW)
                         {
                             openEdges.deleteEdge(point, p, e);
@@ -105,14 +90,18 @@ namespace visgraph
                     }
                 }
 
+                // Initialize the visibility of the point we are considering to false
                 bool isVisible = false;
 
+                // If it's the first iteration (prev is default point) or the orientation is not collinear or it's collinear and the previous point is between point and p
                 if (prev == Point(-1, -1) || getOrientation(point, prev, p) != COLLINEAR || !onSegment(point, prev, p))
                 {
+                    // If there is nothing inside openEdges, then the point is visible because there is no edge that hides it
                     if (openEdges.openEdges.size() == 0)
                     {
                         isVisible = true;
                     }
+                    // If there is something inside openEdges, but the segment [point - p] does not intersect the closer openEdge, then no segment is hiding the point and the point is visible
                     else if (!edgeIntersect(point, p, openEdges.getSmallest()))
                     {
                         isVisible = true;
@@ -120,19 +109,20 @@ namespace visgraph
                 }
                 else if (!prevVisible)
                 {
-                    // For collinear points, if previous point was not visible, p is not
+                    // This is the case of collinear points. If the previous point was not visible, for sure even p is not because they are collinear
                     isVisible = false;
                 }
                 else
                 {
-                    // For collinear points, if previous point was visible, we need to check
+                    // This is the case of collinear points, If the previous point was visible, we need to check (as always)
                     // that the edge from prev to p does not intersect any open edge
                     isVisible = true;
                     for (Edge e : openEdges.openEdges)
                     {
-                        if (!(prev == e.p1) && !(prev == e.p2) && edgeIntersect(prev, p, e))
+                        if (!(e.contains(prev)) && edgeIntersect(prev, p, e))
                         {
                             isVisible = false;
+                            // We break because if there is at least one intersecting openEdge, we are sure the point won't be visible
                             break;
                         }
                     }
@@ -155,10 +145,9 @@ namespace visgraph
                 }
 
                 // Update open edges - Add counter clock wise edges incident on p
-                vector<Edge> edges = graph.getItems(p);
-                for (Edge e : edges)
+                for (Edge e : graph.graph[p])
                 {
-                    if (!e.contains(point) && getOrientation(point, p, e.getAdjacent(p)) == CCW)
+                    if (!(e.contains(point)) && getOrientation(point, p, e.getAdjacent(p)) == CCW)
                     {
                         openEdges.insertEdge(point, p, e);
                     }
@@ -203,6 +192,15 @@ namespace visgraph
         return !(intersectCount % 2 == 0);
     }
 
+    /**
+     * @brief Is the edge from point p1 to point p2 interior to any polygon?
+     * 
+     * @param p1 
+     * @param p2 
+     * @param graph 
+     * @return true The edge [p1, p2] is interior to a polygon
+     * @return false The edge [p1, p2] is not interior to a polygon
+     */
     bool VisGraph::edgeInPolygon(Point p1, Point p2, Graph graph)
     {
         if (p1.polygonId != p2.polygonId)
@@ -291,7 +289,7 @@ namespace visgraph
         if (val == 0)
             return 0; // collinear
 
-        return (val > 0) ? 1 : -1; // clock or counterclock wise
+        return (val < 0) ? 1 : -1; // clock or counterclock wise
     }
 
     bool VisGraph::onSegment(Point p, Point q, Point r)
