@@ -366,7 +366,15 @@ namespace visgraph
         return (!(intersectPoint == Point(-1, -1))) ? edgeDistance(p1, intersectPoint) : 0;
     }
 
-    std::vector<Point> VisGraph::shortest_path(DictG graph, Point origin, Point destination) { 
-        return shortestPath(graph, origin, destination);
+    std::vector<Point> VisGraph::shortest_path(DictG graph, Point origin, Point destination) {
+        visgraph::DictG::iterator v1 = graph.find(origin);
+        visgraph::DictG::iterator v2 = graph.find(origin);
+        if(v1 == graph.end() || v2 == graph.end())
+            return shortestPath(graph, origin, destination);
+        else {
+            std::vector<Point> path;
+            std::cout << "ERROR: origin point or destination point not available in graph!" << std::endl;
+            return path;
+        }
     }
 }

@@ -51,7 +51,7 @@ void shortestPathTest() {
     visgraph::VisGraph visg = visgraph::VisGraph();
 
     visgraph::Graph g = visg.computeVisibilityGraph(polygons);
-    std::vector<visgraph::Point> path = visg.shortest_path(g.graph, visgraph::Point(1.0, 1.0), visgraph::Point(7.0, 5.0));
+    std::vector<visgraph::Point> path = visg.shortest_path(g.graph, visgraph::Point(1.0, 1.0), visgraph::Point(7.0, 6.0));
     for(int it = 0; it < path.size(); it++)
         path[it].print();
 }
