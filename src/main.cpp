@@ -14,6 +14,7 @@ void clipperTest();
 void structuresTest();
 void openEdgesTest();
 void visgraphTest();
+void shortestPathTest();
 
 int main(int argc, char *argv[])
 {
@@ -31,9 +32,28 @@ int main(int argc, char *argv[])
 
     // openEdgesTest();
 
-    visgraphTest();
+    // visgraphTest();
+
+    shortestPathTest();
 
     return 0;
+}
+
+void shortestPathTest() {
+    std::vector<std::vector<visgraph::Point>> polygons;
+
+    std::vector<visgraph::Point> pol1 {visgraph::Point(1.0, 1.0), visgraph::Point(1.0, 3.0), visgraph::Point(3.0,1.0), visgraph::Point(3.0, 3.0)};
+    std::vector<visgraph::Point> pol2 {visgraph::Point(5.0, 5.0), visgraph::Point(7.0, 7.0), visgraph::Point(7.0,5.0), visgraph::Point(7.0, 7.0)};
+
+    polygons.push_back(pol1);
+    polygons.push_back(pol2);
+
+    visgraph::VisGraph visg = visgraph::VisGraph();
+
+    visgraph::Graph g = visg.computeVisibilityGraph(polygons);
+    std::vector<visgraph::Point> path = visg.shortest_path(g.graph, visgraph::Point(1.0, 1.0), visgraph::Point(7.0, 5.0));
+    for(int it = 0; it < path.size(); it++)
+        path[it].print();
 }
 
 void visgraphTest() {
@@ -319,3 +339,4 @@ void clipperTest()
     printSolution(points, paths);
 }
 */
+

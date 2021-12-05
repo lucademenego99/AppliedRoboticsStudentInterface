@@ -2,6 +2,7 @@
 #include "visgraph.hpp"
 #include "open_edges.hpp"
 #include "graph.hpp"
+#include "shortest_path.hpp"
 #include <math.h>
 #include <algorithm>
 
@@ -363,5 +364,9 @@ namespace visgraph
     {
         Point intersectPoint = getIntersectPoint(p1, p2, edge);
         return (!(intersectPoint == Point(-1, -1))) ? edgeDistance(p1, intersectPoint) : 0;
+    }
+
+    std::vector<Point> VisGraph::shortest_path(DictG graph, Point origin, Point destination) { 
+        return shortestPath(graph, origin, destination);
     }
 }

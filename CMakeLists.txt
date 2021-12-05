@@ -5,7 +5,7 @@ project(student_proect)
 add_compile_options(-std=c++11)
 
 find_package(OpenCV REQUIRED )
-find_package(project_interface REQUIRED )
+## find_package(project_interface REQUIRED )
 
 ## Specify additional locations of header files
 include_directories(
@@ -24,7 +24,7 @@ target_link_libraries(student
 )
 
 # Executable to test the implemented functions
-add_executable(functions-testing src/main.cpp src/dubins.cpp src/utils.cpp src/clipper.cpp src/clipper_addons.cpp src/graph.cpp src/open_edges.cpp src/visgraph.cpp)
+add_executable(functions-testing src/main.cpp src/dubins.cpp src/utils.cpp src/clipper.cpp src/clipper_addons.cpp src/graph.cpp src/open_edges.cpp src/visgraph.cpp src/shortest_path.cpp)
 
 target_link_libraries(functions-testing
   ${OpenCV_LIBRARIES}

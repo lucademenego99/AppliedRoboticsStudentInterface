@@ -44,6 +44,7 @@ namespace visgraph
         double pointEdgeDistance(Point p1, Point p2, Edge edge);
         double getAngle2(Point a, Point b, Point c);
         Graph computeVisibilityGraph(std::vector<std::vector<Point>> points);
+        std::vector<Point> shortest_path(DictG graph, Point origin, Point destination);
     };
 
 }
