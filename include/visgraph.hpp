@@ -23,7 +23,7 @@ namespace visgraph
         const int T = pow(10, COLIN_TOLERANCE);
         const double T2 = pow(10.0, COLIN_TOLERANCE);
 
-        std::vector<Point> getVisibleVertices(Point from, Graph graph);
+        std::vector<Point> getVisibleVertices(Point from, Graph graph, Point origin = Point(-1, -1), Point destination = Point(-1, -1));
         double getAngle(Point center, Point p);
         bool onSegment(Point p, Point q, Point r);
         int getOrientation(Point p, Point q, Point r);
@@ -43,7 +43,7 @@ namespace visgraph
         bool edgeIntersect(Point p1, Point q1, Edge edge);
         double pointEdgeDistance(Point p1, Point p2, Edge edge);
         double getAngle2(Point a, Point b, Point c);
-        Graph computeVisibilityGraph(std::vector<std::vector<Point>> points);
+        Graph computeVisibilityGraph(std::vector<std::vector<Point>> points, Point origin, Point destination);
         std::vector<Point> shortest_path(DictG graph, Point origin, Point destination);
     };
 

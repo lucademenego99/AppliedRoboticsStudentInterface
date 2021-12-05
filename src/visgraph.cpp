@@ -12,7 +12,7 @@ using namespace std;
 
 namespace visgraph
 {
-    Graph VisGraph::computeVisibilityGraph(vector<vector<Point>> points)
+    Graph VisGraph::computeVisibilityGraph(vector<vector<Point>> points, Point origin, Point destination)
     {
         Graph initial = Graph(points);
         Graph result = Graph(points);
@@ -25,13 +25,32 @@ namespace visgraph
                 result.addEdge(Edge(allPoints[i], visibleVertices[j]));
             }
         }
+        // Add edges from origin
+        vector<Point> visibleVertices = getVisibleVertices(origin, initial, Point(-1, -1), destination);
+        for (int j = 0; j < visibleVertices.size(); j++)
+        {
+            result.addEdge(Edge(origin, visibleVertices[j]));
+        }
+
+        // Add edges from destination
+        visibleVertices = getVisibleVertices(destination, initial, origin, Point(-1, -1));
+        for (int j = 0; j < visibleVertices.size(); j++)
+        {
+            result.addEdge(Edge(destination, visibleVertices[j]));
+        }
+
         return result;
     }
 
-    vector<Point> VisGraph::getVisibleVertices(Point point, Graph graph)
+    vector<Point> VisGraph::getVisibleVertices(Point point, Graph graph, Point origin, Point destination)
     {
         vector<Edge> edges = graph.getEdges();
         vector<Point> points = graph.getPoints();
+
+        if (!(origin == Point(-1, -1)))
+            points.push_back(origin);
+        if (!(destination == Point(-1, -1)))
+            points.push_back(destination);
 
         // Sort the points in counter-clockwise order. If the angle is the same, take the closer ones.
         sort(points.begin(), points.end(), [&](const Point &lhs, const Point &rhs) -> bool
@@ -74,10 +93,10 @@ namespace visgraph
         {
             if (!(p == point))
             {
-                if (getAngle(point, p) > M_PI)
-                {
-                    break;
-                }
+                // if (getAngle(point, p) > M_PI)
+                // {
+                //     break;
+                // }
                 // Update open edges - remove clock wise edges because we already considered them (remember we are moving counter-clockwise)
                 if (openEdges.openEdges.size() > 0)
                 {
@@ -367,9 +386,7 @@ namespace visgraph
     }
 
     std::vector<Point> VisGraph::shortest_path(DictG graph, Point origin, Point destination) {
-        visgraph::DictG::iterator v1 = graph.find(origin);
-        visgraph::DictG::iterator v2 = graph.find(origin);
-        if(v1 == graph.end() || v2 == graph.end())
+        if(!(graph.find(origin) == graph.end() || graph.find(destination) == graph.end()))
             return shortestPath(graph, origin, destination);
         else {
             std::vector<Point> path;

@@ -5,7 +5,7 @@ project(student_proect)
 add_compile_options(-std=c++11)
 
 find_package(OpenCV REQUIRED )
-## find_package(project_interface REQUIRED )
+find_package(project_interface REQUIRED )
 
 ## Specify additional locations of header files
 include_directories(
