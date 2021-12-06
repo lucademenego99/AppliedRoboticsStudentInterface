@@ -14,29 +14,26 @@ namespace visgraph
 {
     Graph VisGraph::computeVisibilityGraph(vector<vector<Point>> points, Point origin, Point destination)
     {
+        // Initial graph with all our shapes
         Graph initial = Graph(points);
+
+        // Final visibility graph
         Graph result = Graph(points);
+
+        // Get all the points we need to consider
         vector<Point> allPoints = initial.getPoints();
+
+        // Loop through all the points we have
         for (int i = 0; i < allPoints.size(); i++)
         {
-            vector<Point> visibleVertices = getVisibleVertices(allPoints[i], initial);
+            // Get the visible vertices from the point we are considering
+            vector<Point> visibleVertices = getVisibleVertices(allPoints[i], initial, origin, destination);
+
+            // Add an edge (a,b) if b is visible from a
             for (int j = 0; j < visibleVertices.size(); j++)
             {
                 result.addEdge(Edge(allPoints[i], visibleVertices[j]));
             }
-        }
-        // Add edges from origin
-        vector<Point> visibleVertices = getVisibleVertices(origin, initial, Point(-1, -1), destination);
-        for (int j = 0; j < visibleVertices.size(); j++)
-        {
-            result.addEdge(Edge(origin, visibleVertices[j]));
-        }
-
-        // Add edges from destination
-        visibleVertices = getVisibleVertices(destination, initial, origin, Point(-1, -1));
-        for (int j = 0; j < visibleVertices.size(); j++)
-        {
-            result.addEdge(Edge(destination, visibleVertices[j]));
         }
 
         return result;
@@ -97,6 +94,7 @@ namespace visgraph
                 // {
                 //     break;
                 // }
+
                 // Update open edges - remove clock wise edges because we already considered them (remember we are moving counter-clockwise)
                 if (openEdges.openEdges.size() > 0)
                 {
