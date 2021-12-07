@@ -91,9 +91,6 @@ Graph::Graph (std::vector<std::vector<Point>> shapes){
             addEdge(Edge(it[i], siblingPoint)); 
             count++;
         }
-        for(Point p : it){
-            std::cout << "CONSTR " << p.polygonId << "\n";
-        }
         if(it.size() > 2){
             pid += 1;
         }

@@ -37,6 +37,7 @@ int printGraph(std::map<visgraph::Point, std::vector<visgraph::Edge>> g){
     int thickness = 1;
     
     for(it = g.begin(); it != g.end(); it++){
+        circle(image, Point(it->first.x / size * 500, it->first.y / size * 500), 5, Scalar(255, 255, 255), FILLED, LINE_8);
         for(visgraph::Edge e : it->second){
             // Rescale the points so that we can clearly see them in the screen
             Point p1(e.p1.x / size * 500, e.p1.y / size * 500), p2(e.p2.x / size * 500, e.p2.y / size * 500);

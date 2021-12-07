@@ -45,7 +45,7 @@ void shortestPathTest() {
 
     std::vector<visgraph::Point> pol1 {visgraph::Point(1.0, 1.0), visgraph::Point(1.0, 3.0), visgraph::Point(3.0,3.0), visgraph::Point(1.0, 1.0)};
     std::vector<visgraph::Point> pol2 {visgraph::Point(5.0, 5.0), visgraph::Point(7.0, 7.0), visgraph::Point(7.0,5.0), visgraph::Point(7.0, 7.0)};
-    std::vector<visgraph::Point> pol3 {visgraph::Point(1.0, 0.5), visgraph::Point(3.0, 2.5), visgraph::Point(3.0, 0.0), visgraph::Point(1.0, 0.5)};
+    std::vector<visgraph::Point> pol3 {visgraph::Point(1.0, 7), visgraph::Point(3.0, 9.5), visgraph::Point(3.0, 6), visgraph::Point(1.0, 7)};
 
     polygons.push_back(pol1);
     polygons.push_back(pol2);
