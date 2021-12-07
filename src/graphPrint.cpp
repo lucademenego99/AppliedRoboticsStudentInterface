@@ -10,7 +10,7 @@ using namespace std;
 
 int printGraph(std::map<visgraph::Point, std::vector<visgraph::Edge>> g){
     //Black color
-    Mat image(250, 250, CV_8UC3, Scalar(0, 0, 0));
+    Mat image(1000, 1000, CV_8UC3, Scalar(0, 0, 0));
 
 
     if(!image.data){
@@ -18,7 +18,7 @@ int printGraph(std::map<visgraph::Point, std::vector<visgraph::Edge>> g){
         return 0;
     }
 
-    int thickness = 2;
+    int thickness = 1;
     std::map<visgraph::Point, std::vector<visgraph::Edge>>::iterator it;
     for(it = g.begin(); it != g.end(); it++){
         for(visgraph::Edge e : it->second){
