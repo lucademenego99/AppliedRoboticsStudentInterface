@@ -35,21 +35,7 @@ int main(int argc, char *argv[])
 
     //visgraphTest();
 
-    //shortestPathTest();
-
-    std::vector<std::vector<visgraph::Point>> polygons;
-
-    std::vector<visgraph::Point> pol1 {visgraph::Point(100.0, 100.0), visgraph::Point(300.0, 300.0), visgraph::Point(300.0,100.0), visgraph::Point(100.0, 100.0)};
-    std::vector<visgraph::Point> pol2 {visgraph::Point(500.0, 500.0), visgraph::Point(700.0, 700.0), visgraph::Point(700.0,500.0), visgraph::Point(500.0, 500.0)};
-
-    polygons.push_back(pol1);
-    polygons.push_back(pol2);
-
-    visgraph::VisGraph visg = visgraph::VisGraph();
-
-    visgraph::Graph g = visg.computeVisibilityGraph(polygons, visgraph::Point(0, 0), visgraph::Point(800, 600));
-
-    printGraph(g.graph);
+    shortestPathTest();
 
     return 0;
 }
@@ -57,15 +43,20 @@ int main(int argc, char *argv[])
 void shortestPathTest() {
     std::vector<std::vector<visgraph::Point>> polygons;
 
-    std::vector<visgraph::Point> pol1 {visgraph::Point(1.0, 1.0), visgraph::Point(1.0, 3.0), visgraph::Point(3.0,1.0), visgraph::Point(3.0, 3.0)};
+    std::vector<visgraph::Point> pol1 {visgraph::Point(1.0, 1.0), visgraph::Point(1.0, 3.0), visgraph::Point(3.0,3.0), visgraph::Point(1.0, 1.0)};
     std::vector<visgraph::Point> pol2 {visgraph::Point(5.0, 5.0), visgraph::Point(7.0, 7.0), visgraph::Point(7.0,5.0), visgraph::Point(7.0, 7.0)};
+    std::vector<visgraph::Point> pol3 {visgraph::Point(1.0, 0.5), visgraph::Point(3.0, 2.5), visgraph::Point(3.0, 0.0), visgraph::Point(1.0, 0.5)};
 
     polygons.push_back(pol1);
     polygons.push_back(pol2);
+    polygons.push_back(pol3);
 
     visgraph::VisGraph visg = visgraph::VisGraph();
 
     visgraph::Graph g = visg.computeVisibilityGraph(polygons, visgraph::Point(0.0, 0.0), visgraph::Point(8.0, 6.0));
+
+    printGraph(g.graph);
+
     std::vector<visgraph::Point> path = visg.shortest_path(g.graph, visgraph::Point(0.0, 0.0), visgraph::Point(8.0, 6.0));
     for(int it = 0; it < path.size(); it++)
         path[it].print();

@@ -14,8 +14,7 @@ using namespace visgraph;
  * @param Y coordinate
  * @param polygonId the ID of the polygon
 */
-Point::Point (double x_coor, double y_coor, int polygonId) : x(x_coor), y(y_coor), polygonId(polygonId){
-}
+Point::Point(double x_coor, double y_coor, int polygonId) : x(x_coor), y(y_coor), polygonId(polygonId) {}
 
 /**
  * @brief Prints the coordinates of the point
@@ -82,16 +81,18 @@ Graph::Graph (std::vector<std::vector<Point>> shapes){
             it.pop_back();
         }
         int count = 0;
-        for(Point p : it){
+        for(int i =  0; i < it.size(); i++){
             Point siblingPoint = it[(count + 1)%(it.size())]; 
-            Edge edge = Edge(p, siblingPoint);
             if((it.size()) > 2){
-                p.polygonId = pid;
+                it[i].polygonId = pid;
                 siblingPoint.polygonId = pid;
-                polygons[pid].push_back(edge);
+                polygons[pid].push_back(Edge(it[i], siblingPoint));
             }
-            addEdge(edge); 
+            addEdge(Edge(it[i], siblingPoint)); 
             count++;
+        }
+        for(Point p : it){
+            std::cout << "CONSTR " << p.polygonId << "\n";
         }
         if(it.size() > 2){
             pid += 1;
@@ -139,8 +140,8 @@ std::vector<Edge> Graph::getEdges(){
  * @param edge the one we want to insert
  */
 void Graph::addEdge(Edge edge){
-    graph[Point(edge.p1.x, edge.p1.y)].push_back(edge);
-    graph[Point(edge.p2.x, edge.p2.y)].push_back(edge);
+    graph[edge.p1].push_back(edge);
+    graph[edge.p2].push_back(edge);
     edges.push_back(edge);
 }
 /**
