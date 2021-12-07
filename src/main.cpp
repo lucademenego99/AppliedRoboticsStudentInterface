@@ -3,6 +3,7 @@
 #include "graph.hpp"
 #include "visgraph.hpp"
 #include "open_edges.hpp"
+#include "graphPrint.hpp"
 #include <iostream>
 
 using namespace student;
