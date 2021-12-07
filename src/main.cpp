@@ -33,9 +33,23 @@ int main(int argc, char *argv[])
 
     // openEdgesTest();
 
-    visgraphTest();
+    //visgraphTest();
 
-    shortestPathTest();
+    //shortestPathTest();
+
+    std::vector<std::vector<visgraph::Point>> polygons;
+
+    std::vector<visgraph::Point> pol1 {visgraph::Point(100.0, 100.0), visgraph::Point(300.0, 300.0), visgraph::Point(300.0,100.0), visgraph::Point(100.0, 100.0)};
+    std::vector<visgraph::Point> pol2 {visgraph::Point(500.0, 500.0), visgraph::Point(700.0, 700.0), visgraph::Point(700.0,500.0), visgraph::Point(500.0, 500.0)};
+
+    polygons.push_back(pol1);
+    polygons.push_back(pol2);
+
+    visgraph::VisGraph visg = visgraph::VisGraph();
+
+    visgraph::Graph g = visg.computeVisibilityGraph(polygons, visgraph::Point(0, 0), visgraph::Point(800, 600));
+
+    printGraph(g.graph);
 
     return 0;
 }
