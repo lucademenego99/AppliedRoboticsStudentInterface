@@ -25,12 +25,8 @@ int printGraph(std::map<visgraph::Point, std::vector<visgraph::Edge>> g){
     double size = max(biggestX-smallestX, biggestY-smallestY);
 
     //Black color
-<<<<<<< HEAD
-    Mat image(1000, 1000, CV_8UC3, Scalar(0, 0, 0));
-=======
     Mat image(500, 500, CV_8UC3, Scalar(0, 0, 0));
     Mat flipped;
->>>>>>> be3c82894745052f499708686f5e07df1f536314
 
 
     if(!image.data){
@@ -39,11 +35,6 @@ int printGraph(std::map<visgraph::Point, std::vector<visgraph::Edge>> g){
     }
 
     int thickness = 1;
-<<<<<<< HEAD
-    std::map<visgraph::Point, std::vector<visgraph::Edge>>::iterator it;
-=======
-    
->>>>>>> be3c82894745052f499708686f5e07df1f536314
     for(it = g.begin(); it != g.end(); it++){
         circle(image, Point(it->first.x / size * 500, it->first.y / size * 500), 5, Scalar(255, 255, 255), FILLED, LINE_8);
         for(visgraph::Edge e : it->second){
