@@ -14,7 +14,7 @@ namespace visgraph
     bool OpenEdges::lessThan(Point p1, Point p2, Edge edge1, Edge edge2)
     {
         if (edge1 == edge2)
-            return false;    // TODO: maybe true?
+            return false;
         if (!visGraph.edgeIntersect(p1, p2, edge2))
             return true;
         double edge1Distance = visGraph.pointEdgeDistance(p1, p2, edge1);

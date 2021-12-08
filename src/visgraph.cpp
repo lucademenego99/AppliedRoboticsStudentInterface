@@ -20,12 +20,6 @@ namespace visgraph
         // Final visibility graph
         Graph result = Graph(points);
 
-        vector<Point> tmp = getVisibleVertices(Point(1.0, 7.0, 2), initial);
-        std::cout << "VISIBLE: \n";
-        for (Point p : tmp) {
-            p.print();
-        }
-
         // Get all the points we need to consider
         vector<Point> allPoints = initial.getPoints();
 
@@ -123,14 +117,14 @@ namespace visgraph
                 // If it's the first iteration (prev is default point) or the orientation is not collinear or it's collinear and the previous point is between point and p
                 if (prev == Point(-1, -1, -1) || getOrientation(point, prev, p) != COLLINEAR || !onSegment(point, prev, p))
                 {
-                    // If there is nothing inside openEdges, then the point is visible because there is no edge that hides it
                     if (openEdges.openEdges.size() == 0)
                     {
+                        // If there is nothing inside openEdges, then the point is visible because there is no edge that hides it
                         isVisible = true;
                     }
-                    // If there is something inside openEdges, but the segment [point - p] does not intersect the closer openEdge, then no segment is hiding the point and the point is visible
                     else if (!edgeIntersect(point, p, openEdges.getSmallest()))
                     {
+                        // If there is something inside openEdges, but the segment [point - p] does not intersect the closer openEdge, then no segment is hiding the point and the point is visible
                         isVisible = true;
                     }
                 }
@@ -163,7 +157,7 @@ namespace visgraph
                 vector<Point> adjPoints = graph.getAdjacentPoints(point);
                 if (isVisible && !(count(adjPoints.begin(), adjPoints.end(), p)))
                 {
-                    isVisible = !edgeInPolygon(point, p, graph);
+                    isVisible = !(edgeInPolygon(point, p, graph));
                 }
 
                 if (isVisible)
@@ -216,7 +210,7 @@ namespace visgraph
                 }
             }
         }
-        return !(intersectCount % 2 == 0);
+        return (intersectCount % 2 != 0);
     }
 
     /**
@@ -355,11 +349,11 @@ namespace visgraph
 
     double VisGraph::getAngle2(Point a, Point b, Point c)
     {
-        double aValue = pow(c.x - b.x, 2) + pow(c.y - b.y, 2);
-        double bValue = pow(c.x - a.x, 2) + pow(c.y - a.y, 2);
-        double cValue = pow(b.x - a.x, 2) + pow(a.y - a.y, 2);
-        double cosValue = (aValue + cValue - bValue) / (2.0 * sqrt(aValue) * sqrt(cValue));
-        return acos(int(cosValue * T) / (1.0 * T2));
+        double aValue = pow(b.x - c.x, 2) + pow(b.y - c.y, 2);
+        double bValue = pow(a.x - c.x, 2) + pow(a.y - c.y, 2);
+        double cValue = pow(a.x - b.x, 2) + pow(a.y - b.y, 2);
+
+        return acos((aValue + cValue - bValue) / (2 * sqrt(aValue) * sqrt(cValue)));
     }
 
     Point VisGraph::getIntersectPoint(Point p1, Point p2, Edge edge)
