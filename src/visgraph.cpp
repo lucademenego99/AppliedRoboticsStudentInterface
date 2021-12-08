@@ -20,14 +20,23 @@ namespace visgraph
         // Final visibility graph
         Graph result = Graph(points);
 
+        vector<Point> tmp = getVisibleVertices(Point(1.0, 7.0, 2), initial);
+        std::cout << "VISIBLE: \n";
+        for (Point p : tmp) {
+            p.print();
+        }
+
         // Get all the points we need to consider
         vector<Point> allPoints = initial.getPoints();
+
+        allPoints.push_back(origin);
+        allPoints.push_back(destination);
 
         // Loop through all the points we have
         for (int i = 0; i < allPoints.size(); i++)
         {
             // Get the visible vertices from the point we are considering
-            vector<Point> visibleVertices = getVisibleVertices(allPoints[i], initial, origin, destination);
+            vector<Point> visibleVertices = getVisibleVertices(allPoints[i], initial);
 
             // Add an edge (a,b) if b is visible from a
             for (int j = 0; j < visibleVertices.size(); j++)
@@ -82,7 +91,7 @@ namespace visgraph
         }
 
         vector<Point> visible;  // Final result: all the visible points from the point [point]
-        Point prev = Point(-1, -1); // Keep the previous point to understand what is the line that moves counter-clockwise (the one that at first was [point - pointInf])
+        Point prev = Point(-1, -1, -1); // Keep the previous point to understand what is the line that moves counter-clockwise (the one that at first was [point - pointInf])
         bool prevVisible = false;   // Remember if the previous point was visible or not
 
         // Loop through all points (expcept the point we are considering)
@@ -112,7 +121,7 @@ namespace visgraph
                 bool isVisible = false;
 
                 // If it's the first iteration (prev is default point) or the orientation is not collinear or it's collinear and the previous point is between point and p
-                if (prev == Point(-1, -1) || getOrientation(point, prev, p) != COLLINEAR || !onSegment(point, prev, p))
+                if (prev == Point(-1, -1, -1) || getOrientation(point, prev, p) != COLLINEAR || !onSegment(point, prev, p))
                 {
                     // If there is nothing inside openEdges, then the point is visible because there is no edge that hides it
                     if (openEdges.openEdges.size() == 0)
@@ -274,19 +283,19 @@ namespace visgraph
 
         // Special Cases
         // p1, q1 and p2 are collinear and p2 lies on segment p1q1
-        if (o1 == 0 && onSegment(p1, p2, q1))
+        if (o1 == COLLINEAR && onSegment(p1, p2, q1))
             return true;
 
         // p1, q1 and q2 are collinear and q2 lies on segment p1q1
-        if (o2 == 0 && onSegment(p1, q2, q1))
+        if (o2 == COLLINEAR && onSegment(p1, q2, q1))
             return true;
 
         // p2, q2 and p1 are collinear and p1 lies on segment p2q2
-        if (o3 == 0 && onSegment(p2, p1, q2))
+        if (o3 == COLLINEAR && onSegment(p2, p1, q2))
             return true;
 
         // p2, q2 and q1 are collinear and q1 lies on segment p2q2
-        if (o4 == 0 && onSegment(p2, q1, q2))
+        if (o4 == COLLINEAR && onSegment(p2, q1, q2))
             return true;
 
         return false; // Doesn't fall in any of the above cases
@@ -310,9 +319,15 @@ namespace visgraph
         return (val < 0) ? 1 : -1; // clock or counterclock wise
     }
 
+    // Given three collinear points p, q, r, the function checks if
+    // point q lies on line segment 'pr'
     bool VisGraph::onSegment(Point p, Point q, Point r)
     {
-        return (q.x <= max(p.x, r.x) && (q.x >= min(p.x, r.x)) && ((q.y <= max(p.y, r.y) && (q.y >= min(p.y, r.y)))));
+        if (q.x <= max(p.x, r.x) && q.x >= min(p.x, r.x) &&
+            q.y <= max(p.y, r.y) && q.y >= min(p.y, r.y))
+        return true;
+    
+        return false;
     }
 
     double VisGraph::getAngle(Point center, Point point)
@@ -356,17 +371,24 @@ namespace visgraph
         if (edge.p1.x == edge.p2.x)
         {
             if (p1.x == p2.x)
-                return Point(-1, -1);
+                return Point(-1, -1, -1);
             double pSlope = double(p1.y - p2.y) / (p1.x - p2.x);
             double intersectX = edge.p1.x;
             double intersectY = pSlope * (intersectX - p1.x) + p1.y;
             return Point(intersectX, intersectY);
         }
 
+        if (p1.x == p2.x) {
+            double eSlope = double(edge.p1.y - edge.p2.y) / (edge.p1.x - edge.p2.x);
+            double intersectX = p1.x;
+            double intersectY = eSlope * (intersectX - edge.p1.x) + edge.p1.y;
+            return Point(intersectX, intersectY);
+        }
+
         double pSlope = double(p1.y - p2.y) / (p1.x - p2.x);
         double eSlope = double(edge.p1.y - edge.p2.y) / (edge.p1.x - edge.p2.x);
         if (eSlope == pSlope)
-            return Point(-1, -1);
+            return Point(-1, -1, -1);
         double intersectX = ((eSlope * edge.p1.x) - (pSlope * p1.x) + p1.y - edge.p1.y) / (eSlope - pSlope);
         double intersectY = eSlope * (intersectX - edge.p1.x) + edge.p1.y;
         return Point(intersectX, intersectY);
@@ -380,7 +402,7 @@ namespace visgraph
     double VisGraph::pointEdgeDistance(Point p1, Point p2, Edge edge)
     {
         Point intersectPoint = getIntersectPoint(p1, p2, edge);
-        return (!(intersectPoint == Point(-1, -1))) ? edgeDistance(p1, intersectPoint) : 0;
+        return (intersectPoint == Point(-1, -1, -1)) ? edgeDistance(p1, intersectPoint): 0;
     }
 
     std::vector<Point> VisGraph::shortest_path(DictG graph, Point origin, Point destination) {

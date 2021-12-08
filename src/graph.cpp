@@ -20,7 +20,7 @@ Point::Point(double x_coor, double y_coor, int polygonId) : x(x_coor), y(y_coor)
  * @brief Prints the coordinates of the point
  */
 void Point::print (){
-    std::cout<<"Point( "<< x << "," << y << ")\n";
+    std::cout<<"Point("<< x << "," << y << "," << polygonId << ")\n";
 }
 
 bool Point::operator<(const Point &ob) const {
