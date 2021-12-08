@@ -186,31 +186,32 @@ namespace visgraph
     {
         Point p2 = Point(INF, p1.y);
         int intersectCount = 0;
-        for (Edge edge : polygonEdges)
-        {
-            if (!(p1.y < edge.p1.y && p1.y < edge.p2.y) && !(p1.y > edge.p1.y && p1.y > edge.p2.y) && !(p1.x > edge.p1.x && p1.x > edge.p2.x))
-            {
-                // Deal with points collinear to p1
+        vector<Point> polygonPoints;
+        for (Edge edge : polygonEdges) {
+            // Check if the line segment from p1 to p2 intersects the edge
+            if (edgeIntersect(p1, p2, edge)) {
+                // Special case: they are all collinear
+                if (getOrientation(edge.p1, p1, edge.p2) == COLLINEAR)
+                    return onSegment(edge.p1, p1, edge.p2);
+                
+                // Another special case to manage collinear points - if we are intersecting an edge on its vertex, then
+                // we don't want to calculate two intersections, but one. So in that case we
+                // add 1 to intersectCount only if the collinearPoint's y is greater than p1.y
                 bool edgeP1Collinear = (getOrientation(p1, edge.p1, p2) == COLLINEAR);
                 bool edgeP2Collinear = (getOrientation(p1, edge.p2, p2) == COLLINEAR);
-                if (!edgeP1Collinear || !edgeP2Collinear)
-                {
-                    if (edgeP1Collinear || edgeP2Collinear)
+                if (edgeP1Collinear || edgeP2Collinear) {
+                    Point collinearPoint = edgeP1Collinear ? edge.p1 : edge.p2;
+                    if (edge.getAdjacent(collinearPoint).y > p1.y)
                     {
-                        Point collinearPoint = edgeP1Collinear ? edge.p1 : edge.p2;
-                        if (edge.getAdjacent(collinearPoint).y > p1.y)
-                        {
-                            intersectCount += 1;
-                        }
+                        intersectCount++;
                     }
-                    else if (edgeIntersect(p1, p2, edge))
-                    {
-                        intersectCount += 1;
-                    }
+                } else if (!edgeP1Collinear && !edgeP2Collinear) {
+                    // Otherwise, simply add 1 to the intersectCount.
+                    intersectCount++;
                 }
             }
         }
-        return (intersectCount % 2 != 0);
+        return (intersectCount % 2 == 1);
     }
 
     /**
