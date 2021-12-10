@@ -3,6 +3,8 @@
 #include "open_edges.hpp"
 #include "graph.hpp"
 #include "shortest_path.hpp"
+#include "utils.hpp"
+#include "dubins.hpp"
 #include <math.h>
 #include <algorithm>
 
@@ -31,7 +33,6 @@ namespace visgraph
         {
             // Get the visible vertices from the point we are considering
             vector<Point> visibleVertices = getVisibleVertices(allPoints[i], initial);
-
             // Add an edge (a,b) if b is visible from a
             for (int j = 0; j < visibleVertices.size(); j++)
             {
@@ -46,7 +47,9 @@ namespace visgraph
     {
         vector<Edge> edges = graph.getEdges();
         vector<Point> points = graph.getPoints();
-
+        std::vector<student::Point> results; //Just for the sake of passing correct parameters to the function
+        std::vector<double> t;
+        student::Dubins dubin;
         if (!(origin == Point(-1, -1)))
             points.push_back(origin);
         if (!(destination == Point(-1, -1)))
@@ -72,7 +75,7 @@ namespace visgraph
             if (!(edge.contains(point)))
             {
                 // And if the line that starts from point and goes to the right (positive x axis) intersect the edge
-                if (edgeIntersect(point, pointInf, edge))
+                if (dubin.intersLineLine(student::Point(point.x, point.y), student::Point(pointInf.x, pointInf.y), student::Point(edge.p1.x, edge.p1.y), student::Point(edge.p2.x, edge.p2.y), results, t))
                 {
                     // And if one of the points of the edge is on the line that starts from point and goes to the right
                     if (!onSegment(point, edge.p1, pointInf) && !onSegment(point, edge.p2, pointInf))
@@ -107,10 +110,11 @@ namespace visgraph
                         if (getOrientation(point, p, e.getAdjacent(p)) == CW)
                         {
                             openEdges.deleteEdge(point, p, e);
+                            
                         }
                     }
                 }
-
+                
                 // Initialize the visibility of the point we are considering to false
                 bool isVisible = false;
 
@@ -122,7 +126,7 @@ namespace visgraph
                         // If there is nothing inside openEdges, then the point is visible because there is no edge that hides it
                         isVisible = true;
                     }
-                    else if (!edgeIntersect(point, p, openEdges.getSmallest()))
+                    else if (!dubin.intersLineLine(student::Point(point.x, point.y), student::Point(p.x, p.y), student::Point(openEdges.getSmallest().p1.x, openEdges.getSmallest().p1.y), student::Point(openEdges.getSmallest().p2.x, openEdges.getSmallest().p2.y), results, t))
                     {
                         // If there is something inside openEdges, but the segment [point - p] does not intersect the closer openEdge, then no segment is hiding the point and the point is visible
                         isVisible = true;
@@ -140,7 +144,7 @@ namespace visgraph
                     isVisible = true;
                     for (Edge e : openEdges.openEdges)
                     {
-                        if (!(e.contains(prev)) && edgeIntersect(prev, p, e))
+                        if (!(e.contains(prev)) && dubin.intersLineLine(student::Point(prev.x, prev.y), student::Point(p.x, p.y), student::Point(e.p1.x, e.p1.y), student::Point(e.p2.x, e.p2.y), results, t))
                         {
                             isVisible = false;
                             // We break because if there is at least one intersecting openEdge, we are sure the point won't be visible
@@ -187,9 +191,12 @@ namespace visgraph
         Point p2 = Point(INF, p1.y);
         int intersectCount = 0;
         vector<Point> polygonPoints;
+        std::vector<student::Point> results; //Just for the sake of passing correct parameters to the function
+        std::vector<double> t;
+        student::Dubins dubin;
         for (Edge edge : polygonEdges) {
             // Check if the line segment from p1 to p2 intersects the edge
-            if (edgeIntersect(p1, p2, edge)) {
+            if (dubin.intersLineLine(student::Point(p1.x, p1.y), student::Point(p2.x, p2.y), student::Point(edge.p1.x, edge.p1.y), student::Point(edge.p2.x, edge.p2.y), results, t)) {
                 // Special case: they are all collinear
                 if (getOrientation(edge.p1, p1, edge.p2) == COLLINEAR)
                     return onSegment(edge.p1, p1, edge.p2);
@@ -396,8 +403,14 @@ namespace visgraph
 
     double VisGraph::pointEdgeDistance(Point p1, Point p2, Edge edge)
     {
-        Point intersectPoint = getIntersectPoint(p1, p2, edge);
-        return (intersectPoint == Point(-1, -1, -1)) ? edgeDistance(p1, intersectPoint): 0;
+        std::vector<student::Point> results; //Just for the sake of passing correct parameters to the function
+        std::vector<double> t;
+        student::Dubins dubin;
+        dubin.intersLineLine(student::Point(p1.x, p1.y), student::Point(p2.x, p2.y), student::Point(edge.p1.x, edge.p1.y), student::Point(edge.p2.x, edge.p2.y), results, t);
+        if(results.size() > 0){
+            return edgeDistance(p1, Point(results[0].x, results[0].y));
+        }
+        return 0;
     }
 
     std::vector<Point> VisGraph::shortest_path(DictG graph, Point origin, Point destination) {

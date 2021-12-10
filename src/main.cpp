@@ -4,6 +4,7 @@
 #include "visgraph.hpp"
 #include "open_edges.hpp"
 #include "graphPrint.hpp"
+#include "utils.hpp"
 #include <iostream>
 
 using namespace student;
@@ -37,21 +38,31 @@ int main(int argc, char *argv[])
 
     shortestPathTest();
 
+    //Small test for the alternative intersection we might considers, since the other one is problematic
+    /*std::vector<student::Point> points;
+    std::vector<double> t;
+    Dubins dubin;
+    dubin.intersLineLine(student::Point(1,1), student::Point(3,3), student::Point(3,1), student::Point(1,3), points, t);
+    for( student::Point p : points){
+        std::cout << "X intersection: " << p.x << "\n";
+        std::cout << "Y intersection: " << p.y << "\n";
+    }*/
+    
     return 0;
 }
 
 void shortestPathTest() {
     std::vector<std::vector<visgraph::Point>> polygons;
 
-    std::vector<visgraph::Point> pol1 {visgraph::Point(1.0, 1.0), visgraph::Point(1.0, 5.0), visgraph::Point(3.0,5.0), visgraph::Point(3.0,1.0), visgraph::Point(1.0, 1.0)};
-    std::vector<visgraph::Point> pol2 {visgraph::Point(1.0, 6.0), visgraph::Point(1.0, 8.0), visgraph::Point(7.0,8.0), visgraph::Point(7.0,6.0), visgraph::Point(1.0, 6.0)};
-    std::vector<visgraph::Point> pol3 {visgraph::Point(6.0, 1.0), visgraph::Point(5.0, 3.0), visgraph::Point(7.0, 5), visgraph::Point(9.0,3.0), visgraph::Point(8.0,1.0), visgraph::Point(6.0, 1.0)};
-    std::vector<visgraph::Point> pol4 {visgraph::Point(8.0, 8.0), visgraph::Point(8.0,10.0), visgraph::Point(10.0,10.0), visgraph::Point(10.0,8.0), visgraph::Point(8.0,8.0)};
+    std::vector<visgraph::Point> pol1 {visgraph::Point(2.0, 1.0), visgraph::Point(3.0, 1.0), visgraph::Point(4.0,2.0), visgraph::Point(3.0,4.0), visgraph::Point(2.0, 4.0), visgraph::Point(1.0, 2.0), visgraph::Point(2.0, 1.0)};
+    std::vector<visgraph::Point> pol2 {visgraph::Point(1.0, 4), visgraph::Point(4.0, 4), visgraph::Point(6.0,6.0), visgraph::Point(1.0,6.0), visgraph::Point(1.0, 4)};
+    std::vector<visgraph::Point> pol3 {visgraph::Point(7.0, 2.0), visgraph::Point(8.0, 3.0), visgraph::Point(7.0, 5.0), visgraph::Point(6.0,3.0), visgraph::Point(7.0,2.0)};
+    //std::vector<visgraph::Point> pol4 {visgraph::Point(8.0, 8.0), visgraph::Point(8.0,10.0), visgraph::Point(10.0,10.0), visgraph::Point(10.0,8.0), visgraph::Point(8.0,8.0)};
 
     polygons.push_back(pol1);
     polygons.push_back(pol2);
     polygons.push_back(pol3);
-    polygons.push_back(pol4);
+    //polygons.push_back(pol4);
 
     visgraph::VisGraph visg = visgraph::VisGraph();
 

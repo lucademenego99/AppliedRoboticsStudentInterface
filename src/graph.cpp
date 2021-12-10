@@ -44,10 +44,10 @@ Edge::Edge(const Point point1, const Point point2): p1(point1) , p2(point2){
  * @return returns the adjacent
  */
 Point Edge::getAdjacent(Point point){
-    if(point == this->p1){
-        return this->p2;
+    if(point == p1){
+        return p2;
     }
-    return this->p1;
+    return p1;
 }
 
 /**
@@ -56,7 +56,7 @@ Point Edge::getAdjacent(Point point){
  * @return return whether or not the point is present
  */
 bool Edge::contains (Point point){
-    return this->p1 == point || this->p2 == point;
+    return p1 == point || p2 == point;
 }
 
 /**

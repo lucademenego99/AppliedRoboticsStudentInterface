@@ -1,5 +1,6 @@
 #include "open_edges.hpp"
-
+#include "utils.hpp"
+#include "dubins.hpp"
 #include "graph.hpp"
 #include "visgraph.hpp"
 
@@ -13,9 +14,12 @@ namespace visgraph
 
     bool OpenEdges::lessThan(Point p1, Point p2, Edge edge1, Edge edge2)
     {
+        std::vector<student::Point> results; //Just for the sake of passing correct parameters to the function
+        std::vector<double> t;
+        student::Dubins dubin;
         if (edge1 == edge2)
             return false;
-        if (!visGraph.edgeIntersect(p1, p2, edge2))
+        if (!dubin.intersLineLine(student::Point(p1.x, p1.y), student::Point(p2.x, p2.y), student::Point(edge2.p1.x, edge2.p1.y), student::Point(edge2.p2.x, edge2.p2.y), results, t))
             return true;
         double edge1Distance = visGraph.pointEdgeDistance(p1, p2, edge1);
         double edge2Distance = visGraph.pointEdgeDistance(p1, p2, edge2);
@@ -24,7 +28,6 @@ namespace visgraph
             Point samePoint = edge2.contains(edge1.p1) ? edge1.p1 : edge1.p2;
             double angleEdge1 = visGraph.getAngle2(p1, p2, edge1.getAdjacent(samePoint));
             double angleEdge2 = visGraph.getAngle2(p1, p2, edge2.getAdjacent(samePoint));
-
             return angleEdge1 < angleEdge2;
         }
         else
@@ -66,6 +69,9 @@ namespace visgraph
     void OpenEdges::deleteEdge(Point p1, Point p2, Edge edge)
     {
         int index = getIndex(p1, p2, edge) - 1;
+        if(p1 == Point(7,5,2) && p2 == Point(2,1,0)){
+            Edge e = getEdge(index);
+        }
         if (openEdges.size() > index && getEdge(index) == edge)
             openEdges.erase(openEdges.begin() + index);
     }
