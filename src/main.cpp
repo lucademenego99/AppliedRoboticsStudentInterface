@@ -55,16 +55,26 @@ void visgraphTest() {
     // std::vector<visgraph::Point> pol2 {visgraph::Point(1.0, 3.5), visgraph::Point(6.0, 6.0), visgraph::Point(1.0, 6.0), visgraph::Point(1.0, 3.5)};
     // std::vector<visgraph::Point> pol3 {visgraph::Point(7.0, 2.0), visgraph::Point(8.0, 3.0), visgraph::Point(7.0, 5.0), visgraph::Point(6.0, 3.0), visgraph::Point(7.0,2.0)};
 
-    std::vector<visgraph::Point> pol1 {visgraph::Point(1.0, 1.0), visgraph::Point(3.0, 1.0), visgraph::Point(4.0, 5.0), visgraph::Point(1.0, 4.0)};
-    std::vector<visgraph::Point> pol2 {visgraph::Point(1.0, 5.0), visgraph::Point(4.0, 5.5), visgraph::Point(4.0, 6.0), visgraph::Point(1.0, 5.5)};
-    std::vector<visgraph::Point> pol3 {visgraph::Point(6.0, 1.0), visgraph::Point(8.0, 1.0), visgraph::Point(9.0, 3.0), visgraph::Point(6.5, 5.0), visgraph::Point(5.0,3.0)};
+    // std::vector<visgraph::Point> pol1 {visgraph::Point(1.0, 1.0), visgraph::Point(3.0, 1.0), visgraph::Point(4.0, 5.0), visgraph::Point(1.0, 4.0)};
+    // std::vector<visgraph::Point> pol2 {visgraph::Point(1.0, 5.0), visgraph::Point(4.0, 5.5), visgraph::Point(4.0, 6.0), visgraph::Point(1.0, 5.5)};
+    // std::vector<visgraph::Point> pol3 {visgraph::Point(6.0, 1.0), visgraph::Point(8.0, 1.0), visgraph::Point(9.0, 3.0), visgraph::Point(6.5, 5.0), visgraph::Point(5.0,3.0)};
+
+    std::vector<visgraph::Point> pol1 {visgraph::Point(1.0, 1.0), visgraph::Point(10.0, 0.3), visgraph::Point(4.0, 3.0), visgraph::Point(2.0, 2.5), visgraph::Point(1.0, 1.5)};
+    std::vector<visgraph::Point> pol2 {visgraph::Point(0.7, 2.0), visgraph::Point(2.0, 3.0), visgraph::Point(1.5, 4.5)};
+    std::vector<visgraph::Point> pol3 {visgraph::Point(2.0, 6.0), visgraph::Point(2.3, 7.0), visgraph::Point(3.3, 7.0), visgraph::Point(6.6, 8.0)};
+
+    // std::vector<visgraph::Point> pol1 {visgraph::Point(1.0, 1.0), visgraph::Point(4.0, 1.0), visgraph::Point(4.0, 3.0), visgraph::Point(1.0, 3.0)};
+    // std::vector<visgraph::Point> pol2 {visgraph::Point(1.0, 3.5), visgraph::Point(4.0, 3.5), visgraph::Point(4.0, 5.5), visgraph::Point(1.0, 5.5)};
+    // std::vector<visgraph::Point> pol3 {visgraph::Point(1.0, 6.0), visgraph::Point(4.0, 6.0), visgraph::Point(4.0, 8.0), visgraph::Point(1.0, 8.0)};
+    // std::vector<visgraph::Point> pol4 {visgraph::Point(5.0, 1.0), visgraph::Point(7.0, 1.0), visgraph::Point(7.0, 7.0), visgraph::Point(5.0, 7.0)};
 
     polygons.push_back(pol1);
     polygons.push_back(pol2);
     polygons.push_back(pol3);
+    // polygons.push_back(pol4);
 
-    visgraph::Point origin = visgraph::Point(0.0, 0.0);
-    visgraph::Point destination = visgraph::Point(5.0, 4.0);
+    visgraph::Point origin = visgraph::Point(4.5,0.3);
+    visgraph::Point destination = visgraph::Point(7, 2);
 
     visgraph::VisGraph visg = visgraph::VisGraph();
 
@@ -75,7 +85,7 @@ void visgraphTest() {
     for(int it = 0; it < path.size(); it++)
         path[it].print();
     
-    printGraph(g.graph);
+    printGraph(g.graph, origin, destination, path);
 }
 
 void openEdgesTest() {

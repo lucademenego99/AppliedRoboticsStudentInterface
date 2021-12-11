@@ -10,7 +10,7 @@
 using namespace cv;
 using namespace std;
 
-int printGraph(std::map<visgraph::Point, std::vector<visgraph::Edge>> g){
+int printGraph(std::map<visgraph::Point, std::vector<visgraph::Edge>> g, visgraph::Point origin, visgraph::Point destination, std::vector<visgraph::Point> shortestPath){
     std::map<visgraph::Point, std::vector<visgraph::Edge>>::iterator it;
 
     double smallestX = INFINITY, biggestX = -INFINITY, smallestY = INFINITY, biggestY = -INFINITY;
@@ -23,6 +23,7 @@ int printGraph(std::map<visgraph::Point, std::vector<visgraph::Edge>> g){
         biggestY = p.y > biggestY ? p.y : biggestY;
     }
     double size = max(biggestX-smallestX, biggestY-smallestY);
+    size *= 1.1;
 
     //Black color
     Mat image(500, 500, CV_8UC3, Scalar(0, 0, 0));
@@ -43,6 +44,16 @@ int printGraph(std::map<visgraph::Point, std::vector<visgraph::Edge>> g){
             line(image, p1, p2, Scalar(0, 0, 255), thickness, LINE_AA);
         }
     }
+    // Show origin in blue and destination in green
+    circle(image, Point(origin.x / size * 500, origin.y / size * 500), 5, Scalar(252, 19, 3), FILLED, LINE_8);
+    circle(image, Point(destination.x / size * 500, destination.y / size * 500), 5, Scalar(32, 252, 3), FILLED, LINE_8);
+
+    // Show shortest path in green
+    for(int i = 1; i < shortestPath.size(); i++) {
+        Point p1(shortestPath[i-1].x / size * 500, shortestPath[i-1].y / size * 500), p2(shortestPath[i].x / size * 500, shortestPath[i].y / size * 500);
+        line(image, p1, p2, Scalar(32, 252, 3), thickness, LINE_AA);
+    }
+
     flip(image, flipped, 0);
     imshow("Output", flipped);
     cv::waitKey(0);
