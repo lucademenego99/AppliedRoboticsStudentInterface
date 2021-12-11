@@ -114,7 +114,6 @@ namespace visgraph
                         if (getOrientation(point, p, e.getAdjacent(p)) == CW)
                         {
                             openEdges.deleteEdge(point, p, e);
-                            
                         }
                     }
                 }

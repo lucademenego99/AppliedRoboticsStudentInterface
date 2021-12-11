@@ -540,6 +540,7 @@ namespace student
      */
     bool Dubins::intersLineLine(Point p1, Point p2, Point p3, Point p4, std::vector<Point> &pts, std::vector<double> &ts)
     {
+        const double EPSILON = 0.0000001;
         // Initialize the resulting arrays as empty arrays
         pts.clear();
         ts.clear();
@@ -582,7 +583,7 @@ namespace student
             double t1 = t0 + (dotSR / dotRR);
             if (dotSR < 0)
             {
-                if (t0 >= 0 && t1 <= 1)
+                if (t0 >= 0-EPSILON && t1 <= 1+EPSILON)
                 {
                     ts.push_back(std::max(t1, 0.0));
                     ts.push_back(std::min(t0, 1.0));
@@ -590,7 +591,7 @@ namespace student
             }
             else
             {
-                if (t1 >= 0 && t0 <= 1)
+                if (t1 >= 0-EPSILON && t0 <= 1+EPSILON)
                 {
                     ts.push_back(std::max(t0, 0.0));
                     ts.push_back(std::min(t1, 1.0));
@@ -607,7 +608,7 @@ namespace student
             {
                 double t = crossDiffS / crossRS;
                 double u = crossDiffR / crossRS;
-                if (t >= 0 && t <= 1 && u >= 0 && u <= 1)
+                if ((t >= 0-EPSILON && t <= 1+EPSILON && u >= 0-EPSILON && u <= 1+EPSILON))
                 {
                     ts.push_back(t);
                 }

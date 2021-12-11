@@ -97,7 +97,7 @@ double Edge::weight() {
  * @brief Prints the basic information of the edge
  */
 void Edge::print (){
-    std::cout << "Edge((" << p1.x << "," << p1.y << ")(" << p2.x << "," << p2.y << "))\n\n";
+    std::cout << "Edge((" << p1.x << "," << p1.y << ")(" << p2.x << "," << p2.y << "))\n";
 }
 
 bool Edge::operator==(const Edge &ob) const{

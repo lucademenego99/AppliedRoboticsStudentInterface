@@ -36,14 +36,14 @@ int main(int argc, char *argv[])
     visgraphTest();
 
     //Small test for the alternative intersection we might considers, since the other one is problematic
-    /*std::vector<student::Point> points;
-    std::vector<double> t;
-    Dubins dubin;
-    dubin.intersLineLine(student::Point(1,1), student::Point(3,3), student::Point(3,1), student::Point(1,3), points, t);
-    for( student::Point p : points){
-        std::cout << "X intersection: " << p.x << "\n";
-        std::cout << "Y intersection: " << p.y << "\n";
-    }*/
+    // std::vector<student::Point> points;
+    // std::vector<double> t;
+    // Dubins dubin;
+    // std::cout << dubin.intersLineLine(student::Point(450, 30), student::Point(330,700), student::Point(230,700), student::Point(330,700), points, t) << "\n";
+    // for( student::Point p : points){
+    //     std::cout << "X intersection: " << p.x << "\n";
+    //     std::cout << "Y intersection: " << p.y << "\n";
+    // }
     
     return 0;
 }
@@ -59,22 +59,22 @@ void visgraphTest() {
     // std::vector<visgraph::Point> pol2 {visgraph::Point(1.0, 5.0), visgraph::Point(4.0, 5.5), visgraph::Point(4.0, 6.0), visgraph::Point(1.0, 5.5)};
     // std::vector<visgraph::Point> pol3 {visgraph::Point(6.0, 1.0), visgraph::Point(8.0, 1.0), visgraph::Point(9.0, 3.0), visgraph::Point(6.5, 5.0), visgraph::Point(5.0,3.0)};
 
-    std::vector<visgraph::Point> pol1 {visgraph::Point(1.0, 1.0), visgraph::Point(10.0, 0.3), visgraph::Point(4.0, 3.0), visgraph::Point(2.0, 2.5), visgraph::Point(1.0, 1.5)};
-    std::vector<visgraph::Point> pol2 {visgraph::Point(0.7, 2.0), visgraph::Point(2.0, 3.0), visgraph::Point(1.5, 4.5)};
-    std::vector<visgraph::Point> pol3 {visgraph::Point(2.0, 6.0), visgraph::Point(2.3, 7.0), visgraph::Point(3.3, 7.0), visgraph::Point(6.6, 8.0)};
+    // std::vector<visgraph::Point> pol1 {visgraph::Point(1.0, 1.0), visgraph::Point(10.0, 0.3), visgraph::Point(4.0, 3.0), visgraph::Point(2.0, 2.5), visgraph::Point(1.0, 1.5)};
+    // std::vector<visgraph::Point> pol2 {visgraph::Point(0.7, 2.0), visgraph::Point(2.0, 3.0), visgraph::Point(1.5, 4.5)};
+    // std::vector<visgraph::Point> pol3 {visgraph::Point(2.0, 6.0), visgraph::Point(2.3, 7.0), visgraph::Point(3.3, 7.0), visgraph::Point(6.6, 8.0)};
 
-    // std::vector<visgraph::Point> pol1 {visgraph::Point(1.0, 1.0), visgraph::Point(4.0, 1.0), visgraph::Point(4.0, 3.0), visgraph::Point(1.0, 3.0)};
-    // std::vector<visgraph::Point> pol2 {visgraph::Point(1.0, 3.5), visgraph::Point(4.0, 3.5), visgraph::Point(4.0, 5.5), visgraph::Point(1.0, 5.5)};
-    // std::vector<visgraph::Point> pol3 {visgraph::Point(1.0, 6.0), visgraph::Point(4.0, 6.0), visgraph::Point(4.0, 8.0), visgraph::Point(1.0, 8.0)};
-    // std::vector<visgraph::Point> pol4 {visgraph::Point(5.0, 1.0), visgraph::Point(7.0, 1.0), visgraph::Point(7.0, 7.0), visgraph::Point(5.0, 7.0)};
+    std::vector<visgraph::Point> pol1 {visgraph::Point(1.0, 1.0), visgraph::Point(4.0, 1.0), visgraph::Point(4.0, 3.0), visgraph::Point(1.0, 3.0)};
+    std::vector<visgraph::Point> pol2 {visgraph::Point(1.0, 3.5), visgraph::Point(4.0, 3.5), visgraph::Point(4.0, 5.5), visgraph::Point(1.0, 5.5)};
+    std::vector<visgraph::Point> pol3 {visgraph::Point(1.0, 6.0), visgraph::Point(4.0, 6.0), visgraph::Point(4.0, 8.0), visgraph::Point(1.0, 8.0)};
+    std::vector<visgraph::Point> pol4 {visgraph::Point(5.0, 1.0), visgraph::Point(7.0, 1.0), visgraph::Point(7.0, 7.0), visgraph::Point(5.0, 7.0)};
 
     polygons.push_back(pol1);
     polygons.push_back(pol2);
     polygons.push_back(pol3);
-    // polygons.push_back(pol4);
+    polygons.push_back(pol4);
 
-    visgraph::Point origin = visgraph::Point(4.5,0.3);
-    visgraph::Point destination = visgraph::Point(7, 2);
+    visgraph::Point origin = visgraph::Point(5,0.3);
+    visgraph::Point destination = visgraph::Point(9, 2);
 
     visgraph::VisGraph visg = visgraph::VisGraph();
 
