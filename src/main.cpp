@@ -16,7 +16,6 @@ void clipperTest();
 void structuresTest();
 void openEdgesTest();
 void visgraphTest();
-void shortestPathTest();
 
 int main(int argc, char *argv[])
 {
@@ -34,9 +33,7 @@ int main(int argc, char *argv[])
 
     // openEdgesTest();
 
-    //visgraphTest();
-
-    shortestPathTest();
+    visgraphTest();
 
     //Small test for the alternative intersection we might considers, since the other one is problematic
     /*std::vector<student::Point> points;
@@ -51,51 +48,34 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-void shortestPathTest() {
+void visgraphTest() {
     std::vector<std::vector<visgraph::Point>> polygons;
 
-    std::vector<visgraph::Point> pol1 {visgraph::Point(2.0, 1.0), visgraph::Point(3.0, 1.0), visgraph::Point(4.0,2.0), visgraph::Point(3.0,4.0), visgraph::Point(2.0, 4.0), visgraph::Point(1.0, 2.0), visgraph::Point(2.0, 1.0)};
-    std::vector<visgraph::Point> pol2 {visgraph::Point(1.0, 4), visgraph::Point(4.0, 4), visgraph::Point(6.0,6.0), visgraph::Point(1.0,6.0), visgraph::Point(1.0, 4)};
-    std::vector<visgraph::Point> pol3 {visgraph::Point(7.0, 2.0), visgraph::Point(8.0, 3.0), visgraph::Point(7.0, 5.0), visgraph::Point(6.0,3.0), visgraph::Point(7.0,2.0)};
-    //std::vector<visgraph::Point> pol4 {visgraph::Point(8.0, 8.0), visgraph::Point(8.0,10.0), visgraph::Point(10.0,10.0), visgraph::Point(10.0,8.0), visgraph::Point(8.0,8.0)};
+    // std::vector<visgraph::Point> pol1 {visgraph::Point(2.0, 1.0), visgraph::Point(3.0, 1.0), visgraph::Point(4.0, 2.0), visgraph::Point(3.0, 3.0), visgraph::Point(2.0, 3.0), visgraph::Point(1.0, 2.0), visgraph::Point(2.0, 1.0)};
+    // std::vector<visgraph::Point> pol2 {visgraph::Point(1.0, 3.5), visgraph::Point(6.0, 6.0), visgraph::Point(1.0, 6.0), visgraph::Point(1.0, 3.5)};
+    // std::vector<visgraph::Point> pol3 {visgraph::Point(7.0, 2.0), visgraph::Point(8.0, 3.0), visgraph::Point(7.0, 5.0), visgraph::Point(6.0, 3.0), visgraph::Point(7.0,2.0)};
+
+    std::vector<visgraph::Point> pol1 {visgraph::Point(1.0, 1.0), visgraph::Point(3.0, 1.0), visgraph::Point(4.0, 5.0), visgraph::Point(1.0, 4.0)};
+    std::vector<visgraph::Point> pol2 {visgraph::Point(1.0, 5.0), visgraph::Point(4.0, 5.5), visgraph::Point(4.0, 6.0), visgraph::Point(1.0, 5.5)};
+    std::vector<visgraph::Point> pol3 {visgraph::Point(6.0, 1.0), visgraph::Point(8.0, 1.0), visgraph::Point(9.0, 3.0), visgraph::Point(6.5, 5.0), visgraph::Point(5.0,3.0)};
 
     polygons.push_back(pol1);
     polygons.push_back(pol2);
     polygons.push_back(pol3);
-    //polygons.push_back(pol4);
+
+    visgraph::Point origin = visgraph::Point(0.0, 0.0);
+    visgraph::Point destination = visgraph::Point(5.0, 4.0);
 
     visgraph::VisGraph visg = visgraph::VisGraph();
 
-    visgraph::Graph g = visg.computeVisibilityGraph(polygons, visgraph::Point(0.0, 0.0), visgraph::Point(8.0, 6.0));
+    visgraph::Graph g = visg.computeVisibilityGraph(polygons, origin, destination);
 
-    printGraph(g.graph);
-
-    std::vector<visgraph::Point> path = visg.shortest_path(g.graph, visgraph::Point(0.0, 0.0), visgraph::Point(8.0, 6.0));
+    std::cout << "SHORTEST PATH:\n";
+    std::vector<visgraph::Point> path = g.shortestPath(origin, destination);
     for(int it = 0; it < path.size(); it++)
         path[it].print();
-}
-
-void visgraphTest() {
-    std::vector<std::vector<visgraph::Point>> polygons;
-
-    std::vector<visgraph::Point> pol1 {visgraph::Point(1.0, 1.0), visgraph::Point(3.0, 3.0), visgraph::Point(3.0,1.0), visgraph::Point(1.0, 1.0)};
-    std::vector<visgraph::Point> pol2 {visgraph::Point(5.0, 5.0), visgraph::Point(7.0, 7.0), visgraph::Point(7.0,5.0), visgraph::Point(5.0, 5.0)};
-
-    polygons.push_back(pol1);
-    polygons.push_back(pol2);
-
-    visgraph::VisGraph visg = visgraph::VisGraph();
-
-    visgraph::Graph g = visg.computeVisibilityGraph(polygons, visgraph::Point(0, 0), visgraph::Point(8, 6));
-
-    for (visgraph::Point p : g.getPoints()) {
-        p.print();
-    }
-    std::cout << "\n";
-    for (visgraph::Edge e : g.getEdges()) {
-        e.print();
-    }
-    std::cout << "\n";
+    
+    printGraph(g.graph);
 }
 
 void openEdgesTest() {

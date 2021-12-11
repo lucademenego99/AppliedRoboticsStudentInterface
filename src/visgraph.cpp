@@ -2,7 +2,6 @@
 #include "visgraph.hpp"
 #include "open_edges.hpp"
 #include "graph.hpp"
-#include "shortest_path.hpp"
 #include "utils.hpp"
 #include "dubins.hpp"
 #include <math.h>
@@ -20,11 +19,16 @@ namespace visgraph
         Graph initial = Graph(points);
 
         // Final visibility graph
-        Graph result = Graph(points);
+        Graph result = Graph(points, true);
 
         // Get all the points we need to consider
         vector<Point> allPoints = initial.getPoints();
 
+        // Rescale origin and destination, not to have too small numbers
+        origin.scale();
+        destination.scale();
+
+        // Add origin and destination to points to consider
         allPoints.push_back(origin);
         allPoints.push_back(destination);
 
@@ -411,15 +415,5 @@ namespace visgraph
             return edgeDistance(p1, Point(results[0].x, results[0].y));
         }
         return 0;
-    }
-
-    std::vector<Point> VisGraph::shortest_path(DictG graph, Point origin, Point destination) {
-        if(!(graph.find(origin) == graph.end() || graph.find(destination) == graph.end()))
-            return shortestPath(graph, origin, destination);
-        else {
-            std::vector<Point> path;
-            std::cout << "ERROR: origin point or destination point not available in graph!" << std::endl;
-            return path;
-        }
     }
 }

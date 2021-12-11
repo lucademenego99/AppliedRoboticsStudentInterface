@@ -13,9 +13,13 @@ namespace visgraph
         double y;
         int polygonId;
 
+        int SCALE_FACTOR = 100;
+
         //Methods
         Point(double x_coor, double y_coor, int polygonId = -1);
         void print();
+        void scale();
+        void rescaleToOriginal();
         bool operator<(const Point &ob) const;
         bool operator==(const Point &ob) const;
     };
@@ -29,6 +33,7 @@ namespace visgraph
 
         //Methods
         Edge(Point point1, Point point2);
+        double weight();
         Point getAdjacent(Point point);
         bool contains(Point point);
         void print();
@@ -58,9 +63,12 @@ namespace visgraph
         int pid;
         //Struct for polygons
         DictP polygons;
+        // Is this graph a visibility graph
+        bool isVisibilityGraph;
 
         //Methods
-        Graph(std::vector<std::vector<Point>> polygons);
+        Graph(std::vector<std::vector<Point>> polygons, bool isVisibilityGraph = false);
+        std::vector<Point> shortestPath(Point origin, Point destination);
         std::vector<Point> getAdjacentPoints(Point point);
         std::vector<Point> getPoints();
         std::vector<Edge> getEdges();
