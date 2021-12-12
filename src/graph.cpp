@@ -198,7 +198,6 @@ void Graph::addEdge(Edge edge){
 /**
  * @brief get every edge associated to a point
  * @param point point we want to search
- * @param edges empty vector to fill
  */
 std::vector<Edge> Graph::getItems(Point point){
     std::vector<Edge> edges;

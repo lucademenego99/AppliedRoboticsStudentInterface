@@ -13,6 +13,14 @@ using namespace std;
 
 namespace visgraph
 {
+    /**
+     * @brief Computes the visibility graph given a list of points, the origin and the destination
+     * 
+     * @param points Polygons we encounter in the map
+     * @param origin Starting point
+     * @param destination Destination point
+     * @return Graph 
+     */
     Graph VisGraph::computeVisibilityGraph(vector<vector<Point>> points, Point origin, Point destination)
     {
         // Initial graph with all our shapes
@@ -47,6 +55,15 @@ namespace visgraph
         return result;
     }
 
+    /**
+     * @brief Computes the visible points given a starting point
+     * 
+     * @param point Point we want to consider
+     * @param graph Graph of the map
+     * @param origin Starting point
+     * @param destination Final point
+     * @return vector<Point> 
+     */
     vector<Point> VisGraph::getVisibleVertices(Point point, Graph graph, Point origin, Point destination)
     {
         vector<Edge> edges = graph.getEdges();
@@ -189,6 +206,14 @@ namespace visgraph
         return visible;
     }
 
+    /**
+     * @brief Verifies if a point crosses the edges of a polygon
+     * 
+     * @param p1 The point we consider
+     * @param polygonEdges The list of edges of the polygon
+     * @return true 
+     * @return false 
+     */
     bool VisGraph::polygonCrossing(Point p1, vector<Edge> polygonEdges)
     {
         Point p2 = Point(INF, p1.y);
@@ -247,6 +272,13 @@ namespace visgraph
         return polygonCrossing(midPoint, graph.polygons[p1.polygonId]);
     }
 
+    /**
+     * @brief Verifies if a point is within a polygon
+     * 
+     * @param p The point we consider
+     * @param graph The graph of the map
+     * @return vector<Edge> 
+     */
     vector<Edge> VisGraph::pointInPolygon(Point p, Graph graph)
     {
         std::map<int, std::vector<Edge>>::iterator it;
@@ -262,14 +294,14 @@ namespace visgraph
     }
 
     /**
- * @brief https://www.geeksforgeeks.org/check-if-two-given-line-segments-intersect/
- * 
- * @param p1 
- * @param q1 
- * @param edge 
- * @return true 
- * @return false 
- */
+    * @brief https://www.geeksforgeeks.org/check-if-two-given-line-segments-intersect/
+    * 
+    * @param p1 
+    * @param q1 
+    * @param edge 
+    * @return true 
+    * @return false 
+    */
     bool VisGraph::edgeIntersect(Point p1, Point q1, Edge edge)
     {
         Point p2 = edge.p1;
@@ -306,11 +338,14 @@ namespace visgraph
         return false; // Doesn't fall in any of the above cases
     }
 
-    // To find orientation of ordered triplet (p, q, r).
-    // The function returns following values
-    // 0 --> p, q and r are collinear
-    // -1 --> Clockwise
-    // 1 --> Counterclockwise
+    /**
+     * @brief Finds the orientation of ordered triplet
+     * 
+     * @param p First input point
+     * @param q Second input point
+     * @param r Third input point
+     * @return int 0, if the points are collinear, -1 if clockwise and 1 if counterclockwise
+     */
     int VisGraph::getOrientation(Point p, Point q, Point r)
     {
         // See https://www.geeksforgeeks.org/orientation-3-ordered-points/
@@ -324,8 +359,15 @@ namespace visgraph
         return (val < 0) ? 1 : -1; // clock or counterclock wise
     }
 
-    // Given three collinear points p, q, r, the function checks if
-    // point q lies on line segment 'pr'
+    /**
+     * @brief Checks if given three points p, q, r point q lies on line segment "pr"
+     * 
+     * @param p First input point
+     * @param q Second input point
+     * @param r Third input point
+     * @return true 
+     * @return false 
+     */
     bool VisGraph::onSegment(Point p, Point q, Point r)
     {
         if (q.x <= max(p.x, r.x) && q.x >= min(p.x, r.x) &&
@@ -335,6 +377,13 @@ namespace visgraph
         return false;
     }
 
+    /**
+     * @brief 
+     * 
+     * @param center 
+     * @param point 
+     * @return double 
+     */
     double VisGraph::getAngle(Point center, Point point)
     {
         double dx = point.x - center.x;
@@ -358,6 +407,14 @@ namespace visgraph
         return atan(dy / dx);
     }
 
+    /**
+     * @brief Returns the radiant value of an angle given three points
+     * 
+     * @param a 
+     * @param b 
+     * @param c 
+     * @return double 
+     */
     double VisGraph::getAngle2(Point a, Point b, Point c)
     {
         double aValue = pow(b.x - c.x, 2) + pow(b.y - c.y, 2);
@@ -367,6 +424,14 @@ namespace visgraph
         return acos((aValue + cValue - bValue) / (2 * sqrt(aValue) * sqrt(cValue)));
     }
 
+    /**
+     * @brief Verifies if two edges intersect and returns the point of intersection
+     * 
+     * @param p1 The first point
+     * @param p2 The second point
+     * @param edge The other edge to intersect
+     * @return Point 
+     */
     Point VisGraph::getIntersectPoint(Point p1, Point p2, Edge edge)
     {
         if (edge.contains(p1))
@@ -399,11 +464,26 @@ namespace visgraph
         return Point(intersectX, intersectY);
     }
 
+    /**
+     * @brief Computes the distance of two points
+     * 
+     * @param p1 First input point
+     * @param p2 Second input point
+     * @return double 
+     */
     double VisGraph::edgeDistance(Point p1, Point p2)
     {
         return sqrt(pow(p2.x - p1.x, 2) + pow(p2.y - p1.y, 2));
     }
 
+    /**
+     * @brief Computes the distance between a point  and the intersection of two segments
+     * 
+     * @param p1 First point of the segment and also the point we consider for the distance
+     * @param p2 Second point of the segment
+     * @param edge Segment we want to compare
+     * @return double 
+     */
     double VisGraph::pointEdgeDistance(Point p1, Point p2, Edge edge)
     {
         std::vector<student::Point> results; //Just for the sake of passing correct parameters to the function

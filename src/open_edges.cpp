@@ -6,12 +6,25 @@
 
 namespace visgraph
 {
-
+    /**
+     * @brief Construct a new Open Edges:: Open Edges object
+     * 
+     */
     OpenEdges::OpenEdges()
     {
         openEdges.clear();
     }
 
+    /**
+     * @brief Function that positions an element in the tree
+     * 
+     * @param p1 First input point
+     * @param p2 Second input point
+     * @param edge1 First input edge
+     * @param edge2 Second input edge
+     * @return true 
+     * @return false 
+     */
     bool OpenEdges::lessThan(Point p1, Point p2, Edge edge1, Edge edge2)
     {
         std::vector<student::Point> results; //Just for the sake of passing correct parameters to the function
@@ -36,6 +49,12 @@ namespace visgraph
         }
     }
 
+    /**
+     * @brief Gets an edge from the tree given an index
+     * 
+     * @param index position of the element we want to retrieve
+     * @return Edge 
+     */
     Edge OpenEdges::getEdge(int index)
     {
         if (openEdges.size() > index)
@@ -43,6 +62,11 @@ namespace visgraph
         return Edge(Point(-1, -1), Point(-1, -1));
     }
 
+    /**
+     * @brief Gets the closest edge in a tree
+     * 
+     * @return Edge 
+     */
     Edge OpenEdges::getSmallest()
     {
         if (openEdges.size() > 0)
@@ -50,6 +74,14 @@ namespace visgraph
         return Edge(Point(-1, -1), Point(-1, -1));
     }
 
+    /**
+     * @brief Finds an element in the tree given the points and the edge
+     * 
+     * @param p1 First input point
+     * @param p2 Second input point
+     * @param edge Edge that contains the points
+     * @return int 
+     */
     int OpenEdges::getIndex(Point p1, Point p2, Edge edge)
     {
         int low = 0;
@@ -66,6 +98,13 @@ namespace visgraph
         return low;
     }
 
+    /**
+     * @brief Deletes from the tree a given an edge
+     * 
+     * @param p1 First edge point
+     * @param p2 Second edge point
+     * @param edge Edge that contains the two points
+     */
     void OpenEdges::deleteEdge(Point p1, Point p2, Edge edge)
     {
         int index = getIndex(p1, p2, edge) - 1;
@@ -76,6 +115,13 @@ namespace visgraph
             openEdges.erase(openEdges.begin() + index);
     }
 
+    /**
+     * @brief Inserts a new edge in the tree
+     * 
+     * @param p1 First edge point
+     * @param p2 Second edge point
+     * @param edge Edge that contains the two points
+     */
     void OpenEdges::insertEdge(Point p1, Point p2, Edge edge)
     {
         openEdges.insert(openEdges.begin() + getIndex(p1, p2, edge), edge);
