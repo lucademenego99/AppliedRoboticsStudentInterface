@@ -4,6 +4,8 @@
 #include <cfloat>
 #include <algorithm>
 
+using namespace cv;
+
 namespace student
 {
     /**
@@ -86,7 +88,7 @@ namespace student
     CurveSegmentsResult *Dubins::useLSL(double scaled_th0, double scaled_thf, double scaled_k_max)
     {
         double s1, s2, s3;
-        double invK = 1 / scaled_k_max;
+        double invK = 1.0 / scaled_k_max;
         double C = cos(scaled_thf) - cos(scaled_th0);
         double S = 2 * scaled_k_max + sin(scaled_th0) - sin(scaled_thf);
         double temp1 = atan2(C, S);
@@ -107,7 +109,7 @@ namespace student
     CurveSegmentsResult *Dubins::useRSR(double scaled_th0, double scaled_thf, double scaled_k_max)
     {
         double s1, s2, s3;
-        double invK = 1 / scaled_k_max;
+        double invK = 1.0 / scaled_k_max;
         double C = cos(scaled_th0) - cos(scaled_thf);
         double S = 2 * scaled_k_max - sin(scaled_th0) + sin(scaled_thf);
         double temp1 = atan2(C, S);
@@ -128,7 +130,7 @@ namespace student
     CurveSegmentsResult *Dubins::useLSR(double scaled_th0, double scaled_thf, double scaled_k_max)
     {
         double s1, s2, s3;
-        double invK = 1 / scaled_k_max;
+        double invK = 1.0 / scaled_k_max;
         double C = cos(scaled_th0) + cos(scaled_thf);
         double S = 2 * scaled_k_max + sin(scaled_th0) + sin(scaled_thf);
         double temp1 = atan2(-C, S);
@@ -150,7 +152,7 @@ namespace student
     CurveSegmentsResult *Dubins::useRSL(double scaled_th0, double scaled_thf, double scaled_k_max)
     {
         double s1, s2, s3;
-        double invK = 1 / scaled_k_max;
+        double invK = 1.0 / scaled_k_max;
         double C = cos(scaled_th0) + cos(scaled_thf);
         double S = 2 * scaled_k_max - sin(scaled_th0) - sin(scaled_thf);
         double temp1 = atan2(C, S);
@@ -172,7 +174,7 @@ namespace student
     CurveSegmentsResult *Dubins::useRLR(double scaled_th0, double scaled_thf, double scaled_k_max)
     {
         double s1, s2, s3;
-        double invK = 1 / scaled_k_max;
+        double invK = 1.0 / scaled_k_max;
         double C = cos(scaled_th0) - cos(scaled_thf);
         double S = 2 * scaled_k_max - sin(scaled_th0) + sin(scaled_thf);
         double temp1 = atan2(C, S);
@@ -193,7 +195,7 @@ namespace student
     CurveSegmentsResult *Dubins::useLRL(double scaled_th0, double scaled_thf, double scaled_k_max)
     {
         double s1, s2, s3;
-        double invK = 1 / scaled_k_max;
+        double invK = 1.0 / scaled_k_max;
         double C = cos(scaled_thf) - cos(scaled_th0);
         double S = 2 * scaled_k_max + sin(scaled_th0) - sin(scaled_thf);
         double temp1 = atan2(C, S);
@@ -356,7 +358,7 @@ namespace student
      * @param numberOfPoints The number of points provided
      * @return DubinsCurve** Resulting array of curves that together represent the shortest path
      */
-    DubinsCurve **Dubins::multipointShortestPath(Point **points, unsigned int numberOfPoints)
+    double *Dubins::multipointShortestPath(Point **points, unsigned int numberOfPoints)
     {
         std::cout << "INPUT: \n";
         std::cout << "X\tY\tTHETA\n";
@@ -377,8 +379,6 @@ namespace student
         //              {   min[th_j+1](Dj(th_j, th_j+1) + L(j+1, th_j+1))  otherwise
 
         // INITIALIZATION
-        // Init the final result
-        DubinsCurve **result = new DubinsCurve *[numberOfPoints - 1];
         // Init the result of the multipoint problem: an array of optimal angles
         double *minimizingAngles = new double[numberOfPoints];
 
@@ -523,7 +523,7 @@ namespace student
         }
         std::cout << "\n\n";
 
-        return result;
+        return minimizingAngles;
     };
 
     /**
@@ -840,5 +840,94 @@ namespace student
         }
 
         return pts.empty() ? false : true;
+    }
+
+    /**
+     * @brief Helper function to plot with opencv a Dubins Arc
+     * 
+     * @param arc DubinsArc to plot
+     * @param image OpenCV Mat in which we want to plot
+     * @param size Size of the Mat (to scale the points)
+     * @param first Is this the first arc of a curve?
+     * @param last Is this the last arc of a curve?
+     */
+    void Dubins::printDubinsArc(DubinsArc *arc, Mat image, double size, bool first, bool last) {
+        int npts = 100;
+        std::vector<cv::Point> pts;
+        if (first)
+            circle(image, cv::Point(arc->x0 / size * 500, arc->y0 / size * 500), 5, Scalar(255, 255, 255), FILLED, LINE_8);
+        if (last)
+            circle(image, cv::Point(arc->dubins_line->x / size * 500, arc->dubins_line->y / size * 500), 5, Scalar(255, 255, 255), FILLED, LINE_8);
+        for (int i = 0; i < npts; i++) {
+            double s = arc->L/npts * i;
+            DubinsLine *tmp = new DubinsLine(s, arc->x0, arc->y0, arc->th0, arc->k);
+            pts.push_back(cv::Point(tmp->x / size * 500, tmp->y / size * 500));
+            delete tmp;
+        }
+        for (int i = 1; i < pts.size(); i++) {
+            line(image, pts[i-1], pts[i], Scalar(0, 0, 255), 1, LINE_AA);
+        }
+    }
+
+    /**
+     * @brief Plot with opencv a Dubins Curve
+     * 
+     * @param curve DubinsCurve to plot
+     */
+    void Dubins::printDubinsCurve(DubinsCurve *curve) {
+        Mat image(500, 500, CV_8UC3, Scalar(0, 0, 0));
+        Mat flipped;
+
+        double maxx = max({curve->a1->x0, curve->a1->dubins_line->x, curve->a2->x0, curve->a2->dubins_line->x, curve->a3->x0, curve->a3->dubins_line->x});
+        double minx = min({curve->a1->x0, curve->a1->dubins_line->x, curve->a2->x0, curve->a2->dubins_line->x, curve->a3->x0, curve->a3->dubins_line->x});
+        double maxy = max({curve->a1->y0, curve->a1->dubins_line->y, curve->a2->y0, curve->a2->dubins_line->y, curve->a3->y0, curve->a3->dubins_line->y});
+        double miny = min({curve->a1->y0, curve->a1->dubins_line->y, curve->a2->y0, curve->a2->dubins_line->y, curve->a3->y0, curve->a3->dubins_line->y});
+
+        double size = max(maxx, maxy);
+        // size *= 2;
+
+        std::cout << "SIZE: " << size << "\n";
+
+        printDubinsArc(curve->a1, image, size, true, false);
+        printDubinsArc(curve->a2, image, size, false, false);
+        printDubinsArc(curve->a3, image, size, false, true);
+
+        flip(image, flipped, 0);
+        imshow("Output", flipped);
+        cv::waitKey(0);
+    }
+
+    /**
+     * @brief Plot with opencv a set of DubinsCurves
+     * 
+     * @param curves DubinsCurves to plot
+     * @param numberOfCurves Number of curves to plot
+     */
+    void Dubins::printCompletePath(DubinsCurve **curves, int numberOfCurves) {
+        Mat image(500, 500, CV_8UC3, Scalar(0, 0, 0));
+        Mat flipped;
+
+        double maxx = -INFINITY, minx = INFINITY, maxy = -INFINITY, miny = INFINITY;
+        for (int i = 0; i < numberOfCurves; i++) {
+            maxx = max({maxx, curves[i]->a1->x0, curves[i]->a1->dubins_line->x, curves[i]->a2->x0, curves[i]->a2->dubins_line->x, curves[i]->a3->x0, curves[i]->a3->dubins_line->x});
+            minx = min({minx, curves[i]->a1->x0, curves[i]->a1->dubins_line->x, curves[i]->a2->x0, curves[i]->a2->dubins_line->x, curves[i]->a3->x0, curves[i]->a3->dubins_line->x});
+            maxy = max({maxy, curves[i]->a1->y0, curves[i]->a1->dubins_line->y, curves[i]->a2->y0, curves[i]->a2->dubins_line->y, curves[i]->a3->y0, curves[i]->a3->dubins_line->y});
+            miny = min({miny, curves[i]->a1->y0, curves[i]->a1->dubins_line->y, curves[i]->a2->y0, curves[i]->a2->dubins_line->y, curves[i]->a3->y0, curves[i]->a3->dubins_line->y});
+        }
+
+        double size = max(maxx, maxy);
+
+        std::cout << size << "\n";
+
+        for (int i = 0; i < numberOfCurves; i++) {
+            std::cout << "CURVE " << i << ": " << curves[i]->a1->x0 << " " << curves[i]->a1->y0 << "\n";
+            printDubinsArc(curves[i]->a1, image, size, true, false);
+            printDubinsArc(curves[i]->a2, image, size, false, false);
+            printDubinsArc(curves[i]->a3, image, size, false, true);
+        }
+
+        flip(image, flipped, 0);
+        imshow("Output", flipped);
+        cv::waitKey(0);
     }
 }

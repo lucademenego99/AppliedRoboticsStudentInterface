@@ -4,6 +4,9 @@
 #include "utils.hpp"
 #include <vector>
 #include <iostream>
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc.hpp>
 
 namespace student
 {
@@ -240,9 +243,35 @@ namespace student
      * 
      * @param points An array of points we have to pass through
      * @param numberOfPoints The number of points provided
-     * @return DubinsCurve** Resulting array of curves that together represent the shortest path
+     * @return double* Array of optimal angles
      */
-      DubinsCurve **multipointShortestPath(Point **points, unsigned int numberOfPoints);
+      double *multipointShortestPath(Point **points, unsigned int numberOfPoints);
+
+      /**
+       * @brief Helper function to plot with opencv a Dubins Arc
+       * 
+       * @param arc DubinsArc to plot
+       * @param image OpenCV Mat in which we want to plot
+       * @param size Size of the Mat (to scale the points)
+       * @param first Is this the first arc of a curve?
+       * @param last Is this the last arc of a curve?
+       */
+      void printDubinsArc(DubinsArc *arc, cv::Mat image, double size, bool first, bool last);
+
+      /**
+       * @brief Plot with opencv a Dubins Curve
+       * 
+       * @param curve DubinsCurve to plot
+       */
+      void printDubinsCurve(DubinsCurve *curve);
+
+      /**
+       * @brief Plot with opencv a set of DubinsCurves
+       * 
+       * @param curves DubinsCurves to plot
+       * @param numberOfCurves Number of curves to plot
+       */
+      void printCompletePath(DubinsCurve **curves, int numberOfCurves);
 
       /**
      * @brief Find if there is an intersection between a circle and a segment
