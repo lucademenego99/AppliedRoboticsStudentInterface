@@ -1,7 +1,7 @@
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
-
+#include "clipper.hpp"
 #include <iostream>
 
 #include "clipper_addons.hpp"
@@ -67,4 +67,102 @@ void printSolution(IntPoint *startingPoints, Paths solution)
     cv::flip(plot, plot, 0);
     cv::imshow("Clipper", plot);
     cv::waitKey(0);
+}
+
+/**
+ * @brief Verifies if two clipper polygons interact
+ * 
+ * @param subj The first polygon
+ * @param clip The second polygon
+ * @return true 
+ * @return false 
+ */
+ /*
+bool intersect (IntPoint *subj, IntPoint *clip){
+    Paths firstPoly;
+    for (int i = 0; i < sizeof(subj); i++){
+        firstPoly << IntPoint(subj[i].X, subj[i].Y);
+    }
+
+    Paths secondPoly;
+    for (int j = 0; j < sizeof(clip); j++){
+        secondPoly.push_back(clip[i]);
+    }
+
+    ClipperLib::Clipper c;
+    //Need to make this function take as input points instead of paths, create paths
+    c.AddPaths(subj, ClipperLib::ptSubject, true);
+    c.AddPaths(clip, ClipperLib::ptClip, true);
+
+    ClipperLib::Paths solution;
+    c.Execute(ClipperLib::ctIntersection, solution, ClipperLib::pftNonZero, ClipperLib::pftNonZero);
+
+    return solution.size()!=0;
+}
+
+void verifyAndJoin (IntPoint *firstPoly, IntPoint *secondPoly){
+    //Intersect need to take as input points instead of Paths
+    if(intersect(firstPoly, secondPoly)){
+        Clipper c = new Clipper();
+        
+        Polygons subj = new Polygons(1);
+        subj.Add(new Polygon(firstPoly.size()));
+        for (int i = 0; i < sizeof(firstPoly); i++){
+            subj[0].Add(firstPoly[i]);
+        }
+
+        Polygons clip = new Polygons(1);
+        clip.Add(new Polygon(secondPoly.size()));
+        for (int j = 0; j < sizeof(secondPoly); j++){
+            clip[0].push_back(secondPoly[j]);
+        }
+
+        Polygons solution = new Polygons();
+        c.addPolygons(subj, PolyType.ptSubject);
+        c.addPolygons(clip, PolyType.ptClip);
+        c.Execute(ClipType.ctUnion, solution, PolyFillType.pftEvenOdd, PolyFillType.pftNonZero);
+    }
+}
+*/
+
+/**
+ * @brief Verifies if a list of polygons has some intersections, if so joins them and then enlarges them all
+ * 
+ * @param points Matrix of polygons
+ */
+void join (std::vector<std::vector<IntPoint>> points){
+    Paths subj(1), clip(points.size()-1), solution;
+
+    cv::Mat plot(500, 500, CV_8UC3, cv::Scalar(255, 255, 255));
+
+    for (unsigned int i = 0; i < points[0].size(); i++){
+        subj[0].push_back(points[0][i]);
+    }
+    for(unsigned int i = 0; i < clip.size(); i++){
+        for(unsigned int j = 0; j < points[i+1].size(); j++){
+            clip[i].push_back(points[i+1][j]);
+        }    
+    }
+    Clipper c;
+    c.AddPaths(subj, ptSubject, true);
+    c.AddPaths(clip, ptClip, true);
+    c.Execute(ctUnion, solution, pftNonZero, pftNonZero);
+    
+    //TO DO: add the enlarge part or return the solution
+
+    /*
+    for (unsigned int i = 0; i < solution.size(); i++)
+    {
+        Path path = solution.at(i);
+        cv::line(plot, cv::Point2f(path.at(path.size() - 1).X, path.at(path.size() - 1).Y), cv::Point2f(path.at(0).X, path.at(0).Y), cv::Scalar(255, 255, 0), 2);
+        for (unsigned int j = 1; j < path.size(); j++)
+        {
+            cv::line(plot, cv::Point2f(path.at(j - 1).X, path.at(j - 1).Y), cv::Point2f(path.at(j).X, path.at(j).Y), cv::Scalar(255, 255, 0), 2);
+        }
+    }
+    cv::flip(plot, plot, 0);
+    cv::imshow("Clipper", plot);
+    cv::waitKey(0);
+    */
+    
 }

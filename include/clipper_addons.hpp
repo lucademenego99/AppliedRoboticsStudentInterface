@@ -22,4 +22,28 @@ Paths enlarge(IntPoint *points, int offset);
  */
 void printSolution(IntPoint *points, Paths solution);
 
+
+/**
+ * @brief Verifies if two clipper polygons interact
+ * 
+ * @param subj The first polygon
+ * @param clip The second polygon
+ * @return true 
+ * @return false 
+ */
+//bool intersect (IntPoint *subj, IntPoint *clip);
+/**
+ * @brief Given two polygons verifies if they are colling, if so, joins them and enlarges it as a whole
+ * 
+ * @param firstPoly Points of the first polygon
+ * @param secondPoly Points of the second polygon
+ */
+//void verifyAndJoin (IntPoint *firstPoly, IntPoint *secondPoly);
+
+/**
+ * @brief Verifies if a list of polygons has some intersections, if so joins them and then enlarges them all
+ * 
+ * @param points Matrix of polygons
+ */
+void join (std::vector<std::vector<IntPoint>> points);
 #endif

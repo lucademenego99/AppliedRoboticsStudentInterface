@@ -5,6 +5,7 @@
 #include "open_edges.hpp"
 #include "graphPrint.hpp"
 #include "utils.hpp"
+#include "clipper.hpp"
 #include <iostream>
 
 using namespace student;
@@ -20,13 +21,13 @@ void visgraphTest();
 
 int main(int argc, char *argv[])
 {
-    Dubins dubins = Dubins(1.2, 0.005);
+    //Dubins dubins = Dubins(1.2, 0.005);
 
     // shortestPathDubinsTest(dubins);
 
     // multipointDubinsTest(dubins);
 
-    multipointDubinsAndVisgraphTest(dubins);
+    //multipointDubinsAndVisgraphTest(dubins);
 
     // intersectionsTest(dubins);
 
@@ -47,6 +48,34 @@ int main(int argc, char *argv[])
     //     std::cout << "X intersection: " << p.x << "\n";
     //     std::cout << "Y intersection: " << p.y << "\n";
     // }
+    
+    std::vector<IntPoint> points;
+    points.push_back(ClipperLib::IntPoint(150, 110));
+    points.push_back(ClipperLib::IntPoint(150, 200));
+    points.push_back(ClipperLib::IntPoint(360, 200));
+    points.push_back(ClipperLib::IntPoint(400, 110));
+    points.push_back(ClipperLib::IntPoint(150, 110));
+
+    std::vector<std::vector<IntPoint>> polygons;
+    polygons.push_back(points);
+
+    std::vector<IntPoint> points1;
+    points1.push_back(ClipperLib::IntPoint(10, 10));
+    points1.push_back(ClipperLib::IntPoint(80, 80));
+    points1.push_back(ClipperLib::IntPoint(150, 80));
+    points1.push_back(ClipperLib::IntPoint(10, 10));
+
+    polygons.push_back(points1);
+
+    std::vector<IntPoint> points2;
+    points2.push_back(ClipperLib::IntPoint(410, 410));
+    points2.push_back(ClipperLib::IntPoint(320, 320));
+    points2.push_back(ClipperLib::IntPoint(330, 320));
+    points2.push_back(ClipperLib::IntPoint(410, 410));
+
+    polygons.push_back(points2);
+
+    join(polygons);
     
     return 0;
 }
