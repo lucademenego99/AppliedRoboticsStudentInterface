@@ -22,7 +22,7 @@ void clipperJoinAndEnlargeTest();
 
 int main(int argc, char *argv[])
 {
-    //Dubins dubins = Dubins(1.2, 0.005);
+    Dubins dubins = Dubins(1.3, 0.005);
 
     // shortestPathDubinsTest(dubins);
 
@@ -241,12 +241,12 @@ void shortestPathDubinsTest(Dubins dubins)
 
 void multipointDubinsTest(Dubins dubins)
 {
-    std::cout << "MULTIPOINT SHORTEST PATH TEST\n";
-    Point **points = new Point *[3];
-    points[0] = new Point(0.2, 0.2, 0);
-    points[1] = new Point(0.9, 0.8);
-    points[2] = new Point(1.4, 0.2, 0);
-    dubins.multipointShortestPath(points, 3);
+    // std::cout << "MULTIPOINT SHORTEST PATH TEST\n";
+    // Point **points = new Point *[3];
+    // points[0] = new Point(0.2, 0.2, 0);
+    // points[1] = new Point(0.9, 0.8);
+    // points[2] = new Point(1.4, 0.2, 0);
+    // dubins.multipointShortestPath(points, 3);
 
     // Point **points = new Point *[5];
     // points[0] = new Point(0.2, 0.2, M_PI);
@@ -279,19 +279,24 @@ void multipointDubinsTest(Dubins dubins)
 void multipointDubinsAndVisgraphTest(Dubins dubins)
 {
     std::vector<std::vector<visgraph::Point>> polygons;
-    std::vector<visgraph::Point> pol1 {visgraph::Point(1.0, 1.0), visgraph::Point(4.0, 1.0), visgraph::Point(4.0, 3.0), visgraph::Point(1.0, 3.0)};
-    std::vector<visgraph::Point> pol2 {visgraph::Point(1.0, 3.5), visgraph::Point(4.0, 3.5), visgraph::Point(4.0, 5.5), visgraph::Point(1.0, 5.5)};
-    std::vector<visgraph::Point> pol3 {visgraph::Point(1.0, 6.0), visgraph::Point(4.0, 6.0), visgraph::Point(4.0, 8.0), visgraph::Point(1.0, 8.0)};
-    std::vector<visgraph::Point> pol4 {visgraph::Point(5.0, 1.0), visgraph::Point(7.0, 1.0), visgraph::Point(7.0, 7.0), visgraph::Point(5.0, 7.0)};
+    // std::vector<visgraph::Point> pol1 {visgraph::Point(1.0, 1.0), visgraph::Point(4.0, 1.0), visgraph::Point(4.0, 3.0), visgraph::Point(1.0, 3.0)};
+    // std::vector<visgraph::Point> pol2 {visgraph::Point(1.0, 3.5), visgraph::Point(4.0, 3.5), visgraph::Point(4.0, 5.5), visgraph::Point(1.0, 5.5)};
+    // std::vector<visgraph::Point> pol3 {visgraph::Point(1.0, 6.0), visgraph::Point(4.0, 6.0), visgraph::Point(4.0, 8.0), visgraph::Point(1.0, 8.0)};
+    // std::vector<visgraph::Point> pol4 {visgraph::Point(5.0, 1.0), visgraph::Point(7.0, 1.0), visgraph::Point(7.0, 7.0), visgraph::Point(5.0, 7.0)};
+    std::vector<visgraph::Point> pol1 {visgraph::Point(2.0, 1.0), visgraph::Point(3.0, 1.0), visgraph::Point(4.0, 2.0), visgraph::Point(3.0, 3.0), visgraph::Point(2.0, 3.0), visgraph::Point(1.0, 2.0), visgraph::Point(2.0, 1.0)};
+    std::vector<visgraph::Point> pol2 {visgraph::Point(1.0, 3.5), visgraph::Point(6.0, 6.0), visgraph::Point(1.0, 6.0), visgraph::Point(1.0, 3.5)};
+    std::vector<visgraph::Point> pol3 {visgraph::Point(7.0, 2.0), visgraph::Point(8.0, 3.0), visgraph::Point(7.0, 5.0), visgraph::Point(6.0, 3.0), visgraph::Point(7.0,2.0)};
     polygons.push_back(pol1);
     polygons.push_back(pol2);
     polygons.push_back(pol3);
-    polygons.push_back(pol4);
+    // polygons.push_back(pol4);
 
     visgraph::Point origin = visgraph::Point(9, 2);
-    visgraph::Point destination = visgraph::Point(2.5, 5.7);
+    visgraph::Point destination = visgraph::Point(2.5, 7.7);
 
     visgraph::VisGraph visg = visgraph::VisGraph();
+
+    visgraph::Graph originalGraph = visgraph::Graph(polygons);
 
     visgraph::Graph g = visg.computeVisibilityGraph(polygons, origin, destination);
 
@@ -301,23 +306,28 @@ void multipointDubinsAndVisgraphTest(Dubins dubins)
         path[it].print();
 
 
+    std::vector<visgraph::Edge> testEdges = originalGraph.getEdges();
+    for (int i = 0; i < testEdges.size(); i++) {
+        testEdges[i].p1.rescaleToOriginal();
+        testEdges[i].p2.rescaleToOriginal();
+    }
+    for (visgraph::Edge e : testEdges) {
+        e.print();
+    }
     printGraph(g.graph, origin, destination, path);
+
     std::cout << "MULTIPOINT SHORTEST PATH TEST\n";
     Point **points = new Point *[path.size()];
-    points[0] = new Point(path[0].x, path[0].y, M_PI_2);
+    points[0] = new Point(path[0].x, path[0].y, -M_PI_2);
     for(int i = 1; i < path.size()-1; i++) {
         points[i] = new Point(path[i].x, path[i].y);
     }
-    points[path.size()-1] = new Point(path[path.size()-1].x, path[path.size()-1].y, M_PI);
+    points[path.size()-1] = new Point(path[path.size()-1].x, path[path.size()-1].y, -M_PI);
 
     // DubinsCurve *curve = dubins.findShortestPath(points[0]->x, points[0]->y, points[0]->th, points[path.size()-1]->x,points[path.size()-1]->y,points[path.size()-1]->th);
     // dubins.printDubinsCurve(curve);
 
-    double *angles = dubins.multipointShortestPath(points, path.size());
-    DubinsCurve **curves = new DubinsCurve*[path.size()-1];
-    for (int i = 1; i < path.size(); i++) {
-        curves[i-1] = dubins.findShortestPath(points[i-1]->x, points[i-1]->y, angles[i-1], points[i]->x, points[i]->y, angles[i]);
-    }
+    DubinsCurve **curves = dubins.multipointShortestPath(points, path.size(), originalGraph.getEdges());
     // dubins.printDubinsCurve(curves[1]);
     dubins.printCompletePath(curves, path.size()-1);
 }
