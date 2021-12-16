@@ -15,7 +15,7 @@ using namespace ClipperLib;
  * @param offset Offset that must be used to enlarge or shrink the polygon
  * @return Paths Array of resulting polygons
  */
-Paths enlarge(IntPoint *points, int offset)
+Paths enlarge(std::vector<IntPoint> points, int offset)
 {
     Path subj;
     Paths solution;
@@ -35,7 +35,7 @@ Paths enlarge(IntPoint *points, int offset)
  * @param startingPoints Points of the original polygon
  * @param solution Solution given by clipper
  */
-void printSolution(IntPoint *startingPoints, Paths solution)
+void printSolution(std::vector<IntPoint> startingPoints, Paths solution)
 {
     // Create opencv plotting tool
     cv::Mat plot(500, 500, CV_8UC3, cv::Scalar(255, 255, 255));
@@ -130,7 +130,7 @@ void verifyAndJoin (IntPoint *firstPoly, IntPoint *secondPoly){
  * 
  * @param points Matrix of polygons
  */
-void join (std::vector<std::vector<IntPoint>> points){
+std::vector<Paths> joinAndEnlarge (std::vector<std::vector<IntPoint>> points){
     Paths subj(1), clip(points.size()-1), solution;
 
     cv::Mat plot(500, 500, CV_8UC3, cv::Scalar(255, 255, 255));
@@ -148,8 +148,17 @@ void join (std::vector<std::vector<IntPoint>> points){
     c.AddPaths(clip, ptClip, true);
     c.Execute(ctUnion, solution, pftNonZero, pftNonZero);
     
-    //TO DO: add the enlarge part or return the solution
+    std::vector<Paths> enlargedPolygons;
+    int offset = 4; //Modify the offset of the enlargement process
 
+    for (unsigned int i = 0; i < solution.size(); i++)
+    {
+        Path path = solution.at(i);
+        enlargedPolygons.push_back(enlarge(path, offset));
+        
+    }
+    return enlargedPolygons;
+    
     /*
     for (unsigned int i = 0; i < solution.size(); i++)
     {

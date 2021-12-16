@@ -18,6 +18,7 @@ void clipperTest();
 void structuresTest();
 void openEdgesTest();
 void visgraphTest();
+void clipperJoinAndEnlargeTest();
 
 int main(int argc, char *argv[])
 {
@@ -48,34 +49,6 @@ int main(int argc, char *argv[])
     //     std::cout << "X intersection: " << p.x << "\n";
     //     std::cout << "Y intersection: " << p.y << "\n";
     // }
-    
-    std::vector<IntPoint> points;
-    points.push_back(ClipperLib::IntPoint(150, 110));
-    points.push_back(ClipperLib::IntPoint(150, 200));
-    points.push_back(ClipperLib::IntPoint(360, 200));
-    points.push_back(ClipperLib::IntPoint(400, 110));
-    points.push_back(ClipperLib::IntPoint(150, 110));
-
-    std::vector<std::vector<IntPoint>> polygons;
-    polygons.push_back(points);
-
-    std::vector<IntPoint> points1;
-    points1.push_back(ClipperLib::IntPoint(10, 10));
-    points1.push_back(ClipperLib::IntPoint(80, 80));
-    points1.push_back(ClipperLib::IntPoint(150, 80));
-    points1.push_back(ClipperLib::IntPoint(10, 10));
-
-    polygons.push_back(points1);
-
-    std::vector<IntPoint> points2;
-    points2.push_back(ClipperLib::IntPoint(410, 410));
-    points2.push_back(ClipperLib::IntPoint(320, 320));
-    points2.push_back(ClipperLib::IntPoint(330, 320));
-    points2.push_back(ClipperLib::IntPoint(410, 410));
-
-    polygons.push_back(points2);
-
-    join(polygons);
     
     return 0;
 }
@@ -411,17 +384,49 @@ void intersectionsTest(Dubins dubins)
 void clipperTest()
 {
     std::cout << "CLIPPER TEST\n";
-    ClipperLib::IntPoint *points = new ClipperLib::IntPoint[9];
-    points[0] = ClipperLib::IntPoint(348, 257);
-    points[1] = ClipperLib::IntPoint(364, 148);
-    points[2] = ClipperLib::IntPoint(362, 148);
-    points[3] = ClipperLib::IntPoint(326, 241);
-    points[4] = ClipperLib::IntPoint(295, 219);
-    points[5] = ClipperLib::IntPoint(258, 88);
-    points[6] = ClipperLib::IntPoint(440, 129);
-    points[7] = ClipperLib::IntPoint(370, 196);
-    points[8] = ClipperLib::IntPoint(372, 275);
+    std::vector<ClipperLib::IntPoint> points;
+    points.push_back(ClipperLib::IntPoint(348, 257));
+    points.push_back(ClipperLib::IntPoint(364, 148));
+    points.push_back(ClipperLib::IntPoint(362, 148));
+    points.push_back(ClipperLib::IntPoint(326, 241));
+    points.push_back(ClipperLib::IntPoint(295, 219));
+    points.push_back(ClipperLib::IntPoint(258, 88));
+    points.push_back(ClipperLib::IntPoint(440, 129));
+    points.push_back(ClipperLib::IntPoint(370, 196));
+    points.push_back(ClipperLib::IntPoint(372, 275));
 
     ClipperLib::Paths paths = enlarge(points, 7.0);
     printSolution(points, paths);
+}
+
+void clipperJoinAndEnlargeTest(){
+    std::vector<IntPoint> points;
+    points.push_back(ClipperLib::IntPoint(150, 110));
+    points.push_back(ClipperLib::IntPoint(150, 200));
+    points.push_back(ClipperLib::IntPoint(360, 200));
+    points.push_back(ClipperLib::IntPoint(400, 110));
+    points.push_back(ClipperLib::IntPoint(150, 110));
+
+    std::vector<std::vector<IntPoint>> polygons;
+    polygons.push_back(points);
+
+    std::vector<IntPoint> points1;
+    points1.push_back(ClipperLib::IntPoint(10, 10));
+    points1.push_back(ClipperLib::IntPoint(80, 80));
+    points1.push_back(ClipperLib::IntPoint(150, 80));
+    points1.push_back(ClipperLib::IntPoint(10, 10));
+
+    polygons.push_back(points1);
+
+    std::vector<IntPoint> points2;
+    points2.push_back(ClipperLib::IntPoint(410, 410));
+    points2.push_back(ClipperLib::IntPoint(320, 320));
+    points2.push_back(ClipperLib::IntPoint(330, 320));
+    points2.push_back(ClipperLib::IntPoint(410, 410));
+
+    polygons.push_back(points2);
+
+    std::vector<Paths> enlargedPolygons;
+
+    enlargedPolygons = joinAndEnlarge(polygons);
 }
