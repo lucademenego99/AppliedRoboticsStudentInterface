@@ -903,15 +903,23 @@ namespace student
      */
     bool Dubins::intersArcLine(DubinsArc *arc, Point point1, Point point2, std::vector<Point> &pts, std::vector<double> &t)
     {
-
         // Find the circle containing the provided arc
         // Get the perpendicular lines of point1's line and points2's line
         // (we can calculate them because point1 and point2 also contain the angle, that in our case will be the slope)
         // Their intersection will be the center of the circle
 
-        // Calculate the slope of the two perpendicular lines
-        double m1 = tan(-1 / arc->th0);
-        double m2 = tan(-1 / arc->dubins_line->th);
+        double tanFirstAngle = tan(arc->th0);
+        double tanSecondAngle = tan(arc->dubins_line->th);
+
+        double m1 = tanFirstAngle == 0 ? INFINITY : (-1 / tanFirstAngle);
+        double m2 = tanSecondAngle == 0 ? INFINITY : (-1 / tanSecondAngle);
+
+        if (tanFirstAngle > 500 || tanFirstAngle < -500)
+            tanFirstAngle = 0;
+        if (tanSecondAngle > 500 || tanSecondAngle < -500)
+            tanSecondAngle = 0;
+
+        std::cout << "SLOPES: " << m1 <<  " " << m2 << "\n";
 
         Point circleCenter = Point(-1, -1);
 
@@ -934,8 +942,20 @@ namespace student
         else
         {
             // Intersection between the two perpendicular lines
-            circleCenter.x = ((m2 * arc->x0) - (m1 * arc->dubins_line->x) + arc->dubins_line->y - arc->y0) / (m2 - m1);
-            circleCenter.y = -1 / (m1) * (circleCenter.x - arc->x0) + arc->y0;
+            if (m1 == INFINITY) {
+                double q2 = arc->dubins_line->y - (m2*arc->dubins_line->x);
+                circleCenter.x = arc->x0;
+                circleCenter.y = m2 * arc->x0 + q2;
+            } else if (m2 == INFINITY) {
+                double q1 = arc->y0 - (m1*arc->x0);
+                circleCenter.x = arc->dubins_line->x;
+                circleCenter.y = m1 * arc->x0 + q1;
+            } else {
+                double q1 = arc->y0 - (m1*arc->x0);
+                double q2 = arc->dubins_line->y - (m2*arc->dubins_line->x);
+                circleCenter.x = (q1 - q2) / (m2 - m1);
+                circleCenter.y = m1 * arc->x0 + q1;
+            }
         }
 
         // Having the center, we can easily find the radius
@@ -1009,18 +1029,18 @@ namespace student
             double firstTh = (atan2(arc->y0 - circleCenter.y, arc->x0 - circleCenter.x));
             double secondTh = (atan2(arc->dubins_line->y - circleCenter.y, arc->dubins_line->x - circleCenter.x));
 
-            if (firstTh > secondTh)
-            {
-                if (intersectionTh <= firstTh && intersectionTh >= secondTh)
-                {
+            if (firstTh >= 0 && secondTh >= 0) {
+                if (intersectionTh < firstTh && intersectionTh > secondTh) {
                     pts.push_back(intersections[i].first);
                     t.push_back(intersections[i].second);
                 }
-            }
-            else
-            {
-                if (intersectionTh >= firstTh && intersectionTh <= secondTh)
-                {
+            } else if (firstTh > 0 && secondTh < 0) {
+                if (intersectionTh > firstTh || (intersectionTh < firstTh && intersectionTh < secondTh)) {
+                    pts.push_back(intersections[i].first);
+                    t.push_back(intersections[i].second);
+                }
+            } else {
+                if (intersectionTh > firstTh && intersectionTh < secondTh) {
                     pts.push_back(intersections[i].first);
                     t.push_back(intersections[i].second);
                 }

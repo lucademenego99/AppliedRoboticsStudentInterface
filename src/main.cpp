@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
 
     // multipointDubinsTest(dubins);
 
-    //multipointDubinsAndVisgraphTest(dubins);
+    multipointDubinsAndVisgraphTest(dubins);
 
     // intersectionsTest(dubins);
 
@@ -370,11 +370,11 @@ void intersectionsTest(Dubins dubins)
     //     }
     // }
 
-    // DubinsArc *arc = new DubinsArc(0, 0, -1.57, 1, 3.1416);
+    // DubinsArc *arc = new DubinsArc(0, 0, -1.57, 1, 1.57);
     // std::cout << "ARC:\n"
     //           << arc->x0 << " , " << arc->y0 << " , " << arc->th0 << "\n";
     // std::cout << arc->dubins_line->x << " , " << arc->dubins_line->y << " , " << arc->dubins_line->th << "\n";
-    // bool res = dubins.intersArcLine(arc, Point(0, -0.5), Point(3, 1), intersections, ts);
+    // bool res = dubins.intersArcLine(arc, Point(0, -1), Point(1, 0), intersections, ts);
     // std::cout << "\n\nRES: " << res << "\n";
     // if (res)
     // {
