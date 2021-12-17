@@ -2,8 +2,13 @@
 
 #include <stdexcept>
 #include <sstream>
+<<<<<<< HEAD
 namespace student
 {
+=======
+
+namespace student {
+>>>>>>> upstream/master
 
   void loadImage(cv::Mat &img_out, const std::string &config_folder)
   {
@@ -51,8 +56,13 @@ namespace student
     throw std::logic_error("STUDENT FUNCTION - FIND ROBOT - NOT IMPLEMENTED");
   }
 
+<<<<<<< HEAD
   bool planPath(const Polygon &borders, const std::vector<Polygon> &obstacle_list, const std::vector<std::pair<int, Polygon>> &victim_list, const Polygon &gate, const float x, const float y, const float theta, Path &path, const std::string &config_folder)
   {
     throw std::logic_error("STUDENT FUNCTION - PLAN PATH - NOT IMPLEMENTED");
+=======
+  bool planPath(const Polygon& borders, const std::vector<Polygon>& obstacle_list, const std::vector<Polygon>& gate_list, const std::vector<float> x, const std::vector<float> y, const std::vector<float> theta, std::vector<Path>& path, const std::string& config_folder){
+    throw std::logic_error( "STUDENT FUNCTION - PLAN PATH - NOT IMPLEMENTED" );
+>>>>>>> upstream/master
   }
 }
