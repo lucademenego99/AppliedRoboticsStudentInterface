@@ -123,7 +123,7 @@ namespace visgraph
         * @param polygons a map of polygons, keys are IDs and values the edges
         * @returns the complete graph
         */
-        Graph(std::vector<std::vector<Point>> polygons, bool isVisibilityGraph = false);
+        Graph(std::vector<std::vector<Point>> polygons, bool isVisibilityGraph = false, bool isOriginalGraph = false);
 
         /**
         * @brief Dijkstra Shortest path.
@@ -155,6 +155,24 @@ namespace visgraph
         * @param edges the empty vector of edges
         */
         std::vector<Edge> getEdges();
+
+        /**
+         * @brief Verifies if a point is within a polygon
+         * 
+         * @param p Point to verify
+         * @return bool is the point within a polygon?
+         */
+        bool pointInPolygon(Point p);
+
+        /**
+        * @brief Verifies if a point crosses the edges of a polygon
+        * 
+        * @param p1 The point we consider
+        * @param polygonEdges The list of edges of the polygon
+        * @return true 
+        * @return false 
+        */
+        bool polygonCrossing(Point p, std::vector<Edge> polygonEdges);
 
         /**
         * @brief adds an edge to the list of edges

@@ -242,61 +242,61 @@ void shortestPathDubinsTest(Dubins dubins)
 void multipointDubinsTest(Dubins dubins)
 {
     // std::cout << "MULTIPOINT SHORTEST PATH TEST\n";
-    // Point **points = new Point *[3];
-    // points[0] = new Point(0.2, 0.2, 0);
-    // points[1] = new Point(0.9, 0.8);
-    // points[2] = new Point(1.4, 0.2, 0);
+    // student::Point **points = new student::Point *[3];
+    // points[0] = new student::Point(0.2, 0.2, 0);
+    // points[1] = new student::Point(0.9, 0.8);
+    // points[2] = new student::Point(1.4, 0.2, 0);
     // dubins.multipointShortestPath(points, 3);
 
-    // Point **points = new Point *[5];
-    // points[0] = new Point(0.2, 0.2, M_PI);
-    // points[1] = new Point(0.9, 0.8);
-    // points[2] = new Point(0.4, 0.5);
-    // points[3] = new Point(0.7, 0.8);
-    // points[4] = new Point(1.4, 0.2, 0);
+    // student::Point **points = new student::Point *[5];
+    // points[0] = new student::Point(0.2, 0.2, M_PI);
+    // points[1] = new student::Point(0.9, 0.8);
+    // points[2] = new student::Point(0.4, 0.5);
+    // points[3] = new student::Point(0.7, 0.8);
+    // points[4] = new student::Point(1.4, 0.2, 0);
     // dubins.multipointShortestPath(points, 5);
 
-    // Point **points = new Point*[10];
-    // points[0] = new Point(0.2, 0.2, M_PI);
-    // points[1] = new Point(0.9, 0.8);
-    // points[2] = new Point(0.4, 0.5);
-    // points[3] = new Point(0.7, 0.8);
-    // points[4] = new Point(0.9, 0.8);
-    // points[5] = new Point(0.4, 0.5);
-    // points[6] = new Point(0.7, 0.8);
-    // points[7] = new Point(0.9, 0.8);
-    // points[8] = new Point(0.4, 0.5);
-    // points[9] = new Point(1.4, 0.2, 0);
+    // student::Point **points = new student::Point*[10];
+    // points[0] = new student::Point(0.2, 0.2, M_PI);
+    // points[1] = new student::Point(0.9, 0.8);
+    // points[2] = new student::Point(0.4, 0.5);
+    // points[3] = new student::Point(0.7, 0.8);
+    // points[4] = new student::Point(0.9, 0.8);
+    // points[5] = new student::Point(0.4, 0.5);
+    // points[6] = new student::Point(0.7, 0.8);
+    // points[7] = new student::Point(0.9, 0.8);
+    // points[8] = new student::Point(0.4, 0.5);
+    // points[9] = new student::Point(1.4, 0.2, 0);
     // dubins.multipointShortestPath(points, 10);
 
-    // Point **points = new Point*[3];
-    // points[0] = new Point(0.2, 0.2, 0);
-    // points[1] = new Point(0.4, 0.2);
-    // points[2] = new Point(0.6, 0.2, 0);
+    // student::Point **points = new student::Point*[3];
+    // points[0] = new student::Point(0.2, 0.2, 0);
+    // points[1] = new student::Point(0.4, 0.2);
+    // points[2] = new student::Point(0.6, 0.2, 0);
     // dubins.multipointShortestPath(points, 3);
 }
 
 void multipointDubinsAndVisgraphTest(Dubins dubins)
 {
     std::vector<std::vector<visgraph::Point>> polygons;
-    // std::vector<visgraph::Point> pol1 {visgraph::Point(1.0, 1.0), visgraph::Point(4.0, 1.0), visgraph::Point(4.0, 3.0), visgraph::Point(1.0, 3.0)};
-    // std::vector<visgraph::Point> pol2 {visgraph::Point(1.0, 3.5), visgraph::Point(4.0, 3.5), visgraph::Point(4.0, 5.5), visgraph::Point(1.0, 5.5)};
+    std::vector<visgraph::Point> pol1 {visgraph::Point(1.0, 1.0), visgraph::Point(4.0, 1.0), visgraph::Point(4.0, 3.0), visgraph::Point(1.0, 3.0)};
+    std::vector<visgraph::Point> pol2 {visgraph::Point(1.0, 3.5), visgraph::Point(4.0, 3.5), visgraph::Point(4.0, 5.5), visgraph::Point(1.0, 5.5)};
     // std::vector<visgraph::Point> pol3 {visgraph::Point(1.0, 6.0), visgraph::Point(4.0, 6.0), visgraph::Point(4.0, 8.0), visgraph::Point(1.0, 8.0)};
-    // std::vector<visgraph::Point> pol4 {visgraph::Point(5.0, 1.0), visgraph::Point(7.0, 1.0), visgraph::Point(7.0, 7.0), visgraph::Point(5.0, 7.0)};
-    std::vector<visgraph::Point> pol1 {visgraph::Point(2.0, 1.0), visgraph::Point(3.0, 1.0), visgraph::Point(4.0, 2.0), visgraph::Point(3.0, 3.0), visgraph::Point(2.0, 3.0), visgraph::Point(1.0, 2.0), visgraph::Point(2.0, 1.0)};
-    std::vector<visgraph::Point> pol2 {visgraph::Point(1.0, 3.5), visgraph::Point(6.0, 6.0), visgraph::Point(1.0, 6.0), visgraph::Point(1.0, 3.5)};
-    std::vector<visgraph::Point> pol3 {visgraph::Point(7.0, 2.0), visgraph::Point(8.0, 3.0), visgraph::Point(7.0, 5.0), visgraph::Point(6.0, 3.0), visgraph::Point(7.0,2.0)};
+    std::vector<visgraph::Point> pol4 {visgraph::Point(5.0, 1.0), visgraph::Point(7.0, 1.0), visgraph::Point(7.0, 7.0), visgraph::Point(5.0, 7.0)};
+    // std::vector<visgraph::Point> pol1 {visgraph::Point(2.0, 1.0), visgraph::Point(3.0, 1.0), visgraph::Point(4.0, 2.0), visgraph::Point(3.0, 3.0), visgraph::Point(2.0, 3.0), visgraph::Point(1.0, 2.0), visgraph::Point(2.0, 1.0)};
+    // std::vector<visgraph::Point> pol2 {visgraph::Point(1.0, 3.5), visgraph::Point(6.0, 6.0), visgraph::Point(1.0, 6.0), visgraph::Point(1.0, 3.5)};
+    // std::vector<visgraph::Point> pol3 {visgraph::Point(7.0, 2.0), visgraph::Point(8.0, 3.0), visgraph::Point(7.0, 5.0), visgraph::Point(6.0, 3.0), visgraph::Point(7.0,2.0)};
     polygons.push_back(pol1);
     polygons.push_back(pol2);
-    polygons.push_back(pol3);
-    // polygons.push_back(pol4);
+    // polygons.push_back(pol3);
+    polygons.push_back(pol4);
 
     visgraph::Point origin = visgraph::Point(9, 2);
-    visgraph::Point destination = visgraph::Point(2.5, 7.7);
+    visgraph::Point destination = visgraph::Point(2, 5.7);
 
     visgraph::VisGraph visg = visgraph::VisGraph();
 
-    visgraph::Graph originalGraph = visgraph::Graph(polygons);
+    visgraph::Graph originalGraph = visgraph::Graph(polygons, false, true);
 
     visgraph::Graph g = visg.computeVisibilityGraph(polygons, origin, destination);
 
@@ -306,39 +306,41 @@ void multipointDubinsAndVisgraphTest(Dubins dubins)
         path[it].print();
 
 
-    std::vector<visgraph::Edge> testEdges = originalGraph.getEdges();
-    for (int i = 0; i < testEdges.size(); i++) {
-        testEdges[i].p1.rescaleToOriginal();
-        testEdges[i].p2.rescaleToOriginal();
-    }
-    for (visgraph::Edge e : testEdges) {
-        e.print();
-    }
     printGraph(g.graph, origin, destination, path);
 
     std::cout << "MULTIPOINT SHORTEST PATH TEST\n";
-    Point **points = new Point *[path.size()];
-    points[0] = new Point(path[0].x, path[0].y, -M_PI_2);
+    student::Point **points = new student::Point *[path.size()];
+    points[0] = new student::Point(path[0].x, path[0].y, -M_PI_2);
     for(int i = 1; i < path.size()-1; i++) {
-        points[i] = new Point(path[i].x, path[i].y);
+        points[i] = new student::Point(path[i].x, path[i].y);
     }
-    points[path.size()-1] = new Point(path[path.size()-1].x, path[path.size()-1].y, -M_PI);
+    points[path.size()-1] = new student::Point(path[path.size()-1].x, path[path.size()-1].y);
 
     // DubinsCurve *curve = dubins.findShortestPath(points[0]->x, points[0]->y, points[0]->th, points[path.size()-1]->x,points[path.size()-1]->y,points[path.size()-1]->th);
     // dubins.printDubinsCurve(curve);
 
-    DubinsCurve **curves = dubins.multipointShortestPath(points, path.size(), originalGraph.getEdges());
-    // dubins.printDubinsCurve(curves[1]);
-    dubins.printCompletePath(curves, path.size()-1);
+    DubinsCurve **curves = dubins.multipointShortestPath(points, path.size(), originalGraph);
+    if (curves == nullptr) {
+        std::cout << "UNABLE TO COMPUTE A PATH FOR GIVEN INPUT\n";
+    } else {
+        std::cout << "COMPLETED MULTIPOINT SHORTEST PATH SUCCESSFULLY\n";
+        dubins.printCompletePath(curves, path.size()-1);
+    }
+    // student::DubinsCurve *curve = dubins.findShortestPathCollisionDetection(7.0, 1.0, M_PI, origin.x, origin.y, 0, originalGraph);
+    // if (curve == nullptr) {
+    //     std::cout << "NOT FOUND!\n";
+    // } else {
+    //     dubins.printDubinsCurve(curve);
+    // }
 }
 
 void intersectionsTest(Dubins dubins)
 {
     std::cout << "INTERSECTIONS TEST\n";
-    std::vector<Point> intersections = std::vector<Point>();
+    std::vector<student::Point> intersections = std::vector<student::Point>();
     std::vector<double> ts = std::vector<double>();
 
-    bool res = dubins.intersLineLine(Point(1, 1), Point(66.57, 0.367), Point(56.01, 18.22), Point(56.01, 0.067), intersections, ts);
+    bool res = dubins.intersLineLine(student::Point(1, 1), student::Point(66.57, 0.367), student::Point(56.01, 18.22), student::Point(56.01, 0.067), intersections, ts);
     std::cout << "RES: " << res << "\n";
     if (res)
     {
@@ -354,7 +356,7 @@ void intersectionsTest(Dubins dubins)
         }
     }
 
-    // bool res = dubins.intersCircleLine(Point(2, 2), 1, Point(0, 0), Point(4, 4), intersections, ts);
+    // bool res = dubins.intersCircleLine(student::Point(2, 2), 1, student::Point(0, 0), student::Point(4, 4), intersections, ts);
     // std::cout << "RES: " << res << "\n";
     // if (res)
     // {
@@ -374,7 +376,7 @@ void intersectionsTest(Dubins dubins)
     // std::cout << "ARC:\n"
     //           << arc->x0 << " , " << arc->y0 << " , " << arc->th0 << "\n";
     // std::cout << arc->dubins_line->x << " , " << arc->dubins_line->y << " , " << arc->dubins_line->th << "\n";
-    // bool res = dubins.intersArcLine(arc, Point(0, -1), Point(1, 0), intersections, ts);
+    // bool res = dubins.intersArcLine(arc, student::Point(0, -1), student::Point(1, 0), intersections, ts);
     // std::cout << "\n\nRES: " << res << "\n";
     // if (res)
     // {

@@ -214,6 +214,182 @@ namespace student
         return new CurveSegmentsResult(true, s1, s2, s3);
     }
 
+    CurveSegmentsResult *Dubins::useLS(double scaled_th0, double scaled_thf, double scaled_k_max) {
+        double s1, s2, s3;
+        double invK = 1.0 / scaled_k_max;
+        double C = cos(scaled_thf) - cos(scaled_th0);
+        double S = 2 * scaled_k_max + sin(scaled_th0) - sin(scaled_thf);
+        double temp1 = atan2(C, S);
+        s1 = invK * mod2pi(temp1 - scaled_th0);
+        double temp2 = 2 + 4 * pow(scaled_k_max, 2) - 2 * cos(scaled_th0 - scaled_thf) + 4 * scaled_k_max * (sin(scaled_th0) - sin(scaled_thf));
+        if (temp2 < 0)
+        {
+            s1 = 0;
+            s2 = 0;
+            s3 = 0;
+            return new CurveSegmentsResult(false, s1, s2, s3);
+        }
+        s2 = invK * sqrt(temp2);
+        s3 = 0;
+        return new CurveSegmentsResult(true, s1, s2, s3);
+    }
+    CurveSegmentsResult *Dubins::useRS(double scaled_th0, double scaled_thf, double scaled_k_max) {
+        double s1, s2, s3;
+        double invK = 1.0 / scaled_k_max;
+        double C = cos(scaled_th0) + cos(scaled_thf);
+        double S = 2 * scaled_k_max - sin(scaled_th0) - sin(scaled_thf);
+        double temp1 = atan2(C, S);
+        double temp3 = 4 * pow(scaled_k_max, 2) - 2 + 2 * cos(scaled_th0 - scaled_thf) - 4 * scaled_k_max * (sin(scaled_th0) + sin(scaled_thf));
+        if (temp3 < 0)
+        {
+            s1 = 0;
+            s2 = 0;
+            s3 = 0;
+            return new CurveSegmentsResult(false, s1, s2, s3);
+        }
+        s2 = invK * sqrt(temp3);
+        double temp2 = atan2(2, s2 * scaled_k_max);
+        s1 = invK * mod2pi(scaled_th0 - temp1 + temp2);
+        s3 = 0;
+        return new CurveSegmentsResult(true, s1, s2, s3);
+    }
+    CurveSegmentsResult *Dubins::useSL(double scaled_th0, double scaled_thf, double scaled_k_max) {
+        double s1, s2, s3;
+        double invK = 1.0 / scaled_k_max;
+        double C = cos(scaled_th0) + cos(scaled_thf);
+        double S = 2 * scaled_k_max - sin(scaled_th0) - sin(scaled_thf);
+        double temp1 = atan2(C, S);
+        double temp3 = 4 * pow(scaled_k_max, 2) - 2 + 2 * cos(scaled_th0 - scaled_thf) - 4 * scaled_k_max * (sin(scaled_th0) + sin(scaled_thf));
+        if (temp3 < 0)
+        {
+            s1 = 0;
+            s2 = 0;
+            s3 = 0;
+            return new CurveSegmentsResult(false, s1, s2, s3);
+        }
+        s2 = invK * sqrt(temp3);
+        double temp2 = atan2(2, s2 * scaled_k_max);
+        s1 = 0;
+        s3 = invK * mod2pi(scaled_thf - temp1 + temp2);
+        return new CurveSegmentsResult(true, s1, s2, s3);
+    }
+    CurveSegmentsResult *Dubins::useSR(double scaled_th0, double scaled_thf, double scaled_k_max) {
+        double s1, s2, s3;
+        double invK = 1.0 / scaled_k_max;
+        double C = cos(scaled_th0) + cos(scaled_thf);
+        double S = 2 * scaled_k_max + sin(scaled_th0) + sin(scaled_thf);
+        double temp1 = atan2(-C, S);
+        double temp3 = 4 * pow(scaled_k_max, 2) - 2 + 2 * cos(scaled_th0 - scaled_thf) + 4 * scaled_k_max * (sin(scaled_th0) + sin(scaled_thf));
+        if (temp3 < 0)
+        {
+            s1 = 0;
+            s2 = 0;
+            s3 = 0;
+            return new CurveSegmentsResult(false, s1, s2, s3);
+        }
+        s2 = invK * sqrt(temp3);
+        double temp2 = -atan2(-2, s2 * scaled_k_max);
+        s1 = 0;
+        s3 = invK * mod2pi(temp1 + temp2 - scaled_thf);
+        return new CurveSegmentsResult(true, s1, s2, s3);
+    }
+    CurveSegmentsResult *Dubins::useS(double scaled_th0, double scaled_thf, double scaled_k_max) {
+        double s1, s2, s3;
+        double invK = 1.0 / scaled_k_max;
+        double C = cos(scaled_th0) + cos(scaled_thf);
+        double S = 2 * scaled_k_max + sin(scaled_th0) + sin(scaled_thf);
+        double temp1 = atan2(-C, S);
+        double temp3 = 4 * pow(scaled_k_max, 2) - 2 + 2 * cos(scaled_th0 - scaled_thf) + 4 * scaled_k_max * (sin(scaled_th0) + sin(scaled_thf));
+        if (temp3 < 0)
+        {
+            s1 = 0;
+            s2 = 0;
+            s3 = 0;
+            return new CurveSegmentsResult(false, s1, s2, s3);
+        }
+        s2 = invK * sqrt(temp3);
+        double temp2 = -atan2(-2, s2 * scaled_k_max);
+        s1 = 0;
+        s3 = 0;
+        return new CurveSegmentsResult(true, s1, s2, s3);
+    }
+    CurveSegmentsResult *Dubins::useLR(double scaled_th0, double scaled_thf, double scaled_k_max) {
+        double s1, s2, s3;
+        double invK = 1.0 / scaled_k_max;
+        double C = cos(scaled_thf) - cos(scaled_th0);
+        double S = 2 * scaled_k_max + sin(scaled_th0) - sin(scaled_thf);
+        double temp1 = atan2(C, S);
+        double temp2 = 0.125 * (6 - 4 * pow(scaled_k_max, 2) + 2 * cos(scaled_th0 - scaled_thf) - 4 * scaled_k_max * (sin(scaled_th0) - sin(scaled_thf)));
+        if (abs(temp2) > 1)
+        {
+            s1 = 0;
+            s2 = 0;
+            s3 = 0;
+            return new CurveSegmentsResult(false, s1, s2, s3);
+        }
+        s2 = invK * mod2pi(2 * M_PI - acos(temp2));
+        s1 = invK * mod2pi(temp1 - scaled_th0 + 0.5 * s2 * scaled_k_max);
+        s3 = 0;
+        return new CurveSegmentsResult(true, s1, s2, s3);
+    }
+    CurveSegmentsResult *Dubins::useRL(double scaled_th0, double scaled_thf, double scaled_k_max) {
+        double s1, s2, s3;
+        double invK = 1.0 / scaled_k_max;
+        double C = cos(scaled_thf) - cos(scaled_th0);
+        double S = 2 * scaled_k_max + sin(scaled_th0) - sin(scaled_thf);
+        double temp1 = atan2(C, S);
+        double temp2 = 0.125 * (6 - 4 * pow(scaled_k_max, 2) + 2 * cos(scaled_th0 - scaled_thf) - 4 * scaled_k_max * (sin(scaled_th0) - sin(scaled_thf)));
+        if (abs(temp2) > 1)
+        {
+            s1 = 0;
+            s2 = 0;
+            s3 = 0;
+            return new CurveSegmentsResult(false, s1, s2, s3);
+        }
+        s2 = invK * mod2pi(2 * M_PI - acos(temp2));
+        s1 = 0;
+        s3 = invK * mod2pi(scaled_thf - scaled_th0 + scaled_k_max * (s2 - s1));
+        return new CurveSegmentsResult(true, s1, s2, s3);
+    }
+    CurveSegmentsResult *Dubins::useL(double scaled_th0, double scaled_thf, double scaled_k_max) {
+        double s1, s2, s3;
+        double invK = 1.0 / scaled_k_max;
+        double C = cos(scaled_thf) - cos(scaled_th0);
+        double S = 2 * scaled_k_max + sin(scaled_th0) - sin(scaled_thf);
+        double temp1 = atan2(C, S);
+        double temp2 = 0.125 * (6 - 4 * pow(scaled_k_max, 2) + 2 * cos(scaled_th0 - scaled_thf) - 4 * scaled_k_max * (sin(scaled_th0) - sin(scaled_thf)));
+        if (abs(temp2) > 1)
+        {
+            s1 = 0;
+            s2 = 0;
+            s3 = 0;
+            return new CurveSegmentsResult(false, s1, s2, s3);
+        }
+        s2 = 0;
+        s1 = 0;
+        s3 = invK * mod2pi(scaled_thf - scaled_th0 + scaled_k_max * (s2 - s1));
+        return new CurveSegmentsResult(true, s1, s2, s3);
+    }
+    CurveSegmentsResult *Dubins::useR(double scaled_th0, double scaled_thf, double scaled_k_max) {
+        double s1, s2, s3;
+        double invK = 1.0 / scaled_k_max;
+        double C = cos(scaled_thf) - cos(scaled_th0);
+        double S = 2 * scaled_k_max + sin(scaled_th0) - sin(scaled_thf);
+        double temp1 = atan2(C, S);
+        double temp2 = 0.125 * (6 - 4 * pow(scaled_k_max, 2) + 2 * cos(scaled_th0 - scaled_thf) - 4 * scaled_k_max * (sin(scaled_th0) - sin(scaled_thf)));
+        if (abs(temp2) > 1)
+        {
+            s1 = 0;
+            s2 = 0;
+            s3 = 0;
+            return new CurveSegmentsResult(false, s1, s2, s3);
+        }
+        s2 = invK * mod2pi(2 * M_PI - acos(temp2));
+        s1 = 0;
+        s3 = 0;
+        return new CurveSegmentsResult(true, s1, s2, s3);
+    }
+
     /**
      * @brief Find the shortest path between a starting and a final position
      * 
@@ -364,8 +540,9 @@ namespace student
      * @param edges All obstacles' edges
      * @return DubinsCurve* Resulting curve representing the shortest path
      */
-    DubinsCurve *Dubins::findShortestPathCollisionDetection(double x0, double y0, double th0, double xf, double yf, double thf, std::vector<visgraph::Edge> edges)
+    DubinsCurve *Dubins::findShortestPathCollisionDetection(double x0, double y0, double th0, double xf, double yf, double thf, visgraph::Graph &graph)
     {
+        std::vector<visgraph::Edge> edges = graph.getEdges();
         ParametersResult *scaled_parameters = scaleToStandard(x0, y0, th0, xf, yf, thf);
 
         DubinsCurve *curve = nullptr;
@@ -375,27 +552,34 @@ namespace student
         double best_L = DBL_MAX;
         int pidx = -1;
 
+        std::cout << "ONE SHORTEST PATH IS WORKING\n";
+
         for (int i = 0; i < TOTAL_POSSIBLE_CURVES; i++)
         {
+            bool isThereAStraightLine = false;
             switch (i)
             {
             case LSL:
                 curve_segments = useLSL(scaled_parameters->scaled_th0, scaled_parameters->scaled_thf, scaled_parameters->scaled_k_max);
+                isThereAStraightLine = true;
 
                 break;
 
             case RSR:
                 curve_segments = useRSR(scaled_parameters->scaled_th0, scaled_parameters->scaled_thf, scaled_parameters->scaled_k_max);
+                isThereAStraightLine = true;
 
                 break;
 
             case LSR:
                 curve_segments = useLSR(scaled_parameters->scaled_th0, scaled_parameters->scaled_thf, scaled_parameters->scaled_k_max);
+                isThereAStraightLine = true;
 
                 break;
 
             case RSL:
                 curve_segments = useRSL(scaled_parameters->scaled_th0, scaled_parameters->scaled_thf, scaled_parameters->scaled_k_max);
+                isThereAStraightLine = true;
 
                 break;
 
@@ -408,6 +592,43 @@ namespace student
                 curve_segments = useLRL(scaled_parameters->scaled_th0, scaled_parameters->scaled_thf, scaled_parameters->scaled_k_max);
 
                 break;
+            
+            // case LS:
+            //     curve_segments = useLS(scaled_parameters->scaled_th0, scaled_parameters->scaled_thf, scaled_parameters->scaled_k_max);
+
+            //     break;
+            case RS:
+                curve_segments = useRS(scaled_parameters->scaled_th0, scaled_parameters->scaled_thf, scaled_parameters->scaled_k_max);
+
+                break;
+            // case SL:
+            //     curve_segments = useSL(scaled_parameters->scaled_th0, scaled_parameters->scaled_thf, scaled_parameters->scaled_k_max);
+
+            //     break;
+            // case SR:
+            //     curve_segments = useSR(scaled_parameters->scaled_th0, scaled_parameters->scaled_thf, scaled_parameters->scaled_k_max);
+
+            //     break;
+            // case S:
+            //     curve_segments = useS(scaled_parameters->scaled_th0, scaled_parameters->scaled_thf, scaled_parameters->scaled_k_max);
+
+            //     break;
+            // case LR:
+            //     curve_segments = useLR(scaled_parameters->scaled_th0, scaled_parameters->scaled_thf, scaled_parameters->scaled_k_max);
+
+            //     break;
+            // case RL:
+            //     curve_segments = useRL(scaled_parameters->scaled_th0, scaled_parameters->scaled_thf, scaled_parameters->scaled_k_max);
+
+            //     break;
+            // case L:
+            //     curve_segments = useL(scaled_parameters->scaled_th0, scaled_parameters->scaled_thf, scaled_parameters->scaled_k_max);
+
+            //     break;
+            // case R:
+            //     curve_segments = useR(scaled_parameters->scaled_th0, scaled_parameters->scaled_thf, scaled_parameters->scaled_k_max);
+
+            //     break;
 
             default:
                 curve_segments = new CurveSegmentsResult(false, 0, 0, 0);
@@ -417,29 +638,53 @@ namespace student
             double current_L = curve_segments->s1 + curve_segments->s2 + curve_segments->s3;
 
             CurveSegmentsResult *tmpCurveResult = scaleFromStandard(scaled_parameters->lambda, curve_segments);
-            DubinsCurve *tmpCurve = new DubinsCurve(x0, y0, th0, tmpCurveResult->s1, tmpCurveResult->s2, tmpCurveResult->s3, ksigns[pidx][0] * k_max, ksigns[pidx][1] * k_max, ksigns[pidx][2] * k_max);
+
+            DubinsCurve *tmpCurve = new DubinsCurve(x0, y0, th0, tmpCurveResult->s1, tmpCurveResult->s2, tmpCurveResult->s3, ksigns[i][0] * k_max, ksigns[i][1] * k_max, ksigns[i][2] * k_max);
+
+            if (i == RS) {
+            std::cout << "CREATED CURVE\n";
+            } else {
+                std::cout << "CREATED CURVE OTHERS\n";
+            }
 
             if (curve_segments->ok && current_L < best_L)
             {
                 bool areThereCollisions = false;
-                Polygon polTmp;
-                std::vector<double> tTmp;
-                for (int z = 0; z < edges.size(); z++) {
-                    areThereCollisions = areThereCollisions || intersArcLine(tmpCurve->a1, Point(edges[z].p1.x, edges[z].p1.y), Point(edges[z].p2.x, edges[z].p2.y), polTmp, tTmp);
-                    areThereCollisions = areThereCollisions || intersArcLine(tmpCurve->a2, Point(edges[z].p1.x, edges[z].p1.y), Point(edges[z].p2.x, edges[z].p2.y), polTmp, tTmp);
-                    areThereCollisions = areThereCollisions || intersArcLine(tmpCurve->a3, Point(edges[z].p1.x, edges[z].p1.y), Point(edges[z].p2.x, edges[z].p2.y), polTmp, tTmp);
+
+                for (int z = 1; z < 4; z++) {
+                    double s1 = tmpCurve->a1->L/4 * z;
+                    DubinsLine *tmp1 = new DubinsLine(s1, tmpCurve->a1->x0, tmpCurve->a1->y0, tmpCurve->a1->th0, tmpCurve->a1->k);
+                    double s2 = tmpCurve->a2->L/4 * z;
+                    DubinsLine *tmp2 = new DubinsLine(s2, tmpCurve->a2->x0, tmpCurve->a2->y0, tmpCurve->a2->th0, tmpCurve->a2->k);
+                    double s3 = tmpCurve->a3->L/4 * z;
+                    DubinsLine *tmp3 = new DubinsLine(s3, tmpCurve->a3->x0, tmpCurve->a3->y0, tmpCurve->a3->th0, tmpCurve->a3->k);
+                    // std::cout << "POINT EX: (" << tmp1->x << "," << tmp1->y << ") WITH S= " << s1 << "\n";
+                    areThereCollisions = areThereCollisions || graph.pointInPolygon(visgraph::Point(tmp1->x, tmp1->y));
+                    areThereCollisions = areThereCollisions || graph.pointInPolygon(visgraph::Point(tmp2->x, tmp2->y));
+                    areThereCollisions = areThereCollisions || graph.pointInPolygon(visgraph::Point(tmp3->x, tmp3->y));
+                    delete tmp1;
+                    delete tmp2;
+                    delete tmp3;
                 }
-                if (areThereCollisions) {
-                    std::cout << "THERE'S A COLLISION!\n";
-                } else {
-                    // std::cout << "NO COLLISION\n";
-                }
+
                 if (!areThereCollisions) {
-                    best_L = current_L;
-                    pidx = i;
-                    if (best_curve_segments != nullptr)
-                        delete best_curve_segments;
-                    best_curve_segments = new CurveSegmentsResult(true, curve_segments->s1, curve_segments->s2, curve_segments->s3);
+                    Polygon polTmp;
+                    std::vector<double> tTmp;
+                    for (int z = 0; z < edges.size(); z++) {
+                        areThereCollisions = areThereCollisions || intersArcLine(tmpCurve->a1, Point(edges[z].p1.x, edges[z].p1.y), Point(edges[z].p2.x, edges[z].p2.y), polTmp, tTmp);
+                        if (isThereAStraightLine)
+                            areThereCollisions = areThereCollisions || intersLineLine(Point(tmpCurve->a2->x0, tmpCurve->a2->y0), Point(tmpCurve->a2->dubins_line->x, tmpCurve->a2->dubins_line->y),Point(edges[z].p1.x, edges[z].p1.y), Point(edges[z].p2.x, edges[z].p2.y), polTmp, tTmp);
+                        else
+                            areThereCollisions = areThereCollisions || intersArcLine(tmpCurve->a2, Point(edges[z].p1.x, edges[z].p1.y), Point(edges[z].p2.x, edges[z].p2.y), polTmp, tTmp);
+                        areThereCollisions = areThereCollisions || intersArcLine(tmpCurve->a3, Point(edges[z].p1.x, edges[z].p1.y), Point(edges[z].p2.x, edges[z].p2.y), polTmp, tTmp);
+                    }
+                    if (!areThereCollisions) {
+                        best_L = current_L;
+                        pidx = i;
+                        if (best_curve_segments != nullptr)
+                            delete best_curve_segments;
+                        best_curve_segments = new CurveSegmentsResult(true, curve_segments->s1, curve_segments->s2, curve_segments->s3);
+                    }
                 }
             }
             delete tmpCurveResult;
@@ -460,46 +705,11 @@ namespace student
         {
             CurveSegmentsResult *curve_result = scaleFromStandard(scaled_parameters->lambda, best_curve_segments);
 
-            // std::cout << "CURVE RESULT: " << curve_result->s1 << " " << curve_result->s2 << " " << curve_result->s3 << "\n\n";
-
             curve = new DubinsCurve(x0, y0, th0, curve_result->s1, curve_result->s2, curve_result->s3, ksigns[pidx][0] * k_max, ksigns[pidx][1] * k_max, ksigns[pidx][2] * k_max);
-
-            // std::cout << "GENERAL L: " << curve->L << "\n";
-
-            // std::cout << "a1 = \n"
-            //       << "\tL = " << curve->a1->L << "\n"
-            //       << "\tk = " << curve->a1->k << "\n"
-            //       << "\tx0 = " << curve->a1->x0 << "\n"
-            //       << "\ty0 = " << curve->a1->y0 << "\n"
-            //       << "\tth0 = " << curve->a1->th0 << "\n"
-            //       << "\tdubins_line-x = " << curve->a1->dubins_line->x << "\n"
-            //       << "\tdubins_line-y = " << curve->a1->dubins_line->y << "\n"
-            //       << "\tdubins_line-th = " << curve->a1->dubins_line->th << "\n\n";
-
-            // std::cout << "a2 = \n"
-            //       << "\tL = " << curve->a2->L << "\n"
-            //       << "\tk = " << curve->a2->k << "\n"
-            //       << "\tx0 = " << curve->a2->x0 << "\n"
-            //       << "\ty0 = " << curve->a2->y0 << "\n"
-            //       << "\tth0 = " << curve->a2->th0 << "\n"
-            //       << "\tdubins_line-x = " << curve->a2->dubins_line->x << "\n"
-            //       << "\tdubins_line-y = " << curve->a2->dubins_line->y << "\n"
-            //       << "\tdubins_line-th = " << curve->a2->dubins_line->th << "\n\n";
-
-            // std::cout << "a3 = \n"
-            //       << "\tL = " << curve->a3->L << "\n"
-            //       << "\tk = " << curve->a3->k << "\n"
-            //       << "\tx0 = " << curve->a3->x0 << "\n"
-            //       << "\ty0 = " << curve->a3->y0 << "\n"
-            //       << "\tth0 = " << curve->a3->th0 << "\n"
-            //       << "\tdubins_line-x = " << curve->a3->dubins_line->x << "\n"
-            //       << "\tdubins_line-y = " << curve->a3->dubins_line->y << "\n"
-            //       << "\tdubins_line-th = " << curve->a3->dubins_line->th << "\n\n";
 
             bool valid = checkValidity(best_curve_segments, ksigns[pidx][0] * scaled_parameters->scaled_k_max, ksigns[pidx][1] * scaled_parameters->scaled_k_max, ksigns[pidx][2] * scaled_parameters->scaled_k_max, scaled_parameters->scaled_th0, scaled_parameters->scaled_thf);
             if (!valid)
             {
-                std::cout << "NOT VALID!!\n\n";
                 delete curve;
                 curve = nullptr;
             }
@@ -518,8 +728,9 @@ namespace student
      * @param numberOfPoints The number of points provided
      * @return DubinsCurve** Resulting array of curves that together represent the shortest path
      */
-    double *Dubins::multipointShortestPathAngles(Point **points, unsigned int numberOfPoints, std::vector<visgraph::Edge> edges)
+    double *Dubins::multipointShortestPathAngles(Point **points, unsigned int numberOfPoints, visgraph::Graph &graph)
     {
+        std::vector<visgraph::Edge> edges = graph.getEdges();
         std::cout << "INPUT: \n";
         std::cout << "X\tY\tTHETA\n";
         for (int i = 0; i < numberOfPoints; i++)
@@ -581,10 +792,12 @@ namespace student
 
         // ALGORITHM - FIRST STEP
         // For the last two points, we already know the end angle
+        bool isThereAPath = false;
         for (unsigned int i = 0; i < K; i++)
         {
-            DubinsCurve *curve = findShortestPathCollisionDetection(points[numberOfPoints - 2]->x, points[numberOfPoints - 2]->y, points[numberOfPoints - 2]->th != -1 ? points[numberOfPoints - 2]->th : i, points[numberOfPoints - 1]->x, points[numberOfPoints - 1]->y, points[numberOfPoints - 1]->th, edges);
+            DubinsCurve *curve = findShortestPathCollisionDetection(points[numberOfPoints - 2]->x, points[numberOfPoints - 2]->y, points[numberOfPoints - 2]->th != -1 ? points[numberOfPoints - 2]->th : multipointAngles[i], points[numberOfPoints - 1]->x, points[numberOfPoints - 1]->y, points[numberOfPoints - 1]->th, graph);
             if (curve != nullptr) {
+                isThereAPath = true;
                 if (L[numberOfPoints - 2][i] == -1 || L[numberOfPoints - 2][i] > curve->L)
                 {
                     L[numberOfPoints - 2][i] = curve->L;
@@ -595,29 +808,40 @@ namespace student
             }
         }
 
+        if (!isThereAPath) {
+            std::cout << "NOT FOUND A PATH FOR LAST CURVE\n";
+            return nullptr;
+        }
+
         // ALGORITHM - ITERATIVE COMPUTATION
         for (int n = numberOfPoints - 3; n >= 0; n--)
         {
+            std::cout << "CALCULATING FOR n=" << n << "\n";
             for (unsigned int i = 0; i < K; i++)
             {
                 for (unsigned int j = 0; j < K; j++)
                 {
-                    int actual_i_angle = points[n]->th != -1 ? points[n]->th : multipointAngles[i];
-                    DubinsCurve *curve = findShortestPathCollisionDetection(points[n]->x, points[n]->y, actual_i_angle, points[n + 1]->x, points[n + 1]->y, multipointAngles[j], edges);
-                    if (curve != nullptr) {
-                        if (n == 0 && ((L[n][0] > curve->L + L[n + 1][j]) || L[n][0] == -1))
-                        {
-                            // If it's the first two points, we already know the initial angle
-                            L[n][0] = curve->L + L[n + 1][j];
-                            S[n][0] = j;
+                    if (L[n+1][j] != INFINITY) {
+                        int actual_i_angle = points[n]->th != -1 ? points[n]->th : multipointAngles[i];
+                        DubinsCurve *curve = findShortestPathCollisionDetection(points[n]->x, points[n]->y, actual_i_angle, points[n + 1]->x, points[n + 1]->y, multipointAngles[j], graph);
+                        if (curve != nullptr) {
+                            if (L[n][i] > curve->L + L[n + 1][j] || L[n][i] == -1)
+                            {
+                                // Default case: I update the optimal solution
+                                L[n][i] = curve->L + L[n + 1][j];
+                                S[n][i] = j;
+                            }
+                            delete curve;
+                        } else {
+                            if (L[n][i] == -1)
+                            {
+                                L[n][i] = INFINITY;
+                                S[n][i] = -1;
+                            }
                         }
-                        else if (L[n][i] > curve->L + L[n + 1][j] || L[n][i] == -1)
-                        {
-                            // Default case: I update the optimal solution
-                            L[n][i] = curve->L + L[n + 1][j];
-                            S[n][i] = j;
-                        }
-                        delete curve;
+                    } else {
+                        L[n][i] = INFINITY;
+                        S[n][i] = -1;
                     }
                 }
             }
@@ -660,25 +884,30 @@ namespace student
         }
         std::cout << "\n\n";
 
-        // Find the maximum length and the corresponding index in the first row of L
-        unsigned int maxIndex;
-        double maxLength = -INFINITY;
+        // Find the minimum length and the corresponding index in the first row of L
+        unsigned int minIndex = -1;
+        double minLength = INFINITY;
         for (unsigned int i = 0; i < K; i++)
         {
-            if (L[0][i] > maxLength)
+            if (L[0][i] < minLength)
             {
-                maxIndex = i;
-                maxLength = L[0][i];
+                minIndex = i;
+                minLength = L[0][i];
             }
         }
 
-        std::cout << "MINIMUM LENGTH FOUND: " << L[0][maxIndex] << "\n\n";
+        if (minIndex == -1) {
+            return nullptr;
+        }
 
-        minimizingAngles[0] = points[0]->th;
+        std::cout << "MINIMUM LENGTH FOUND: " << L[0][minIndex] << "\n\n";
+
+        minimizingAngles[0] = multipointAngles[minIndex];
         for (int i = 0; i < numberOfPoints - 2; i++)
         {
-            minimizingAngles[i + 1] = multipointAngles[S[i][maxIndex]];
-            maxIndex = S[i][maxIndex];
+            minimizingAngles[i + 1] = multipointAngles[S[i][minIndex]];
+            minIndex = S[i][minIndex];
+            std::cout << "minIndex: " << minIndex << "\n";
         }
         minimizingAngles[numberOfPoints - 1] = points[numberOfPoints - 1]->th;
 
@@ -699,15 +928,26 @@ namespace student
      * @param numberOfPoints Number of points we have
      * @return DubinsCurve** Array of DubinsCurves
      */
-    DubinsCurve **Dubins::multipointShortestPath(Point **points, unsigned int numberOfPoints, std::vector<visgraph::Edge> edges)
+    DubinsCurve **Dubins::multipointShortestPath(Point **points, unsigned int numberOfPoints, visgraph::Graph &graph)
     {
+        Point **newPoints = new Point*[numberOfPoints];
+        for (int i = 0; i < numberOfPoints; i++) {
+            newPoints[i] = points[numberOfPoints - i - 1];
+        }
+        newPoints[numberOfPoints-1]->th = 1.57;
         // Get the optimal angles for each point (dynamic programming iterative procedure)
-        double *angles = multipointShortestPathAngles(points, numberOfPoints, edges);
+        double *angles = multipointShortestPathAngles(newPoints, numberOfPoints, graph);
+        if (angles == nullptr) {
+            return nullptr;
+        }
 
         // Now that we have everything we need, calculate the optimal multipoint shortest path
         DubinsCurve **curves = new DubinsCurve*[numberOfPoints-1];
         for (int i = 1; i < numberOfPoints; i++) {
-            curves[i-1] = findShortestPathCollisionDetection(points[i-1]->x, points[i-1]->y, angles[i-1], points[i]->x, points[i]->y, angles[i], edges);
+            curves[i-1] = findShortestPathCollisionDetection(newPoints[i-1]->x, newPoints[i-1]->y, angles[i-1], newPoints[i]->x, newPoints[i]->y, angles[i], graph);
+            if (curves[i-1] == nullptr) {
+                return nullptr;
+            }
         }
         return curves;
     }
@@ -890,6 +1130,58 @@ namespace student
         return pts.empty() ? false : true;
     }
 
+    bool Dubins::findCenterAndRadiusFromArc(DubinsArc *arc, Point *center, double &radius) {
+        double tanFirstAngle = tan(arc->th0);
+        double tanSecondAngle = tan(arc->dubins_line->th);
+
+        double m1 = tanFirstAngle == 0 ? INFINITY : (-1 / tanFirstAngle);
+        double m2 = tanSecondAngle == 0 ? INFINITY : (-1 / tanSecondAngle);
+
+        if (tanFirstAngle > 500 || tanFirstAngle < -500)
+            tanFirstAngle = 0;
+        if (tanSecondAngle > 500 || tanSecondAngle < -500)
+            tanSecondAngle = 0;
+
+        // Limit case: the slope is the same
+        if (abs(m1 - m2) < 1.e-1 || abs(m1 + m2) < 1.e-1)
+        {
+            if (arc->x0 == arc->dubins_line->x && arc->y0 == arc->dubins_line->y)
+            {
+                // The two points are the same, no intersection?
+                return false;
+            }
+            else
+            {
+                // The segment between the two points forms the diagonal of the circle
+                // This means the center is in the middle
+                center->x = (arc->x0 + arc->dubins_line->x) / 2;
+                center->y = (arc->y0 + arc->dubins_line->y) / 2;
+            }
+        }
+        else
+        {
+            // Intersection between the two perpendicular lines
+            if (m1 == INFINITY) {
+                double q2 = arc->dubins_line->y - (m2*arc->dubins_line->x);
+                center->x = arc->x0;
+                center->y = m2 * arc->x0 + q2;
+            } else if (m2 == INFINITY) {
+                double q1 = arc->y0 - (m1*arc->x0);
+                center->x = arc->dubins_line->x;
+                center->y = m1 * arc->x0 + q1;
+            } else {
+                double q1 = arc->y0 - (m1*arc->x0);
+                double q2 = arc->dubins_line->y - (m2*arc->dubins_line->x);
+                center->x = (q1 - q2) / (m2 - m1);
+                center->y = m1 * arc->x0 + q1;
+            }
+        }
+
+        // Having the center, we can easily find the radius
+        radius = sqrt(pow(arc->x0 - center->x, 2) + pow(arc->y0 - center->y, 2));
+        return true;
+    }
+
     /**
      * @brief Find if there is an intersection between an arc and a segment
      * 
@@ -918,8 +1210,6 @@ namespace student
             tanFirstAngle = 0;
         if (tanSecondAngle > 500 || tanSecondAngle < -500)
             tanSecondAngle = 0;
-
-        std::cout << "SLOPES: " << m1 <<  " " << m2 << "\n";
 
         Point circleCenter = Point(-1, -1);
 
@@ -1060,6 +1350,8 @@ namespace student
      * @param last Is this the last arc of a curve?
      */
     void Dubins::printDubinsArc(DubinsArc *arc, Mat image, double size, bool first, bool last) {
+        // std::cout << "PRINTING DUBINS ARC FROM (" << arc->x0 << "," << arc->y0 << "," << arc->th0 << ") TO (" << arc->dubins_line->x << "," << arc->dubins_line->y << "," << arc->dubins_line->th << ")\n";
+        // std::cout << "POINTS:\n";
         int npts = 100;
         std::vector<cv::Point> pts;
         if (first)
@@ -1069,9 +1361,11 @@ namespace student
         for (int i = 0; i < npts; i++) {
             double s = arc->L/npts * i;
             DubinsLine *tmp = new DubinsLine(s, arc->x0, arc->y0, arc->th0, arc->k);
+            // std::cout << "(" << tmp->x << "," << tmp->y << ") ; ";
             pts.push_back(cv::Point(tmp->x / size * 500, tmp->y / size * 500));
             delete tmp;
         }
+        // std::cout << "\n";
         for (int i = 1; i < pts.size(); i++) {
             line(image, pts[i-1], pts[i], Scalar(0, 0, 255), 1, LINE_AA);
         }
@@ -1114,13 +1408,16 @@ namespace student
 
         double maxx = -INFINITY, minx = INFINITY, maxy = -INFINITY, miny = INFINITY;
         for (int i = 0; i < numberOfCurves; i++) {
+            std::cout << "I : " << i << "\n";
             maxx = max({maxx, curves[i]->a1->x0, curves[i]->a1->dubins_line->x, curves[i]->a2->x0, curves[i]->a2->dubins_line->x, curves[i]->a3->x0, curves[i]->a3->dubins_line->x});
             minx = min({minx, curves[i]->a1->x0, curves[i]->a1->dubins_line->x, curves[i]->a2->x0, curves[i]->a2->dubins_line->x, curves[i]->a3->x0, curves[i]->a3->dubins_line->x});
             maxy = max({maxy, curves[i]->a1->y0, curves[i]->a1->dubins_line->y, curves[i]->a2->y0, curves[i]->a2->dubins_line->y, curves[i]->a3->y0, curves[i]->a3->dubins_line->y});
             miny = min({miny, curves[i]->a1->y0, curves[i]->a1->dubins_line->y, curves[i]->a2->y0, curves[i]->a2->dubins_line->y, curves[i]->a3->y0, curves[i]->a3->dubins_line->y});
         }
+        std::cout << "NUMBER OF CURVES: " << numberOfCurves << "\n";
 
         double size = max(maxx, maxy);
+
 
         for (int i = 0; i < numberOfCurves; i++) {
             printDubinsArc(curves[i]->a1, image, size, true, false);
