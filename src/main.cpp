@@ -280,19 +280,38 @@ void multipointDubinsAndVisgraphTest(Dubins dubins)
 {
     std::vector<std::vector<visgraph::Point>> polygons;
     std::vector<visgraph::Point> pol1 {visgraph::Point(1.0, 1.0), visgraph::Point(4.0, 1.0), visgraph::Point(4.0, 3.0), visgraph::Point(1.0, 3.0)};
-    std::vector<visgraph::Point> pol2 {visgraph::Point(1.0, 3.5), visgraph::Point(4.0, 3.5), visgraph::Point(4.0, 5.5), visgraph::Point(1.0, 5.5)};
+    // std::vector<visgraph::Point> pol2 {visgraph::Point(1.0, 3.5), visgraph::Point(4.0, 3.5), visgraph::Point(4.0, 5.5), visgraph::Point(1.0, 5.5)};
     // std::vector<visgraph::Point> pol3 {visgraph::Point(1.0, 6.0), visgraph::Point(4.0, 6.0), visgraph::Point(4.0, 8.0), visgraph::Point(1.0, 8.0)};
-    std::vector<visgraph::Point> pol4 {visgraph::Point(5.0, 1.0), visgraph::Point(7.0, 1.0), visgraph::Point(7.0, 7.0), visgraph::Point(5.0, 7.0)};
+    // std::vector<visgraph::Point> pol4 {visgraph::Point(5.0, 1.0), visgraph::Point(7.0, 1.0), visgraph::Point(7.0, 7.0), visgraph::Point(5.0, 7.0)};
     // std::vector<visgraph::Point> pol1 {visgraph::Point(2.0, 1.0), visgraph::Point(3.0, 1.0), visgraph::Point(4.0, 2.0), visgraph::Point(3.0, 3.0), visgraph::Point(2.0, 3.0), visgraph::Point(1.0, 2.0), visgraph::Point(2.0, 1.0)};
     // std::vector<visgraph::Point> pol2 {visgraph::Point(1.0, 3.5), visgraph::Point(6.0, 6.0), visgraph::Point(1.0, 6.0), visgraph::Point(1.0, 3.5)};
     // std::vector<visgraph::Point> pol3 {visgraph::Point(7.0, 2.0), visgraph::Point(8.0, 3.0), visgraph::Point(7.0, 5.0), visgraph::Point(6.0, 3.0), visgraph::Point(7.0,2.0)};
     polygons.push_back(pol1);
-    polygons.push_back(pol2);
+    // polygons.push_back(pol2);
     // polygons.push_back(pol3);
-    polygons.push_back(pol4);
+    // polygons.push_back(pol4);
 
     visgraph::Point origin = visgraph::Point(9, 2);
     visgraph::Point destination = visgraph::Point(2, 5.7);
+
+    std::vector<student::Point> pointsToEnlargePol1;
+    std::cout << "BEGINNING POINTS:\n";
+    for (visgraph::Point p : pol1) {
+        p.print();
+        pointsToEnlargePol1.push_back(student::Point(p.x*100, p.y*100));
+    }
+    std::cout << "END BEGINNING POINTS\n";
+    std::vector<student::Point> newPointsEnlarged = enlarge(pointsToEnlargePol1, 1);
+    std::vector<visgraph::Point> enlargedPol1;
+    std::cout << "END POINTS:\n";
+    for (student::Point p : newPointsEnlarged) {
+        std::cout << p.x << "," << p.y << "\n";
+        enlargedPol1.push_back(visgraph::Point(p.x, p.y));
+    }
+    std::cout << "END END POINTS\n";
+
+    // visgraph::Point origin = visgraph::Point(0, 2);
+    // visgraph::Point destination = visgraph::Point(1, 3);
 
     visgraph::VisGraph visg = visgraph::VisGraph();
 
@@ -395,50 +414,50 @@ void intersectionsTest(Dubins dubins)
 
 void clipperTest()
 {
-    std::cout << "CLIPPER TEST\n";
-    std::vector<ClipperLib::IntPoint> points;
-    points.push_back(ClipperLib::IntPoint(348, 257));
-    points.push_back(ClipperLib::IntPoint(364, 148));
-    points.push_back(ClipperLib::IntPoint(362, 148));
-    points.push_back(ClipperLib::IntPoint(326, 241));
-    points.push_back(ClipperLib::IntPoint(295, 219));
-    points.push_back(ClipperLib::IntPoint(258, 88));
-    points.push_back(ClipperLib::IntPoint(440, 129));
-    points.push_back(ClipperLib::IntPoint(370, 196));
-    points.push_back(ClipperLib::IntPoint(372, 275));
+    // std::cout << "CLIPPER TEST\n";
+    // std::vector<ClipperLib::IntPoint> points;
+    // points.push_back(ClipperLib::IntPoint(348, 257));
+    // points.push_back(ClipperLib::IntPoint(364, 148));
+    // points.push_back(ClipperLib::IntPoint(362, 148));
+    // points.push_back(ClipperLib::IntPoint(326, 241));
+    // points.push_back(ClipperLib::IntPoint(295, 219));
+    // points.push_back(ClipperLib::IntPoint(258, 88));
+    // points.push_back(ClipperLib::IntPoint(440, 129));
+    // points.push_back(ClipperLib::IntPoint(370, 196));
+    // points.push_back(ClipperLib::IntPoint(372, 275));
 
-    ClipperLib::Paths paths = enlarge(points, 7.0);
-    printSolution(points, paths);
+    // ClipperLib::Paths paths = enlarge(points, 7.0);
+    // printSolution(points, paths);
 }
 
 void clipperJoinAndEnlargeTest(){
-    std::vector<IntPoint> points;
-    points.push_back(ClipperLib::IntPoint(150, 110));
-    points.push_back(ClipperLib::IntPoint(150, 200));
-    points.push_back(ClipperLib::IntPoint(360, 200));
-    points.push_back(ClipperLib::IntPoint(400, 110));
-    points.push_back(ClipperLib::IntPoint(150, 110));
+    // std::vector<IntPoint> points;
+    // points.push_back(ClipperLib::IntPoint(150, 110));
+    // points.push_back(ClipperLib::IntPoint(150, 200));
+    // points.push_back(ClipperLib::IntPoint(360, 200));
+    // points.push_back(ClipperLib::IntPoint(400, 110));
+    // points.push_back(ClipperLib::IntPoint(150, 110));
 
-    std::vector<std::vector<IntPoint>> polygons;
-    polygons.push_back(points);
+    // std::vector<std::vector<IntPoint>> polygons;
+    // polygons.push_back(points);
 
-    std::vector<IntPoint> points1;
-    points1.push_back(ClipperLib::IntPoint(10, 10));
-    points1.push_back(ClipperLib::IntPoint(80, 80));
-    points1.push_back(ClipperLib::IntPoint(150, 80));
-    points1.push_back(ClipperLib::IntPoint(10, 10));
+    // std::vector<IntPoint> points1;
+    // points1.push_back(ClipperLib::IntPoint(10, 10));
+    // points1.push_back(ClipperLib::IntPoint(80, 80));
+    // points1.push_back(ClipperLib::IntPoint(150, 80));
+    // points1.push_back(ClipperLib::IntPoint(10, 10));
 
-    polygons.push_back(points1);
+    // polygons.push_back(points1);
 
-    std::vector<IntPoint> points2;
-    points2.push_back(ClipperLib::IntPoint(410, 410));
-    points2.push_back(ClipperLib::IntPoint(320, 320));
-    points2.push_back(ClipperLib::IntPoint(330, 320));
-    points2.push_back(ClipperLib::IntPoint(410, 410));
+    // std::vector<IntPoint> points2;
+    // points2.push_back(ClipperLib::IntPoint(410, 410));
+    // points2.push_back(ClipperLib::IntPoint(320, 320));
+    // points2.push_back(ClipperLib::IntPoint(330, 320));
+    // points2.push_back(ClipperLib::IntPoint(410, 410));
 
-    polygons.push_back(points2);
+    // polygons.push_back(points2);
 
-    std::vector<Paths> enlargedPolygons;
+    // std::vector<Paths> enlargedPolygons;
 
-    enlargedPolygons = joinAndEnlarge(polygons);
+    // enlargedPolygons = joinAndEnlarge(polygons);
 }

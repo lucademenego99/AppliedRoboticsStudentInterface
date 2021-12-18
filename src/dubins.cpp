@@ -795,7 +795,7 @@ namespace student
         bool isThereAPath = false;
         for (unsigned int i = 0; i < K; i++)
         {
-            DubinsCurve *curve = findShortestPathCollisionDetection(points[numberOfPoints - 2]->x, points[numberOfPoints - 2]->y, points[numberOfPoints - 2]->th != -1 ? points[numberOfPoints - 2]->th : multipointAngles[i], points[numberOfPoints - 1]->x, points[numberOfPoints - 1]->y, points[numberOfPoints - 1]->th, graph);
+            DubinsCurve *curve = findShortestPath(points[numberOfPoints - 2]->x, points[numberOfPoints - 2]->y, points[numberOfPoints - 2]->th != -1 ? points[numberOfPoints - 2]->th : multipointAngles[i], points[numberOfPoints - 1]->x, points[numberOfPoints - 1]->y, points[numberOfPoints - 1]->th);
             if (curve != nullptr) {
                 isThereAPath = true;
                 if (L[numberOfPoints - 2][i] == -1 || L[numberOfPoints - 2][i] > curve->L)
@@ -823,7 +823,7 @@ namespace student
                 {
                     if (L[n+1][j] != INFINITY) {
                         int actual_i_angle = points[n]->th != -1 ? points[n]->th : multipointAngles[i];
-                        DubinsCurve *curve = findShortestPathCollisionDetection(points[n]->x, points[n]->y, actual_i_angle, points[n + 1]->x, points[n + 1]->y, multipointAngles[j], graph);
+                        DubinsCurve *curve = findShortestPath(points[n]->x, points[n]->y, actual_i_angle, points[n + 1]->x, points[n + 1]->y, multipointAngles[j]);
                         if (curve != nullptr) {
                             if (L[n][i] > curve->L + L[n + 1][j] || L[n][i] == -1)
                             {
@@ -934,7 +934,7 @@ namespace student
         for (int i = 0; i < numberOfPoints; i++) {
             newPoints[i] = points[numberOfPoints - i - 1];
         }
-        newPoints[numberOfPoints-1]->th = 1.57;
+        newPoints[numberOfPoints-1]->th = 0;
         // Get the optimal angles for each point (dynamic programming iterative procedure)
         double *angles = multipointShortestPathAngles(newPoints, numberOfPoints, graph);
         if (angles == nullptr) {
@@ -944,7 +944,8 @@ namespace student
         // Now that we have everything we need, calculate the optimal multipoint shortest path
         DubinsCurve **curves = new DubinsCurve*[numberOfPoints-1];
         for (int i = 1; i < numberOfPoints; i++) {
-            curves[i-1] = findShortestPathCollisionDetection(newPoints[i-1]->x, newPoints[i-1]->y, angles[i-1], newPoints[i]->x, newPoints[i]->y, angles[i], graph);
+            // curves[i-1] = findShortestPathCollisionDetection(newPoints[i-1]->x, newPoints[i-1]->y, angles[i-1], newPoints[i]->x, newPoints[i]->y, angles[i], graph);
+            curves[i-1] = findShortestPath(newPoints[i-1]->x, newPoints[i-1]->y, angles[i-1], newPoints[i]->x, newPoints[i]->y, angles[i]);
             if (curves[i-1] == nullptr) {
                 return nullptr;
             }

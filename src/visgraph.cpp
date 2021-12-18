@@ -44,7 +44,7 @@ namespace visgraph
         for (int i = 0; i < allPoints.size(); i++)
         {
             // Get the visible vertices from the point we are considering
-            vector<Point> visibleVertices = getVisibleVertices(allPoints[i], initial);
+            vector<Point> visibleVertices = getVisibleVertices(allPoints[i], initial, origin, destination);
             // Add an edge (a,b) if b is visible from a
             for (int j = 0; j < visibleVertices.size(); j++)
             {
@@ -121,6 +121,14 @@ namespace visgraph
                 // {
                 //     break;
                 // }
+
+                if (point == Point(9, 2, -1) && p == Point(2, 5.7, -1)) {
+                    std::cout << "CONSIDERING EDGE ORIGIN DESTINATION\nOPENEDGES:\n";
+
+                    for (Edge e : openEdges.openEdges) {
+                        e.print();
+                    }
+                }
 
                 // Update open edges - remove clock wise edges because we already considered them (remember we are moving counter-clockwise)
                 if (openEdges.openEdges.size() > 0)

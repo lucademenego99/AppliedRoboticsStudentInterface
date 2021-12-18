@@ -3,6 +3,7 @@
 #include <opencv2/highgui.hpp>
 #include "clipper.hpp"
 #include <iostream>
+#include "utils.hpp"
 
 #include "clipper_addons.hpp"
 
@@ -13,20 +14,34 @@ using namespace ClipperLib;
  * 
  * @param points Points of the original polygon
  * @param offset Offset that must be used to enlarge or shrink the polygon
- * @return Paths Array of resulting polygons
+ * @return std::vector<student::Point> Array of points of the resulting polygon
  */
-Paths enlarge(std::vector<IntPoint> points, int offset)
+std::vector<student::Point> enlarge(std::vector<student::Point> points, int offset)
 {
     Path subj;
     Paths solution;
-    for (int i = 0; i < sizeof(points); i++)
+    for (int i = 0; i < points.size(); i++)
     {
-        subj.push_back(points[i]);
+        subj.push_back(IntPoint(points[i].x, points[i].y));
     }
     ClipperOffset co;
     co.AddPath(subj, jtRound, etClosedPolygon);
     co.Execute(solution, offset);
-    return solution;
+
+    std::vector<student::Point> result;
+    if (solution.size() > 0) {
+        for (IntPoint p : solution[0]) {
+            result.push_back(student::Point(p.X, p.Y));
+        }
+    }
+
+    std::vector<IntPoint> initial;
+    for (student::Point p : points) {
+        initial.push_back(IntPoint(p.x, p.y));
+    }
+    printSolution(initial, solution);
+
+    return result;
 }
 
 /**
@@ -130,48 +145,48 @@ void verifyAndJoin (IntPoint *firstPoly, IntPoint *secondPoly){
  * 
  * @param points Matrix of polygons
  */
-std::vector<Paths> joinAndEnlarge (std::vector<std::vector<IntPoint>> points){
-    Paths subj(1), clip(points.size()-1), solution;
+// std::vector<Paths> joinAndEnlarge (std::vector<std::vector<IntPoint>> points){
+//     Paths subj(1), clip(points.size()-1), solution;
 
-    cv::Mat plot(500, 500, CV_8UC3, cv::Scalar(255, 255, 255));
+//     cv::Mat plot(500, 500, CV_8UC3, cv::Scalar(255, 255, 255));
 
-    for (unsigned int i = 0; i < points[0].size(); i++){
-        subj[0].push_back(points[0][i]);
-    }
-    for(unsigned int i = 0; i < clip.size(); i++){
-        for(unsigned int j = 0; j < points[i+1].size(); j++){
-            clip[i].push_back(points[i+1][j]);
-        }    
-    }
-    Clipper c;
-    c.AddPaths(subj, ptSubject, true);
-    c.AddPaths(clip, ptClip, true);
-    c.Execute(ctUnion, solution, pftNonZero, pftNonZero);
+//     for (unsigned int i = 0; i < points[0].size(); i++){
+//         subj[0].push_back(points[0][i]);
+//     }
+//     for(unsigned int i = 0; i < clip.size(); i++){
+//         for(unsigned int j = 0; j < points[i+1].size(); j++){
+//             clip[i].push_back(points[i+1][j]);
+//         }    
+//     }
+//     Clipper c;
+//     c.AddPaths(subj, ptSubject, true);
+//     c.AddPaths(clip, ptClip, true);
+//     c.Execute(ctUnion, solution, pftNonZero, pftNonZero);
     
-    std::vector<Paths> enlargedPolygons;
-    int offset = 4; //Modify the offset of the enlargement process
+//     std::vector<Paths> enlargedPolygons;
+//     int offset = 4; //Modify the offset of the enlargement process
 
-    for (unsigned int i = 0; i < solution.size(); i++)
-    {
-        Path path = solution.at(i);
-        enlargedPolygons.push_back(enlarge(path, offset));
+//     for (unsigned int i = 0; i < solution.size(); i++)
+//     {
+//         Path path = solution.at(i);
+//         enlargedPolygons.push_back(enlarge(path, offset));
         
-    }
-    return enlargedPolygons;
+//     }
+//     return enlargedPolygons;
     
-    /*
-    for (unsigned int i = 0; i < solution.size(); i++)
-    {
-        Path path = solution.at(i);
-        cv::line(plot, cv::Point2f(path.at(path.size() - 1).X, path.at(path.size() - 1).Y), cv::Point2f(path.at(0).X, path.at(0).Y), cv::Scalar(255, 255, 0), 2);
-        for (unsigned int j = 1; j < path.size(); j++)
-        {
-            cv::line(plot, cv::Point2f(path.at(j - 1).X, path.at(j - 1).Y), cv::Point2f(path.at(j).X, path.at(j).Y), cv::Scalar(255, 255, 0), 2);
-        }
-    }
-    cv::flip(plot, plot, 0);
-    cv::imshow("Clipper", plot);
-    cv::waitKey(0);
-    */
+//     /*
+//     for (unsigned int i = 0; i < solution.size(); i++)
+//     {
+//         Path path = solution.at(i);
+//         cv::line(plot, cv::Point2f(path.at(path.size() - 1).X, path.at(path.size() - 1).Y), cv::Point2f(path.at(0).X, path.at(0).Y), cv::Scalar(255, 255, 0), 2);
+//         for (unsigned int j = 1; j < path.size(); j++)
+//         {
+//             cv::line(plot, cv::Point2f(path.at(j - 1).X, path.at(j - 1).Y), cv::Point2f(path.at(j).X, path.at(j).Y), cv::Scalar(255, 255, 0), 2);
+//         }
+//     }
+//     cv::flip(plot, plot, 0);
+//     cv::imshow("Clipper", plot);
+//     cv::waitKey(0);
+//     */
     
-}
+// }
