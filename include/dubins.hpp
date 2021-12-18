@@ -216,16 +216,6 @@ namespace student
       CurveSegmentsResult *useRLR(double scaled_th0, double scaled_thf, double scaled_k_max);
       CurveSegmentsResult *useLRL(double scaled_th0, double scaled_thf, double scaled_k_max);
 
-      CurveSegmentsResult *useLS(double scaled_th0, double scaled_thf, double scaled_k_max);
-      CurveSegmentsResult *useRS(double scaled_th0, double scaled_thf, double scaled_k_max);
-      CurveSegmentsResult *useSL(double scaled_th0, double scaled_thf, double scaled_k_max);
-      CurveSegmentsResult *useSR(double scaled_th0, double scaled_thf, double scaled_k_max);
-      CurveSegmentsResult *useS(double scaled_th0, double scaled_thf, double scaled_k_max);
-      CurveSegmentsResult *useLR(double scaled_th0, double scaled_thf, double scaled_k_max);
-      CurveSegmentsResult *useRL(double scaled_th0, double scaled_thf, double scaled_k_max);
-      CurveSegmentsResult *useL(double scaled_th0, double scaled_thf, double scaled_k_max);
-      CurveSegmentsResult *useR(double scaled_th0, double scaled_thf, double scaled_k_max);
-
       /**
        * @brief Find the shortest path between two points, given a set of intermediate points our path must pass through
        * 
