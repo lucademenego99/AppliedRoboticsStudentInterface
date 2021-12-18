@@ -16,30 +16,27 @@ using namespace ClipperLib;
  * @param offset Offset that must be used to enlarge or shrink the polygon
  * @return std::vector<student::Point> Array of points of the resulting polygon
  */
-std::vector<student::Point> enlarge(std::vector<student::Point> points, int offset)
+std::vector<student::Point> enlarge(std::vector<student::Point> points, double offset)
 {
     Path subj;
     Paths solution;
     for (int i = 0; i < points.size(); i++)
     {
-        subj.push_back(IntPoint(points[i].x, points[i].y));
+        subj << IntPoint(points[i].x*1000, points[i].y*1000);
     }
+    
     ClipperOffset co;
-    co.AddPath(subj, jtRound, etClosedPolygon);
-    co.Execute(solution, offset);
+    co.AddPath(subj, jtMiter, etClosedPolygon);
+    co.Execute(solution, offset*1000);
+
+    CleanPolygons(solution);
 
     std::vector<student::Point> result;
     if (solution.size() > 0) {
         for (IntPoint p : solution[0]) {
-            result.push_back(student::Point(p.X, p.Y));
+            result.push_back(student::Point(p.X / 1000.0, p.Y / 1000.0));
         }
     }
-
-    std::vector<IntPoint> initial;
-    for (student::Point p : points) {
-        initial.push_back(IntPoint(p.x, p.y));
-    }
-    printSolution(initial, solution);
 
     return result;
 }
@@ -57,7 +54,7 @@ void printSolution(std::vector<IntPoint> startingPoints, Paths solution)
 
     // Get the initial path
     Path subj;
-    for (int i = 0; i < sizeof(startingPoints); i++)
+    for (int i = 0; i < startingPoints.size(); i++)
     {
         subj.push_back(startingPoints[i]);
     }

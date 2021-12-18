@@ -12,7 +12,7 @@ using namespace ClipperLib;
  * @param offset Offset that must be used to enlarge or shrink the polygon
  * @return Paths Array of resulting polygons
  */
-std::vector<student::Point> enlarge(std::vector<student::Point> points, int offset);
+std::vector<student::Point> enlarge(std::vector<student::Point> points, double offset);
 
 /**
  * @brief Print a clipper polygon offsetting solution using OpenCV

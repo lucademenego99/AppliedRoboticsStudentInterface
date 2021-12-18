@@ -295,20 +295,14 @@ void multipointDubinsAndVisgraphTest(Dubins dubins)
     visgraph::Point destination = visgraph::Point(2, 5.7);
 
     std::vector<student::Point> pointsToEnlargePol1;
-    std::cout << "BEGINNING POINTS:\n";
     for (visgraph::Point p : pol1) {
-        p.print();
-        pointsToEnlargePol1.push_back(student::Point(p.x*100, p.y*100));
+        pointsToEnlargePol1.push_back(student::Point(p.x, p.y));
     }
-    std::cout << "END BEGINNING POINTS\n";
-    std::vector<student::Point> newPointsEnlarged = enlarge(pointsToEnlargePol1, 1);
+    std::vector<student::Point> newPointsEnlarged = enlarge(pointsToEnlargePol1, 1.0);
     std::vector<visgraph::Point> enlargedPol1;
-    std::cout << "END POINTS:\n";
     for (student::Point p : newPointsEnlarged) {
-        std::cout << p.x << "," << p.y << "\n";
         enlargedPol1.push_back(visgraph::Point(p.x, p.y));
     }
-    std::cout << "END END POINTS\n";
 
     // visgraph::Point origin = visgraph::Point(0, 2);
     // visgraph::Point destination = visgraph::Point(1, 3);
