@@ -31,19 +31,28 @@ void printSolution(std::vector<IntPoint> points, Paths solution);
  * @return true 
  * @return false 
  */
-//bool intersect (IntPoint *subj, IntPoint *clip);
+bool intersect (student::Point *subj, student::Point *clip);
 /**
  * @brief Given two polygons verifies if they are colling, if so, joins them and enlarges it as a whole
  * 
  * @param firstPoly Points of the first polygon
  * @param secondPoly Points of the second polygon
  */
-//void verifyAndJoin (IntPoint *firstPoly, IntPoint *secondPoly);
+std::vector<std::vector<student::Point>> verifyAndJoin (student::Point *firstPoly, student::Point *secondPoly);
 
 /**
  * @brief Verifies if a list of polygons has some intersections, if so joins them and then enlarges them all
  * 
  * @param points Matrix of polygons
  */
-std::vector<Paths> joinAndEnlarge (std::vector<std::vector<IntPoint>> points);
+std::vector<std::vector<student::Point>> joinAndEnlarge (std::vector<std::vector<IntPoint>> points);
+
+/**
+ * @brief Given some obstacles and an offset, creates a "bigger" version using clipper and a "slightly bigger" one, then returns them
+ * 
+ * @param polygon Obstacles we are considering
+ * @param offset Offset for obstacle enhancing
+ * @return std::vector<std::vector<student::Point>> 
+ */
+std::vector<std::vector<student::Point>> applyChanges(std::vector<visgraph::Point> polygon, int offset);
 #endif

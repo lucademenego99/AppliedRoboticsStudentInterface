@@ -4,6 +4,7 @@
 #include "clipper.hpp"
 #include <iostream>
 #include "utils.hpp"
+#include "visgraph.hpp"
 
 #include "clipper_addons.hpp"
 
@@ -89,22 +90,26 @@ void printSolution(std::vector<IntPoint> startingPoints, Paths solution)
  * @return true 
  * @return false 
  */
- /*
-bool intersect (IntPoint *subj, IntPoint *clip){
-    Paths firstPoly;
+ 
+bool intersect (student::Point *subj, student::Point *clip){
+    Path firstPoly;
+    Paths firstFinalPoly;
     for (int i = 0; i < sizeof(subj); i++){
-        firstPoly << IntPoint(subj[i].X, subj[i].Y);
+        firstPoly << IntPoint(subj[i].x*1000, subj[i].y*1000);
     }
+    firstFinalPoly.push_back(firstPoly);
 
-    Paths secondPoly;
+    Path secondPoly;
+    Paths secondFinalPoly;
     for (int j = 0; j < sizeof(clip); j++){
-        secondPoly.push_back(clip[i]);
+        secondPoly << IntPoint(clip[j].x*1000, clip[j].y*1000);
     }
+    secondFinalPoly.push_back(secondPoly);
 
     ClipperLib::Clipper c;
     //Need to make this function take as input points instead of paths, create paths
-    c.AddPaths(subj, ClipperLib::ptSubject, true);
-    c.AddPaths(clip, ClipperLib::ptClip, true);
+    c.AddPaths(firstFinalPoly, ClipperLib::ptSubject, true);
+    c.AddPaths(secondFinalPoly, ClipperLib::ptClip, true);
 
     ClipperLib::Paths solution;
     c.Execute(ClipperLib::ctIntersection, solution, ClipperLib::pftNonZero, ClipperLib::pftNonZero);
@@ -112,78 +117,120 @@ bool intersect (IntPoint *subj, IntPoint *clip){
     return solution.size()!=0;
 }
 
-void verifyAndJoin (IntPoint *firstPoly, IntPoint *secondPoly){
+std::vector<std::vector<student::Point>> verifyAndJoin (student::Point *firstPoly, student::Point *secondPoly){
     //Intersect need to take as input points instead of Paths
+    ClipperLib::Clipper c;
     if(intersect(firstPoly, secondPoly)){
-        Clipper c = new Clipper();
         
-        Polygons subj = new Polygons(1);
-        subj.Add(new Polygon(firstPoly.size()));
+        Path subj;
+        Paths finalSubj;
         for (int i = 0; i < sizeof(firstPoly); i++){
-            subj[0].Add(firstPoly[i]);
+            subj << IntPoint(firstPoly[i].x*1000, firstPoly[i].y*1000);
         }
+        finalSubj.push_back(subj);
 
-        Polygons clip = new Polygons(1);
-        clip.Add(new Polygon(secondPoly.size()));
+        Path clip;
+        Paths finalClip;
         for (int j = 0; j < sizeof(secondPoly); j++){
-            clip[0].push_back(secondPoly[j]);
+            clip << IntPoint(secondPoly[j].x*1000, secondPoly[j].y*1000);
         }
 
-        Polygons solution = new Polygons();
-        c.addPolygons(subj, PolyType.ptSubject);
-        c.addPolygons(clip, PolyType.ptClip);
-        c.Execute(ClipType.ctUnion, solution, PolyFillType.pftEvenOdd, PolyFillType.pftNonZero);
+        ClipperLib::Paths solution;
+        c.AddPaths(finalSubj, ClipperLib::ptSubject, true);
+        c.AddPaths(finalClip, ClipperLib::ptClip, true);
+        c.Execute(ClipperLib::ctUnion, solution, ClipperLib::pftEvenOdd, ClipperLib::pftNonZero);
+
+        std::vector<student::Point> newPath;
+        std::vector<std::vector<student::Point>> finalPoints;
+
+        for (unsigned int i = 0; i < solution.size(); i++){
+            Path path = solution.at(i);
+            for(IntPoint p : path){
+                newPath.push_back(student::Point(p.X, p.Y));
+            }
+            finalPoints.push_back(newPath);
+            newPath.clear();
+        }
+        return finalPoints;
     }
 }
-*/
+
 
 /**
  * @brief Verifies if a list of polygons has some intersections, if so joins them and then enlarges them all
  * 
  * @param points Matrix of polygons
  */
-// std::vector<Paths> joinAndEnlarge (std::vector<std::vector<IntPoint>> points){
-//     Paths subj(1), clip(points.size()-1), solution;
+std::vector<std::vector<student::Point>> joinAndEnlarge (std::vector<std::vector<student::Point>> points){
 
-//     cv::Mat plot(500, 500, CV_8UC3, cv::Scalar(255, 255, 255));
+    Paths subj(1), clip(points.size()-1), solution;
+    cv::Mat plot(500, 500, CV_8UC3, cv::Scalar(255, 255, 255));
 
-//     for (unsigned int i = 0; i < points[0].size(); i++){
-//         subj[0].push_back(points[0][i]);
-//     }
-//     for(unsigned int i = 0; i < clip.size(); i++){
-//         for(unsigned int j = 0; j < points[i+1].size(); j++){
-//             clip[i].push_back(points[i+1][j]);
-//         }    
-//     }
-//     Clipper c;
-//     c.AddPaths(subj, ptSubject, true);
-//     c.AddPaths(clip, ptClip, true);
-//     c.Execute(ctUnion, solution, pftNonZero, pftNonZero);
-    
-//     std::vector<Paths> enlargedPolygons;
-//     int offset = 4; //Modify the offset of the enlargement process
+    for (unsigned int i = 0; i < points[0].size(); i++){
+        subj[0].push_back(IntPoint(points[0][i].x*1000, points[0][i].y*1000));
+    }
+    for(unsigned int i = 0; i < clip.size(); i++){
+        for(unsigned int j = 0; j < points[i+1].size(); j++){
+            clip[i].push_back(IntPoint(points[i+1][j].x*1000, points[i+1][j].y*1000));
+        }    
+    }
+    Clipper c;
+    c.AddPaths(subj, ptSubject, true);
+    c.AddPaths(clip, ptClip, true);
+    c.Execute(ctUnion, solution, pftNonZero, pftNonZero);
 
-//     for (unsigned int i = 0; i < solution.size(); i++)
-//     {
-//         Path path = solution.at(i);
-//         enlargedPolygons.push_back(enlarge(path, offset));
-        
-//     }
-//     return enlargedPolygons;
+    std::vector<std::vector<student::Point>> enlargedPolygons;
+    int offset = 4; //Modify the offset of the enlargement process
+
+    for (unsigned int i = 0; i < solution.size(); i++){
+        Path path = solution.at(i);
+        std::vector<student::Point> newPath;
+        for(IntPoint p : path){
+            newPath.push_back(student::Point(p.X, p.Y));
+        }
+        enlargedPolygons.push_back(enlarge(newPath, offset));
+        newPath.clear();
+    }
+    return enlargedPolygons;
     
-//     /*
-//     for (unsigned int i = 0; i < solution.size(); i++)
-//     {
-//         Path path = solution.at(i);
-//         cv::line(plot, cv::Point2f(path.at(path.size() - 1).X, path.at(path.size() - 1).Y), cv::Point2f(path.at(0).X, path.at(0).Y), cv::Scalar(255, 255, 0), 2);
-//         for (unsigned int j = 1; j < path.size(); j++)
-//         {
-//             cv::line(plot, cv::Point2f(path.at(j - 1).X, path.at(j - 1).Y), cv::Point2f(path.at(j).X, path.at(j).Y), cv::Scalar(255, 255, 0), 2);
-//         }
-//     }
-//     cv::flip(plot, plot, 0);
-//     cv::imshow("Clipper", plot);
-//     cv::waitKey(0);
-//     */
-    
-// }
+    /*
+    for (unsigned int i = 0; i < solution.size(); i++){
+        Path path = solution.at(i);
+        cv::line(plot, cv::Point2f(path.at(path.size() - 1).X, path.at(path.size() - 1).Y), cv::Point2f(path.at(0).X, path.at(0).Y), cv::Scalar(255, 255, 0), 2);
+        for (unsigned int j = 1; j < path.size(); j++){
+            cv::line(plot, cv::Point2f(path.at(j - 1).X, path.at(j - 1).Y), cv::Point2f(path.at(j).X, path.at(j).Y), cv::Scalar(255, 255, 0), 2);
+        }
+    }
+    cv::flip(plot, plot, 0);
+    cv::imshow("Clipper", plot);
+    cv::waitKey(0);
+    */
+}
+/**
+ * @brief Given some obstacles and an offset, creates a "bigger" version using clipper and a "slightly bigger" one, then returns them
+ * 
+ * @param polygon Obstacles we are considering
+ * @param offset Offset for obstacle enhancing
+ * @return std::vector<std::vector<student::Point>> 
+ */
+std::vector<std::vector<student::Point>> applyChanges(std::vector<visgraph::Point> polygon, int offset){
+    int variant = 5;
+    std::vector<student::Point> newPath;
+
+    //Convert the polygon to the data structure for enlarge, we need a vector of student points
+    for(unsigned int i = 0; i < polygon.size(); i++){
+        newPath.push_back(student::Point(polygon[i].x, polygon[i].y));
+    }
+    std::vector<student::Point> bigSolution;
+    std::vector<student::Point> smallSolution;
+    bigSolution = enlarge(newPath, offset);
+    smallSolution = enlarge(newPath, offset/variant);
+    //Take both solutions, push them back a vector, return it
+    std::vector<std::vector<student::Point>> finalResult;
+    finalResult.push_back(bigSolution);
+    finalResult.push_back(smallSolution);
+
+    return finalResult;
+}
+
+
