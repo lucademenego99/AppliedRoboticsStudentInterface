@@ -39,6 +39,8 @@ std::vector<student::Point> enlarge(std::vector<student::Point> points, double o
         }
     }
 
+    // printSolution(subj, solution);
+
     return result;
 }
 
