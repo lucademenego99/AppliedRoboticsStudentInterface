@@ -17,7 +17,7 @@ using namespace ClipperLib;
  * @param offset Offset that must be used to enlarge or shrink the polygon
  * @return std::vector<student::Point> Array of points of the resulting polygon
  */
-std::vector<student::Point> enlarge(std::vector<student::Point> points, double offset)
+std::vector<visgraph::Point> enlarge(std::vector<visgraph::Point> points, double offset)
 {
     Path subj;
     Paths solution;
@@ -32,10 +32,10 @@ std::vector<student::Point> enlarge(std::vector<student::Point> points, double o
 
     CleanPolygons(solution);
 
-    std::vector<student::Point> result;
+    std::vector<visgraph::Point> result;
     if (solution.size() > 0) {
         for (IntPoint p : solution[0]) {
-            result.push_back(student::Point(p.X / 1000.0, p.Y / 1000.0));
+            result.push_back(visgraph::Point(p.X / 1000.0, p.Y / 1000.0));
         }
     }
 
@@ -163,7 +163,7 @@ std::vector<std::vector<student::Point>> verifyAndJoin (student::Point *firstPol
  * 
  * @param points Matrix of polygons
  */
-std::vector<std::vector<student::Point>> joinAndEnlarge (std::vector<std::vector<student::Point>> points){
+std::vector<std::vector<visgraph::Point>> joinAndEnlarge (std::vector<std::vector<visgraph::Point>> points){
 
     Paths subj(1), clip(points.size()-1), solution;
     cv::Mat plot(500, 500, CV_8UC3, cv::Scalar(255, 255, 255));
@@ -181,14 +181,14 @@ std::vector<std::vector<student::Point>> joinAndEnlarge (std::vector<std::vector
     c.AddPaths(clip, ptClip, true);
     c.Execute(ctUnion, solution, pftNonZero, pftNonZero);
 
-    std::vector<std::vector<student::Point>> enlargedPolygons;
+    std::vector<std::vector<visgraph::Point>> enlargedPolygons;
     int offset = 4; //Modify the offset of the enlargement process
 
     for (unsigned int i = 0; i < solution.size(); i++){
         Path path = solution.at(i);
-        std::vector<student::Point> newPath;
+        std::vector<visgraph::Point> newPath;
         for(IntPoint p : path){
-            newPath.push_back(student::Point(p.X, p.Y));
+            newPath.push_back(visgraph::Point(p.X, p.Y));
         }
         enlargedPolygons.push_back(enlarge(newPath, offset));
         newPath.clear();
@@ -215,33 +215,33 @@ std::vector<std::vector<student::Point>> joinAndEnlarge (std::vector<std::vector
  * @param offset Offset for obstacle enhancing
  * @return std::vector<std::vector<student::Point>> 
  */
-std::vector<std::vector<student::Point>> applyChanges(std::vector<visgraph::Point> polygon, int offset){
+std::vector<std::vector<visgraph::Point>> applyChanges(std::vector<visgraph::Point> polygon, int offset){
     double variant = 4.0;
-    std::vector<student::Point> newPath;
+    std::vector<visgraph::Point> newPath;
 
-    //Convert the polygon to the data structure for enlarge, we need a vector of student points
+    //Convert the polygon to the data structure for enlarge, we need a vector of visgraph points
     for(unsigned int i = 0; i < polygon.size(); i++){
-        newPath.push_back(student::Point(polygon[i].x, polygon[i].y));
+        newPath.push_back(visgraph::Point(polygon[i].x, polygon[i].y));
     }
-    std::vector<student::Point> bigSolution;
-    std::vector<student::Point> smallSolution;
+    std::vector<visgraph::Point> bigSolution;
+    std::vector<visgraph::Point> smallSolution;
     smallSolution = enlarge(newPath, offset);
     bigSolution = enlarge(newPath, offset + (offset/variant));
     //Take both solutions, push them back a vector, return it
-    std::vector<std::vector<student::Point>> finalResult;
+    std::vector<std::vector<visgraph::Point>> finalResult;
     finalResult.push_back(bigSolution);
     finalResult.push_back(smallSolution);
 
     return finalResult;
 }
 //Name still needs to be defined
-std::vector<std::vector<std::vector<student::Point>>> joinMultiplePolygons(std::vector<std::vector<visgraph::Point>> polygonsList, int offset){
+std::vector<std::vector<std::vector<visgraph::Point>>> joinMultiplePolygons(std::vector<std::vector<visgraph::Point>> polygonsList, int offset){
 
-    std::vector<std::vector<student::Point>> bigPolygons;
-    std::vector<std::vector<student::Point>> smallPolygons;
+    std::vector<std::vector<visgraph::Point>> bigPolygons;
+    std::vector<std::vector<visgraph::Point>> smallPolygons;
 
     for (int i = 0; i < polygonsList.size(); i++){
-        std::vector<std::vector<student::Point>> results;
+        std::vector<std::vector<visgraph::Point>> results;
         results = applyChanges(polygonsList[i], offset);
         bigPolygons.push_back(results[0]);
         smallPolygons.push_back(results[1]);
@@ -279,15 +279,15 @@ std::vector<std::vector<std::vector<student::Point>>> joinMultiplePolygons(std::
     c1.AddPaths(clip1, ptClip, true);
     c1.Execute(ctUnion, solution1, pftNonZero, pftNonZero);
 
-    std::vector<std::vector<std::vector<student::Point>>> returnValues;
+    std::vector<std::vector<std::vector<visgraph::Point>>> returnValues;
 
-    std::vector<std::vector<student::Point>> intermediateValues;
+    std::vector<std::vector<visgraph::Point>> intermediateValues;
 
     for (unsigned int i = 0; i < solution.size(); i++){
         Path path = solution.at(i);
-        std::vector<student::Point> newPath;
+        std::vector<visgraph::Point> newPath;
         for(IntPoint p : path){
-            newPath.push_back(student::Point(p.X, p.Y));
+            newPath.push_back(visgraph::Point(p.X/1000, p.Y/1000));
         }
         intermediateValues.push_back(newPath);
         newPath.clear();
@@ -299,9 +299,9 @@ std::vector<std::vector<std::vector<student::Point>>> joinMultiplePolygons(std::
 
     for (unsigned int i = 0; i < solution1.size(); i++){
         Path path = solution1.at(i);
-        std::vector<student::Point> newPath;
+        std::vector<visgraph::Point> newPath;
         for(IntPoint p : path){
-            newPath.push_back(student::Point(p.X, p.Y));
+            newPath.push_back(visgraph::Point(p.X/1000, p.Y/1000));
         }
         intermediateValues.push_back(newPath);
         newPath.clear();

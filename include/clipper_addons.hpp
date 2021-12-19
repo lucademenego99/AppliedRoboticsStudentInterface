@@ -12,7 +12,7 @@ using namespace ClipperLib;
  * @param offset Offset that must be used to enlarge or shrink the polygon
  * @return Paths Array of resulting polygons
  */
-std::vector<student::Point> enlarge(std::vector<student::Point> points, double offset);
+std::vector<visgraph::Point> enlarge(std::vector<visgraph::Point> points, double offset);
 
 /**
  * @brief Print a clipper polygon offsetting solution using OpenCV
@@ -45,7 +45,7 @@ std::vector<std::vector<student::Point>> verifyAndJoin (student::Point *firstPol
  * 
  * @param points Matrix of polygons
  */
-std::vector<std::vector<student::Point>> joinAndEnlarge (std::vector<std::vector<IntPoint>> points);
+std::vector<std::vector<visgraph::Point>> joinAndEnlarge (std::vector<std::vector<IntPoint>> points);
 
 /**
  * @brief Given some obstacles and an offset, creates a "bigger" version using clipper and a "slightly bigger" one, then returns them
@@ -54,7 +54,7 @@ std::vector<std::vector<student::Point>> joinAndEnlarge (std::vector<std::vector
  * @param offset Offset for obstacle enhancing
  * @return std::vector<std::vector<student::Point>> 
  */
-std::vector<std::vector<student::Point>> applyChanges(std::vector<visgraph::Point> polygon, int offset);
+std::vector<std::vector<visgraph::Point>> applyChanges(std::vector<visgraph::Point> polygon, int offset);
 
-std::vector<std::vector<std::vector<student::Point>>> joinMultiplePolygons(std::vector<std::vector<visgraph::Point>> polygonsList, int offset);
+std::vector<std::vector<std::vector<visgraph::Point>>> joinMultiplePolygons(std::vector<std::vector<visgraph::Point>> polygonsList, int offset);
 #endif
