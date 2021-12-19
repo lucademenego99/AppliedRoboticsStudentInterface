@@ -284,21 +284,21 @@ void multipointDubinsAndVisgraphTest(Dubins dubins)
     std::cout << "RESULT INTERSECTION: " << res << "\n";
 
     std::vector<std::vector<visgraph::Point>> polygons, polygonsForVisgraph;
-    std::vector<visgraph::Point> pol1 {visgraph::Point(1.0, 1.0), visgraph::Point(2.0, 1.0), visgraph::Point(2.0, 3.0), visgraph::Point(1.0, 3.0)};
-    std::vector<visgraph::Point> pol2 {visgraph::Point(1.0, 6.0), visgraph::Point(4.0, 6.0), visgraph::Point(4.0, 6.5), visgraph::Point(1.0, 6.5)};
-    std::vector<visgraph::Point> pol3 {visgraph::Point(7.7, 0.0), visgraph::Point(7.8, 0.0), visgraph::Point(7.8, 4.0), visgraph::Point(7.7, 4.0)};
-    std::vector<visgraph::Point> pol4 {visgraph::Point(11.0, 4.0), visgraph::Point(12.0, 4.0), visgraph::Point(12.0, 7.0), visgraph::Point(11.0, 7.0)};
+    std::vector<visgraph::Point> pol1 {visgraph::Point(1.5, 1.5), visgraph::Point(3.5, 1.5), visgraph::Point(5.0, 3.0), visgraph::Point(3.5, 4.5), visgraph::Point(1.5, 4.5), visgraph::Point(0.0, 3.0)};
+    std::vector<visgraph::Point> pol2 {visgraph::Point(5.0, 5.0), visgraph::Point(8.0, 5.0), visgraph::Point(8.0, 11.0), visgraph::Point(5.0, 11.0)};
+    std::vector<visgraph::Point> pol3 {visgraph::Point(12.0, 1.0), visgraph::Point(14.0, 4.0), visgraph::Point(12.0, 7.0), visgraph::Point(10.0, 4.0)};
+    std::vector<visgraph::Point> pol4 {visgraph::Point(18.0, 3.0), visgraph::Point(23.0, 7.0), visgraph::Point(12.0, 19.0), visgraph::Point(8.0, 14.0)};
     // std::vector<visgraph::Point> pol1 {visgraph::Point(2.0, 1.0), visgraph::Point(3.0, 1.0), visgraph::Point(4.0, 2.0), visgraph::Point(3.0, 3.0), visgraph::Point(2.0, 3.0), visgraph::Point(1.0, 2.0), visgraph::Point(2.0, 1.0)};
     // std::vector<visgraph::Point> pol2 {visgraph::Point(1.0, 3.5), visgraph::Point(6.0, 6.0), visgraph::Point(1.0, 6.0), visgraph::Point(1.0, 3.5)};
     // std::vector<visgraph::Point> pol3 {visgraph::Point(7.0, 2.0), visgraph::Point(8.0, 3.0), visgraph::Point(7.0, 5.0), visgraph::Point(6.0, 3.0), visgraph::Point(7.0,2.0)};
 
-    std::vector<student::Polygon> pol1s = applyChanges(pol1, 1);
-    std::vector<student::Polygon> pol2s = applyChanges(pol2, 1);
-    std::vector<student::Polygon> pol3s = applyChanges(pol3, 1);
-    std::vector<student::Polygon> pol4s = applyChanges(pol4, 1);
+    std::vector<student::Polygon> pol1s = applyChanges(pol1, 0.5);
+    std::vector<student::Polygon> pol2s = applyChanges(pol2, 0.5);
+    std::vector<student::Polygon> pol3s = applyChanges(pol3, 0.5);
+    std::vector<student::Polygon> pol4s = applyChanges(pol4, 0.5);
 
-    visgraph::Point origin = visgraph::Point(11, 2);
-    visgraph::Point destination = visgraph::Point(1, 4.3);
+    visgraph::Point origin = visgraph::Point(1.0, 6.0);
+    visgraph::Point destination = visgraph::Point(24.0, 2.0);
 
     // Create polygons for visibility graph generation
     std::vector<std::vector<visgraph::Point>> pol1Ready;

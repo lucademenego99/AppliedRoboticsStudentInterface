@@ -234,5 +234,81 @@ std::vector<std::vector<student::Point>> applyChanges(std::vector<visgraph::Poin
 
     return finalResult;
 }
+//Name still needs to be defined
+std::vector<std::vector<std::vector<student::Point>>> joinMultiplePolygons(std::vector<std::vector<visgraph::Point>> polygonsList, int offset){
 
+    std::vector<std::vector<student::Point>> bigPolygons;
+    std::vector<std::vector<student::Point>> smallPolygons;
+
+    for (int i = 0; i < polygonsList.size(); i++){
+        std::vector<std::vector<student::Point>> results;
+        results = applyChanges(polygonsList[i], offset);
+        bigPolygons.push_back(results[0]);
+        smallPolygons.push_back(results[1]);
+        results.clear();
+    }
+
+    Paths subj(1), clip(bigPolygons.size()-1), solution;
+
+    for (unsigned int i = 0; i < bigPolygons[0].size(); i++){
+        subj[0].push_back(IntPoint(bigPolygons[0][i].x*1000, bigPolygons[0][i].y*1000));
+    }
+    for(unsigned int i = 0; i < clip.size(); i++){
+        for(unsigned int j = 0; j < bigPolygons[i+1].size(); j++){
+            clip[i].push_back(IntPoint(bigPolygons[i+1][j].x*1000, bigPolygons[i+1][j].y*1000));
+        }    
+    }
+    Clipper c;
+    c.AddPaths(subj, ptSubject, true);
+    c.AddPaths(clip, ptClip, true);
+    c.Execute(ctUnion, solution, pftNonZero, pftNonZero);
+
+
+    Paths subj1(1), clip1(smallPolygons.size()-1), solution1;
+
+    for (unsigned int i = 0; i < smallPolygons[0].size(); i++){
+        subj1[0].push_back(IntPoint(smallPolygons[0][i].x*1000, smallPolygons[0][i].y*1000));
+    }
+    for(unsigned int i = 0; i < clip1.size(); i++){
+        for(unsigned int j = 0; j < smallPolygons[i+1].size(); j++){
+            clip1[i].push_back(IntPoint(smallPolygons[i+1][j].x*1000, smallPolygons[i+1][j].y*1000));
+        }    
+    }
+    Clipper c1;
+    c1.AddPaths(subj1, ptSubject, true);
+    c1.AddPaths(clip1, ptClip, true);
+    c1.Execute(ctUnion, solution1, pftNonZero, pftNonZero);
+
+    std::vector<std::vector<std::vector<student::Point>>> returnValues;
+
+    std::vector<std::vector<student::Point>> intermediateValues;
+
+    for (unsigned int i = 0; i < solution.size(); i++){
+        Path path = solution.at(i);
+        std::vector<student::Point> newPath;
+        for(IntPoint p : path){
+            newPath.push_back(student::Point(p.X, p.Y));
+        }
+        intermediateValues.push_back(newPath);
+        newPath.clear();
+    }
+
+    returnValues.push_back(intermediateValues);
+
+    intermediateValues.clear();
+
+    for (unsigned int i = 0; i < solution1.size(); i++){
+        Path path = solution1.at(i);
+        std::vector<student::Point> newPath;
+        for(IntPoint p : path){
+            newPath.push_back(student::Point(p.X, p.Y));
+        }
+        intermediateValues.push_back(newPath);
+        newPath.clear();
+    }
+
+    returnValues.push_back(intermediateValues);
+
+    return returnValues;
+}
 

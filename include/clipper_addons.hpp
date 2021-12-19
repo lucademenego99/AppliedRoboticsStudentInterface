@@ -55,4 +55,6 @@ std::vector<std::vector<student::Point>> joinAndEnlarge (std::vector<std::vector
  * @return std::vector<std::vector<student::Point>> 
  */
 std::vector<std::vector<student::Point>> applyChanges(std::vector<visgraph::Point> polygon, int offset);
+
+std::vector<std::vector<std::vector<student::Point>>> joinMultiplePolygons(std::vector<std::vector<visgraph::Point>> polygonsList, int offset);
 #endif
