@@ -1165,7 +1165,7 @@ namespace student
      * @param curves DubinsCurves to plot
      * @param numberOfCurves Number of curves to plot
      */
-    void Dubins::printCompletePath(DubinsCurve **curves, int numberOfCurves) {
+    void Dubins::printCompletePath(DubinsCurve **curves, int numberOfCurves, std::vector<std::vector<visgraph::Point>> polygons) {
         Mat image(500, 500, CV_8UC3, Scalar(0, 0, 0));
         Mat flipped;
 
@@ -1181,12 +1181,21 @@ namespace student
 
         double size = max(maxx, maxy);
 
-
+        
         for (int i = 0; i < numberOfCurves; i++) {
             printDubinsArc(curves[i]->a1, image, size, true, false);
             printDubinsArc(curves[i]->a2, image, size, false, false);
             printDubinsArc(curves[i]->a3, image, size, false, true);
         }
+        
+        //Still need to understand how much I need to multiply
+        for (int i = 0; i < polygons.size(); i++){
+            cv::line(image, cv::Point2f(polygons[i][polygons[i].size() - 1].x/size*500, polygons[i][polygons[i].size() - 1].y/size*500), cv::Point2f(polygons[i][0].x/size*500, polygons[i][0].y/size*500), cv::Scalar(255, 255, 0), 2);
+            for (int j = 1; j < polygons[i].size(); j++){
+                cv::line(image, cv::Point2f(polygons[i][j-1].x/size*500, polygons[i][j-1].y/size*500), cv::Point2f(polygons[i][j].x/size*500, polygons[i][j].y/size*500), cv::Scalar(255, 255, 0), 2);
+            }
+        }
+
 
         flip(image, flipped, 0);
         imshow("Output", flipped);

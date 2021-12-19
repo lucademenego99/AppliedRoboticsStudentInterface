@@ -302,7 +302,7 @@ namespace student
        * @param curves DubinsCurves to plot
        * @param numberOfCurves Number of curves to plot
        */
-      void printCompletePath(DubinsCurve **curves, int numberOfCurves);
+      void printCompletePath(DubinsCurve **curves, int numberOfCurves, std::vector<std::vector<visgraph::Point>> polygons);
 
       /**
      * @brief Find if there is an intersection between a circle and a segment

@@ -342,8 +342,8 @@ void multipointDubinsAndVisgraphTest(Dubins dubins)
         path[it].print();
 
 
-    printGraph(originalGraph.graph, origin, destination, path);
-    printGraph(g.graph, origin, destination, path);
+    //printGraph(originalGraph.graph, origin, destination, path);
+    //printGraph(g.graph, origin, destination, path);
 
     std::cout << "MULTIPOINT SHORTEST PATH TEST\n";
     student::Point **points = new student::Point *[path.size()];
@@ -361,7 +361,7 @@ void multipointDubinsAndVisgraphTest(Dubins dubins)
         std::cout << "UNABLE TO COMPUTE A PATH FOR GIVEN INPUT\n";
     } else {
         std::cout << "COMPLETED MULTIPOINT SHORTEST PATH SUCCESSFULLY\n";
-        dubins.printCompletePath(curves, path.size()-1);
+        dubins.printCompletePath(curves, path.size()-1, polygons);
     }
     // student::DubinsCurve *curve = dubins.findShortestPathCollisionDetection(7.0, 1.0, M_PI, origin.x, origin.y, 0, originalGraph);
     // if (curve == nullptr) {
