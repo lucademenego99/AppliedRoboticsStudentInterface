@@ -157,24 +157,6 @@ namespace visgraph
         std::vector<Edge> getEdges();
 
         /**
-         * @brief Verifies if a point is within a polygon
-         * 
-         * @param p Point to verify
-         * @return bool is the point within a polygon?
-         */
-        bool pointInPolygon(Point p);
-
-        /**
-        * @brief Verifies if a point crosses the edges of a polygon
-        * 
-        * @param p1 The point we consider
-        * @param polygonEdges The list of edges of the polygon
-        * @return true 
-        * @return false 
-        */
-        bool polygonCrossing(Point p, std::vector<Edge> polygonEdges);
-
-        /**
         * @brief adds an edge to the list of edges
         * @param edge the one we want to insert
         */

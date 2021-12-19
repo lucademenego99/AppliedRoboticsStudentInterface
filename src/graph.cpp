@@ -237,55 +237,6 @@ Edge Graph::containsE (Edge e) {
     return Edge(Point(-1, -1), Point(-1, -1));
 }
 
-bool Graph::pointInPolygon(Point p) {
-    std::map<int, std::vector<Edge>>::iterator it;
-    for (it = polygons.begin(); it != polygons.end(); it++)
-    {
-        if (polygonCrossing(p, it->second))
-        {
-            return true;
-        }
-    }
-    return false;
-}
-
-/**
- * @brief Verifies if a point crosses the edges of a polygon
- * 
- * @param p1 The point we consider
- * @param polygonEdges The list of edges of the polygon
- * @return true 
- * @return false 
- */
-bool Graph::polygonCrossing(Point p1, std::vector<Edge> polygonEdges)
-{
-    // std::cout << "CHECKING POINT ";
-    // p1.print();
-    Point p2 = Point(10000, p1.y);
-    int intersectCount = 0;
-    std::vector<Point> polygonPoints;
-    std::vector<student::Point> results; //Just for the sake of passing correct parameters to the function
-    std::vector<double> t;
-    student::Dubins dubin;
-    VisGraph visg;
-    for (Edge edge : polygonEdges) {
-        // std::cout << "EDGE ";
-        // edge.print();
-        // Check if the line segment from p1 to p2 intersects the edge
-        if (dubin.intersLineLine(student::Point(p1.x, p1.y), student::Point(p2.x, p2.y), student::Point(edge.p1.x, edge.p1.y), student::Point(edge.p2.x, edge.p2.y), results, t)) {
-            // std::cout << "INTERSECTS!\n";
-            // Special case: they are all collinear
-            if (visg.getOrientation(edge.p1, p1, edge.p2) == 0) {
-                // std::cout << "COLLINEAR TO EDGE, RETURN FALSE\n";
-                return false;
-            }
-            intersectCount++;
-        }
-    }
-    // std::cout << "INTERSECT COUNT: " << intersectCount << "\n";
-    return (intersectCount % 2 == 1);
-}
-
 /**
  * @brief Dijkstra Shortest path.
  * Reference: https://www.geeksforgeeks.org/dijkstras-shortest-path-algorithm-using-set-in-stl/

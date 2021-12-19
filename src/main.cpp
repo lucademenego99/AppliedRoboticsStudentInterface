@@ -22,7 +22,7 @@ void clipperJoinAndEnlargeTest();
 
 int main(int argc, char *argv[])
 {
-    Dubins dubins = Dubins(0.6, 0.005);
+    Dubins dubins = Dubins(1.1, 0.005);
 
     // shortestPathDubinsTest(dubins);
 
@@ -282,69 +282,65 @@ void multipointDubinsAndVisgraphTest(Dubins dubins)
     std::vector<visgraph::Point> pol1 {visgraph::Point(1.0, 1.0), visgraph::Point(4.0, 1.0), visgraph::Point(4.0, 3.0), visgraph::Point(1.0, 3.0)};
     // std::vector<visgraph::Point> pol2 {visgraph::Point(1.0, 3.5), visgraph::Point(4.0, 3.5), visgraph::Point(4.0, 5.5), visgraph::Point(1.0, 5.5)};
     // std::vector<visgraph::Point> pol3 {visgraph::Point(1.0, 6.0), visgraph::Point(4.0, 6.0), visgraph::Point(4.0, 8.0), visgraph::Point(1.0, 8.0)};
-    std::vector<visgraph::Point> pol4 {visgraph::Point(8.0, 1.0), visgraph::Point(9.0, 1.0), visgraph::Point(9.0, 7.0), visgraph::Point(8.0, 7.0)};
+    std::vector<visgraph::Point> pol4 {visgraph::Point(8.0, 2.0), visgraph::Point(9.0, 2.0), visgraph::Point(9.0, 7.0), visgraph::Point(8.0, 7.0)};
     // std::vector<visgraph::Point> pol1 {visgraph::Point(2.0, 1.0), visgraph::Point(3.0, 1.0), visgraph::Point(4.0, 2.0), visgraph::Point(3.0, 3.0), visgraph::Point(2.0, 3.0), visgraph::Point(1.0, 2.0), visgraph::Point(2.0, 1.0)};
     // std::vector<visgraph::Point> pol2 {visgraph::Point(1.0, 3.5), visgraph::Point(6.0, 6.0), visgraph::Point(1.0, 6.0), visgraph::Point(1.0, 3.5)};
     // std::vector<visgraph::Point> pol3 {visgraph::Point(7.0, 2.0), visgraph::Point(8.0, 3.0), visgraph::Point(7.0, 5.0), visgraph::Point(6.0, 3.0), visgraph::Point(7.0,2.0)};
 
+    std::vector<student::Polygon> pol1s = applyChanges(pol1, 1.0);
+    std::vector<student::Polygon> pol4s = applyChanges(pol4, 1.0);
+
     visgraph::Point origin = visgraph::Point(11, 2);
     visgraph::Point destination = visgraph::Point(2, 5.7);
 
-    std::vector<student::Point> pointsToEnlargePol1;
-    for (visgraph::Point p : pol1) {
-        pointsToEnlargePol1.push_back(student::Point(p.x, p.y));
+    // Create polygons for visibility graph generation
+    std::vector<std::vector<visgraph::Point>> pol1Ready;
+    std::vector<visgraph::Point> pol1Big, pol1Small;
+    pol1Ready.push_back(pol1Big);
+    pol1Ready.push_back(pol1Small);
+    for (student::Point p : pol1s[0]) {
+        pol1Ready[0].push_back(visgraph::Point(p.x, p.y));
     }
-    std::vector<student::Point> newPointsEnlarged = enlarge(pointsToEnlargePol1, 1.0);
-    std::vector<student::Point> newPointsEnlargedForVisgraph = enlarge(pointsToEnlargePol1, 1.3);
-    std::vector<visgraph::Point> enlargedPol1, enlargedPol1ForVisgraph;
-    for (student::Point p : newPointsEnlarged) {
-        enlargedPol1.push_back(visgraph::Point(p.x, p.y));
+    for (student::Point p : pol1s[1]) {
+        pol1Ready[1].push_back(visgraph::Point(p.x, p.y));
     }
-    for (student::Point p : newPointsEnlargedForVisgraph) {
-        enlargedPol1ForVisgraph.push_back(visgraph::Point(p.x, p.y));
+    std::vector<std::vector<visgraph::Point>> pol4Ready;
+    std::vector<visgraph::Point> pol4Big, pol4Small;
+    pol4Ready.push_back(pol4Big);
+    pol4Ready.push_back(pol4Small);
+    for (student::Point p : pol4s[0]) {
+        pol4Ready[0].push_back(visgraph::Point(p.x, p.y));
     }
-
-    std::vector<student::Point> pointsToEnlargePol4;
-    for (visgraph::Point p : pol4) {
-        pointsToEnlargePol4.push_back(student::Point(p.x, p.y));
-    }
-    newPointsEnlarged = enlarge(pointsToEnlargePol4, 0.2);
-    newPointsEnlargedForVisgraph = enlarge(pointsToEnlargePol4, 0.5);
-    std::vector<visgraph::Point> enlargedPol4, enlargedPol4ForVisgraph;
-    for (student::Point p : newPointsEnlarged) {
-        enlargedPol4.push_back(visgraph::Point(p.x, p.y));
-    }
-    for (student::Point p : newPointsEnlargedForVisgraph) {
-        enlargedPol4ForVisgraph.push_back(visgraph::Point(p.x, p.y));
+    for (student::Point p : pol4s[1]) {
+        pol4Ready[1].push_back(visgraph::Point(p.x, p.y));
     }
 
-    polygons.push_back(enlargedPol1);
-    polygonsForVisgraph.push_back(enlargedPol1ForVisgraph);
-    polygons.push_back(enlargedPol4);
-    polygonsForVisgraph.push_back(enlargedPol4ForVisgraph);
+    polygonsForVisgraph.push_back(pol1Ready[0]);
+    polygons.push_back(pol1Ready[1]);
+    polygonsForVisgraph.push_back(pol4Ready[0]);
+    polygons.push_back(pol4Ready[1]);
     // polygons.push_back(pol2);
     // polygons.push_back(pol3);
     // polygons.push_back(pol4);
 
-    // visgraph::Point origin = visgraph::Point(0, 2);
-    // visgraph::Point destination = visgraph::Point(1, 3);
 
+    // COMPUTE VISIBILITY GRAPH
     visgraph::VisGraph visg = visgraph::VisGraph();
-
     visgraph::Graph originalGraph = visgraph::Graph(polygons, false, true);
-
-
     visgraph::Graph g = visg.computeVisibilityGraph(polygonsForVisgraph, origin, destination);
 
+    // COMPUTE SHORTEST PATH
     std::cout << "SHORTEST PATH:\n";
     std::vector<visgraph::Point> path = g.shortestPath(origin, destination);
     for(int it = 0; it < path.size(); it++)
         path[it].print();
 
 
-    //printGraph(originalGraph.graph, origin, destination, path);
-    //printGraph(g.graph, origin, destination, path);
+    // printGraph(originalGraph.graph, origin, destination, path);
+    // printGraph(g.graph, origin, destination, path);
 
+
+    // COMPUTE MULTIPOINT DUBINS SHORTEST PATH
     std::cout << "MULTIPOINT SHORTEST PATH TEST\n";
     student::Point **points = new student::Point *[path.size()];
     points[0] = new student::Point(path[0].x, path[0].y, -M_PI);
@@ -360,12 +356,6 @@ void multipointDubinsAndVisgraphTest(Dubins dubins)
         std::cout << "COMPLETED MULTIPOINT SHORTEST PATH SUCCESSFULLY\n";
         dubins.printCompletePath(curves, path.size()-1, polygons);
     }
-    // student::DubinsCurve *curve = dubins.findShortestPathCollisionDetection(7.0, 1.0, M_PI, origin.x, origin.y, 0, originalGraph);
-    // if (curve == nullptr) {
-    //     std::cout << "NOT FOUND!\n";
-    // } else {
-    //     dubins.printDubinsCurve(curve);
-    // }
 }
 
 void intersectionsTest(Dubins dubins)

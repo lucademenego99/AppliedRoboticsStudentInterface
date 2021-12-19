@@ -216,7 +216,7 @@ std::vector<std::vector<student::Point>> joinAndEnlarge (std::vector<std::vector
  * @return std::vector<std::vector<student::Point>> 
  */
 std::vector<std::vector<student::Point>> applyChanges(std::vector<visgraph::Point> polygon, int offset){
-    int variant = 5;
+    double variant = 4.0;
     std::vector<student::Point> newPath;
 
     //Convert the polygon to the data structure for enlarge, we need a vector of student points
@@ -225,8 +225,8 @@ std::vector<std::vector<student::Point>> applyChanges(std::vector<visgraph::Poin
     }
     std::vector<student::Point> bigSolution;
     std::vector<student::Point> smallSolution;
-    bigSolution = enlarge(newPath, offset);
-    smallSolution = enlarge(newPath, offset/variant);
+    smallSolution = enlarge(newPath, offset);
+    bigSolution = enlarge(newPath, offset + (offset/variant));
     //Take both solutions, push them back a vector, return it
     std::vector<std::vector<student::Point>> finalResult;
     finalResult.push_back(bigSolution);
