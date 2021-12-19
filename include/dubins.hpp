@@ -157,8 +157,8 @@ namespace student
      * @brief All the possible angles handled by the solution of the multipoint dubins problem
      * 
      */
-      // const double multipointAngles[8] = {0, M_PI / 4, M_PI / 2, 3.0 / 4 * M_PI, M_PI, 5.0 / 4 * M_PI, 3.0 / 2 * M_PI, 7.0 / 4 * M_PI};
-      const double multipointAngles[4] = {0, M_PI / 2, M_PI, 3.0 / 2 * M_PI};
+      const double multipointAngles[8] = {0, M_PI / 4, M_PI / 2, 3.0 / 4 * M_PI, M_PI, 5.0 / 4 * M_PI, 3.0 / 2 * M_PI, 7.0 / 4 * M_PI};
+      // const double multipointAngles[4] = {0, M_PI / 2, M_PI, 3.0 / 2 * M_PI};
 
       /**
      * @brief Bound on maximum path curvature

@@ -555,7 +555,7 @@ namespace student
         bool isThereAPath = false;
         for (unsigned int i = 0; i < K; i++)
         {
-            DubinsCurve *curve = findShortestPathCollisionDetection(points[numberOfPoints - 2]->x, points[numberOfPoints - 2]->y, points[numberOfPoints - 2]->th != -1 ? points[numberOfPoints - 2]->th : multipointAngles[i], points[numberOfPoints - 1]->x, points[numberOfPoints - 1]->y, points[numberOfPoints - 1]->th, graph);
+            DubinsCurve *curve = findShortestPathCollisionDetection(points[numberOfPoints - 2]->x, points[numberOfPoints - 2]->y, multipointAngles[i], points[numberOfPoints - 1]->x, points[numberOfPoints - 1]->y, points[numberOfPoints - 1]->th, graph);
             if (curve != nullptr) {
                 isThereAPath = true;
                 if (L[numberOfPoints - 2][i] == -1 || L[numberOfPoints - 2][i] > curve->L)
@@ -582,8 +582,7 @@ namespace student
                 for (unsigned int j = 0; j < K; j++)
                 {
                     if (L[n+1][j] != INFINITY) {
-                        int actual_i_angle = points[n]->th != -1 ? points[n]->th : multipointAngles[i];
-                        DubinsCurve *curve = findShortestPathCollisionDetection(points[n]->x, points[n]->y, actual_i_angle, points[n + 1]->x, points[n + 1]->y, multipointAngles[j], graph);
+                        DubinsCurve *curve = findShortestPathCollisionDetection(points[n]->x, points[n]->y, multipointAngles[i], points[n + 1]->x, points[n + 1]->y, multipointAngles[j], graph);
                         if (curve != nullptr) {
                             if (L[n][i] > curve->L + L[n + 1][j] || L[n][i] == -1)
                             {
@@ -703,7 +702,6 @@ namespace student
         // Now that we have everything we need, calculate the optimal multipoint shortest path
         DubinsCurve **curves = new DubinsCurve*[numberOfPoints-1];
         for (int i = 1; i < numberOfPoints; i++) {
-            // curves[i-1] = findShortestPathCollisionDetection(newPoints[i-1]->x, newPoints[i-1]->y, angles[i-1], newPoints[i]->x, newPoints[i]->y, angles[i], graph);
             curves[i-1] = findShortestPathCollisionDetection(newPoints[i-1]->x, newPoints[i-1]->y, angles[i-1], newPoints[i]->x, newPoints[i]->y, angles[i], graph);
             if (curves[i-1] == nullptr) {
                 return nullptr;
@@ -955,6 +953,7 @@ namespace student
      */
     bool Dubins::intersArcLine(DubinsArc *arc, Point point1, Point point2, std::vector<Point> &pts, std::vector<double> &t)
     {
+        const double EPSILON = 0.0000001;
         // Find the circle containing the provided arc
         // Get the perpendicular lines of point1's line and points2's line
         // (we can calculate them because point1 and point2 also contain the angle, that in our case will be the slope)
@@ -963,13 +962,19 @@ namespace student
         double tanFirstAngle = tan(arc->th0);
         double tanSecondAngle = tan(arc->dubins_line->th);
 
-        double m1 = tanFirstAngle == 0 ? INFINITY : (-1 / tanFirstAngle);
-        double m2 = tanSecondAngle == 0 ? INFINITY : (-1 / tanSecondAngle);
+        double m1 = tanFirstAngle == INFINITY ? 0 : (-1 / tanFirstAngle);
+        double m2 = tanSecondAngle == INFINITY ? 0 : (-1 / tanSecondAngle);
+
 
         if (tanFirstAngle > 500 || tanFirstAngle < -500)
-            tanFirstAngle = 0;
-        if (tanSecondAngle > 500 || tanSecondAngle < -500)
-            tanSecondAngle = 0;
+            m1 = 0;
+        else if (tanSecondAngle > 500 || tanSecondAngle < -500)
+            m2 = 0;
+        
+        if (abs(tanFirstAngle) <=  0+EPSILON)
+            m1 = INFINITY;
+        if (abs(tanSecondAngle) <= 0+EPSILON)
+            m2 = INFINITY;
 
         Point circleCenter = Point(-1, -1);
 
@@ -995,16 +1000,16 @@ namespace student
             if (m1 == INFINITY) {
                 double q2 = arc->dubins_line->y - (m2*arc->dubins_line->x);
                 circleCenter.x = arc->x0;
-                circleCenter.y = m2 * arc->x0 + q2;
+                circleCenter.y = m2 * circleCenter.x + q2;
             } else if (m2 == INFINITY) {
                 double q1 = arc->y0 - (m1*arc->x0);
                 circleCenter.x = arc->dubins_line->x;
-                circleCenter.y = m1 * arc->x0 + q1;
+                circleCenter.y = m1 * circleCenter.x + q1;
             } else {
                 double q1 = arc->y0 - (m1*arc->x0);
                 double q2 = arc->dubins_line->y - (m2*arc->dubins_line->x);
-                circleCenter.x = (q1 - q2) / (m2 - m1);
-                circleCenter.y = m1 * arc->x0 + q1;
+                circleCenter.x = (q2 - q1) / (m1 - m2);
+                circleCenter.y = m1 * circleCenter.x + q1;
             }
         }
 
@@ -1023,7 +1028,7 @@ namespace student
         double p6 = 2 * circleCenter.y * point2.y;
 
         double c1 = pow(point1.x, 2) + pow(point2.x, 2) - p1 + pow(point1.y, 2) + pow(point2.y, 2) - p2;
-        double c2 = -2 * pow(point2.x, 2) + p1 - p3 + p4 - 2 * pow(point2.y, 2) + p2 - p5 + p6;
+        double c2 = -2 * pow(point2.x, 2) + p1 - p3 + p4 - (2 * pow(point2.y, 2)) + p2 - p5 + p6;
         double c3 = pow(point2.x, 2) - p4 + pow(circleCenter.x, 2) + pow(point2.y, 2) - p6 + pow(circleCenter.y, 2) - pow(r, 2);
 
         double delta = pow(c2, 2) - (4 * c1 * c3);
@@ -1069,6 +1074,15 @@ namespace student
         std::sort(intersections.begin(), intersections.end(), [](const std::pair<Point, double> a, const std::pair<Point, double> b)
                   { return a.second < b.second; });
 
+
+        // Check if the arc goes clockwise (orientation=-1) or counterclockwise(orientation=1)
+        double s = arc->L/100 * 50;
+        DubinsLine *tmp = new DubinsLine(s, arc->x0, arc->y0, arc->th0, arc->k);
+        visgraph::Point middlePoint = visgraph::Point(tmp->x, tmp->y);
+        visgraph::VisGraph vis;
+        int orientation = vis.getOrientation(visgraph::Point(arc->x0, arc->y0), middlePoint, visgraph::Point(arc->dubins_line->x, arc->dubins_line->y));
+        delete tmp;
+
         // Fill the resulting arrays
         for (int i = 0; i < intersections.size(); i++)
         {
@@ -1077,18 +1091,25 @@ namespace student
             double firstTh = (atan2(arc->y0 - circleCenter.y, arc->x0 - circleCenter.x));
             double secondTh = (atan2(arc->dubins_line->y - circleCenter.y, arc->dubins_line->x - circleCenter.x));
 
-            if (firstTh >= 0 && secondTh >= 0) {
-                if (intersectionTh < firstTh && intersectionTh > secondTh) {
+            if (orientation == 1) {
+                // Counter Clockwise Arc 
+                if (firstTh < secondTh && (intersectionTh >= firstTh && intersectionTh <= secondTh)) {
                     pts.push_back(intersections[i].first);
                     t.push_back(intersections[i].second);
-                }
-            } else if (firstTh > 0 && secondTh < 0) {
-                if (intersectionTh > firstTh || (intersectionTh < firstTh && intersectionTh < secondTh)) {
-                    pts.push_back(intersections[i].first);
-                    t.push_back(intersections[i].second);
+                } else if (firstTh > secondTh) {
+                    if (intersectionTh >= firstTh || intersectionTh <= secondTh) {
+                        pts.push_back(intersections[i].first);
+                        t.push_back(intersections[i].second);
+                    }
                 }
             } else {
-                if (intersectionTh > firstTh && intersectionTh < secondTh) {
+                // Clockwise Arc
+                if (firstTh < secondTh) {
+                    if (intersectionTh <= firstTh || intersectionTh >= secondTh) {
+                        pts.push_back(intersections[i].first);
+                        t.push_back(intersections[i].second);
+                    }
+                } else if (firstTh > secondTh && (intersectionTh <= firstTh && intersectionTh >= secondTh)) {
                     pts.push_back(intersections[i].first);
                     t.push_back(intersections[i].second);
                 }
