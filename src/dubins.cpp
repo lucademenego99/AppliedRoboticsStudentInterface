@@ -376,8 +376,6 @@ namespace student
         double best_L = DBL_MAX;
         int pidx = -1;
 
-        std::cout << "ONE SHORTEST PATH IS WORKING\n";
-
         for (int i = 0; i < TOTAL_POSSIBLE_CURVES; i++)
         {
             bool isThereAStraightLine = false;
@@ -669,7 +667,6 @@ namespace student
         {
             minimizingAngles[i + 1] = multipointAngles[S[i][minIndex]];
             minIndex = S[i][minIndex];
-            std::cout << "minIndex: " << minIndex << "\n";
         }
         minimizingAngles[numberOfPoints - 1] = points[numberOfPoints - 1]->th;
 
@@ -696,7 +693,7 @@ namespace student
         for (int i = 0; i < numberOfPoints; i++) {
             newPoints[i] = points[numberOfPoints - i - 1];
         }
-        newPoints[numberOfPoints-1]->th = -M_PI_2;
+        newPoints[numberOfPoints-1]->th = mod2pi(points[0]->th + M_PI);
         // Get the optimal angles for each point (dynamic programming iterative procedure)
         double *angles = multipointShortestPathAngles(newPoints, numberOfPoints, graph);
         if (angles == nullptr) {
@@ -1014,8 +1011,6 @@ namespace student
         // Having the center, we can easily find the radius
         double r = sqrt(pow(arc->x0 - circleCenter.x, 2) + pow(arc->y0 - circleCenter.y, 2));
 
-        // std::cout << "CIRCLE: " << circleCenter.x << " " << circleCenter.y << " " << r << "\n";
-
         // Initialize the resulting arrays as empty arrays
         pts.clear();
         t.clear();
@@ -1113,8 +1108,6 @@ namespace student
      * @param last Is this the last arc of a curve?
      */
     void Dubins::printDubinsArc(DubinsArc *arc, Mat image, double size, bool first, bool last) {
-        // std::cout << "PRINTING DUBINS ARC FROM (" << arc->x0 << "," << arc->y0 << "," << arc->th0 << ") TO (" << arc->dubins_line->x << "," << arc->dubins_line->y << "," << arc->dubins_line->th << ")\n";
-        // std::cout << "POINTS:\n";
         int npts = 100;
         std::vector<cv::Point> pts;
         if (first)
@@ -1124,11 +1117,9 @@ namespace student
         for (int i = 0; i < npts; i++) {
             double s = arc->L/npts * i;
             DubinsLine *tmp = new DubinsLine(s, arc->x0, arc->y0, arc->th0, arc->k);
-            // std::cout << "(" << tmp->x << "," << tmp->y << ") ; ";
             pts.push_back(cv::Point(tmp->x / size * 500, tmp->y / size * 500));
             delete tmp;
         }
-        // std::cout << "\n";
         for (int i = 1; i < pts.size(); i++) {
             line(image, pts[i-1], pts[i], Scalar(0, 0, 255), 1, LINE_AA);
         }
@@ -1171,13 +1162,11 @@ namespace student
 
         double maxx = -INFINITY, minx = INFINITY, maxy = -INFINITY, miny = INFINITY;
         for (int i = 0; i < numberOfCurves; i++) {
-            std::cout << "I : " << i << "\n";
             maxx = max({maxx, curves[i]->a1->x0, curves[i]->a1->dubins_line->x, curves[i]->a2->x0, curves[i]->a2->dubins_line->x, curves[i]->a3->x0, curves[i]->a3->dubins_line->x});
             minx = min({minx, curves[i]->a1->x0, curves[i]->a1->dubins_line->x, curves[i]->a2->x0, curves[i]->a2->dubins_line->x, curves[i]->a3->x0, curves[i]->a3->dubins_line->x});
             maxy = max({maxy, curves[i]->a1->y0, curves[i]->a1->dubins_line->y, curves[i]->a2->y0, curves[i]->a2->dubins_line->y, curves[i]->a3->y0, curves[i]->a3->dubins_line->y});
             miny = min({miny, curves[i]->a1->y0, curves[i]->a1->dubins_line->y, curves[i]->a2->y0, curves[i]->a2->dubins_line->y, curves[i]->a3->y0, curves[i]->a3->dubins_line->y});
         }
-        std::cout << "NUMBER OF CURVES: " << numberOfCurves << "\n";
 
         double size = max(maxx, maxy);
 

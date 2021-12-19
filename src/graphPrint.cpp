@@ -31,6 +31,10 @@ int printGraph(std::map<visgraph::Point, std::vector<visgraph::Edge>> g, visgrap
         smallestY = p.y < smallestY ? p.y : smallestY;
         biggestY = p.y > biggestY ? p.y : biggestY;
     }
+    smallestX = origin.x < smallestX ? origin.x : smallestX;
+    smallestY = origin.y < smallestY ? origin.y : smallestY;
+    biggestX = origin.x > biggestX ? origin.x : biggestX;
+    biggestY = origin.y > biggestY ? origin.y : biggestY;
     double size = max(biggestX-smallestX, biggestY-smallestY);
     size *= 1.1;
 

@@ -22,7 +22,7 @@ void clipperJoinAndEnlargeTest();
 
 int main(int argc, char *argv[])
 {
-    Dubins dubins = Dubins(1.3, 0.005);
+    Dubins dubins = Dubins(0.6, 0.005);
 
     // shortestPathDubinsTest(dubins);
 
@@ -347,14 +347,11 @@ void multipointDubinsAndVisgraphTest(Dubins dubins)
 
     std::cout << "MULTIPOINT SHORTEST PATH TEST\n";
     student::Point **points = new student::Point *[path.size()];
-    points[0] = new student::Point(path[0].x, path[0].y, -M_PI_2);
+    points[0] = new student::Point(path[0].x, path[0].y, -M_PI);
     for(int i = 1; i < path.size()-1; i++) {
         points[i] = new student::Point(path[i].x, path[i].y);
     }
     points[path.size()-1] = new student::Point(path[path.size()-1].x, path[path.size()-1].y);
-
-    // DubinsCurve *curve = dubins.findShortestPath(points[0]->x, points[0]->y, points[0]->th, points[path.size()-1]->x,points[path.size()-1]->y,points[path.size()-1]->th);
-    // dubins.printDubinsCurve(curve);
 
     DubinsCurve **curves = dubins.multipointShortestPath(points, path.size(), originalGraph);
     if (curves == nullptr) {
