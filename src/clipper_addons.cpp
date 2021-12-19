@@ -248,36 +248,29 @@ std::vector<std::vector<std::vector<visgraph::Point>>> joinMultiplePolygons(std:
         results.clear();
     }
 
-    Paths subj(1), clip(bigPolygons.size()-1), solution;
+    Paths subj(bigPolygons.size()), clip(bigPolygons.size()-1), solution;
 
-    for (unsigned int i = 0; i < bigPolygons[0].size(); i++){
-        subj[0].push_back(IntPoint(bigPolygons[0][i].x*1000, bigPolygons[0][i].y*1000));
-    }
-    for(unsigned int i = 0; i < clip.size(); i++){
-        for(unsigned int j = 0; j < bigPolygons[i+1].size(); j++){
-            clip[i].push_back(IntPoint(bigPolygons[i+1][j].x*1000, bigPolygons[i+1][j].y*1000));
-        }    
+    for (unsigned int i = 0; i < bigPolygons.size(); i++){
+        for (unsigned int j = 0; j < bigPolygons[i].size(); j++) {
+            subj[i].push_back(IntPoint(bigPolygons[i][j].x*1000, bigPolygons[i][j].y*1000));
+        }
     }
     Clipper c;
     c.AddPaths(subj, ptSubject, true);
-    c.AddPaths(clip, ptClip, true);
-    c.Execute(ctUnion, solution, pftNonZero, pftNonZero);
+    c.Execute(ctUnion, solution, pftPositive);
 
 
-    Paths subj1(1), clip1(smallPolygons.size()-1), solution1;
+    Paths subj1(smallPolygons.size()), clip1(smallPolygons.size()-1), solution1;
 
-    for (unsigned int i = 0; i < smallPolygons[0].size(); i++){
-        subj1[0].push_back(IntPoint(smallPolygons[0][i].x*1000, smallPolygons[0][i].y*1000));
+    for (unsigned int i = 0; i < smallPolygons.size(); i++){
+        for (unsigned int j = 0; j < smallPolygons[i].size(); j++) {
+            subj1[i].push_back(IntPoint(smallPolygons[i][j].x*1000, smallPolygons[i][j].y*1000));
+        }
     }
-    for(unsigned int i = 0; i < clip1.size(); i++){
-        for(unsigned int j = 0; j < smallPolygons[i+1].size(); j++){
-            clip1[i].push_back(IntPoint(smallPolygons[i+1][j].x*1000, smallPolygons[i+1][j].y*1000));
-        }    
-    }
+
     Clipper c1;
     c1.AddPaths(subj1, ptSubject, true);
-    c1.AddPaths(clip1, ptClip, true);
-    c1.Execute(ctUnion, solution1, pftNonZero, pftNonZero);
+    c1.Execute(ctUnion, solution1, pftPositive);
 
     std::vector<std::vector<std::vector<visgraph::Point>>> returnValues;
 
