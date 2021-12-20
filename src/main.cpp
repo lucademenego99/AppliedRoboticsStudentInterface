@@ -22,7 +22,7 @@ void clipperJoinAndEnlargeTest();
 
 int main(int argc, char *argv[])
 {
-    Dubins dubins = Dubins(1.4, 0.005);
+    Dubins dubins = Dubins(1.5, 0.005);
 
     // shortestPathDubinsTest(dubins);
 
@@ -280,8 +280,6 @@ void multipointDubinsAndVisgraphTest(Dubins dubins)
 {
     student::Polygon polTmp;
     std::vector<double> tTmp;
-    bool res = dubins.intersCircleLine(student::Point(1.58926, 4.3), 0.589256, student::Point(0,5), student::Point(5,5), polTmp, tTmp);
-    std::cout << "RESULT INTERSECTION: " << res << "\n";
 
     std::vector<std::vector<visgraph::Point>> polygons, polygonsForVisgraph;
     std::vector<visgraph::Point> pol1 {visgraph::Point(1.5, 1.5), visgraph::Point(3.5, 1.5), visgraph::Point(5.0, 3.0), visgraph::Point(3.5, 4.5), visgraph::Point(1.5, 4.5), visgraph::Point(0.0, 3.0)};
@@ -301,12 +299,12 @@ void multipointDubinsAndVisgraphTest(Dubins dubins)
     polygonsForVisgraph = pols[0];
     polygons = pols[1];
 
-    visgraph::Point origin = visgraph::Point(1.0, 6.0);
+    visgraph::Point origin = visgraph::Point(1.0, 8.0);
     visgraph::Point destination = visgraph::Point(24.0, 2.0);
 
-    
+    visgraph::VisGraph visg;
+
     // COMPUTE VISIBILITY GRAPH
-    visgraph::VisGraph visg = visgraph::VisGraph();
     visgraph::Graph originalGraph = visgraph::Graph(polygons, false, true);
     visgraph::Graph originalGraph2 = visgraph::Graph(polygonsForVisgraph, false, true);
     visgraph::Graph g = visg.computeVisibilityGraph(polygonsForVisgraph, origin, destination);
@@ -326,7 +324,7 @@ void multipointDubinsAndVisgraphTest(Dubins dubins)
     // COMPUTE MULTIPOINT DUBINS SHORTEST PATH
     std::cout << "MULTIPOINT SHORTEST PATH TEST\n";
     student::Point **points = new student::Point *[path.size()];
-    points[0] = new student::Point(path[0].x, path[0].y, -M_PI);
+    points[0] = new student::Point(path[0].x, path[0].y, -2.5);
     for(int i = 1; i < path.size()-1; i++) {
         points[i] = new student::Point(path[i].x, path[i].y);
     }

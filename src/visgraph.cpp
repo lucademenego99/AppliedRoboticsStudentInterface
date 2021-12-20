@@ -122,14 +122,6 @@ namespace visgraph
                 //     break;
                 // }
 
-                if (point == Point(9, 2, -1) && p == Point(2, 5.7, -1)) {
-                    std::cout << "CONSIDERING EDGE ORIGIN DESTINATION\nOPENEDGES:\n";
-
-                    for (Edge e : openEdges.openEdges) {
-                        e.print();
-                    }
-                }
-
                 // Update open edges - remove clock wise edges because we already considered them (remember we are moving counter-clockwise)
                 if (openEdges.openEdges.size() > 0)
                 {
@@ -233,10 +225,6 @@ namespace visgraph
         for (Edge edge : polygonEdges) {
             // Check if the line segment from p1 to p2 intersects the edge
             if (dubin.intersLineLine(student::Point(p1.x, p1.y), student::Point(p2.x, p2.y), student::Point(edge.p1.x, edge.p1.y), student::Point(edge.p2.x, edge.p2.y), results, t)) {
-                // Special case: they are all collinear
-                if (getOrientation(edge.p1, p1, edge.p2) == COLLINEAR)
-                    return onSegment(edge.p1, p1, edge.p2);
-                
                 // Another special case to manage collinear points - if we are intersecting an edge on its vertex, then
                 // we don't want to calculate two intersections, but one. So in that case we
                 // add 1 to intersectCount only if the collinearPoint's y is greater than p1.y

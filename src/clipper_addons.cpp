@@ -216,7 +216,7 @@ std::vector<std::vector<visgraph::Point>> joinAndEnlarge (std::vector<std::vecto
  * @return std::vector<std::vector<student::Point>> 
  */
 std::vector<std::vector<visgraph::Point>> applyChanges(std::vector<visgraph::Point> polygon, int offset){
-    double variant = 4.0;
+    double variant = 3.0;
     std::vector<visgraph::Point> newPath;
 
     //Convert the polygon to the data structure for enlarge, we need a vector of visgraph points
@@ -248,7 +248,7 @@ std::vector<std::vector<std::vector<visgraph::Point>>> joinMultiplePolygons(std:
         results.clear();
     }
 
-    Paths subj(bigPolygons.size()), clip(bigPolygons.size()-1), solution;
+    Paths subj(bigPolygons.size()), solution;
 
     for (unsigned int i = 0; i < bigPolygons.size(); i++){
         for (unsigned int j = 0; j < bigPolygons[i].size(); j++) {
@@ -257,10 +257,10 @@ std::vector<std::vector<std::vector<visgraph::Point>>> joinMultiplePolygons(std:
     }
     Clipper c;
     c.AddPaths(subj, ptSubject, true);
-    c.Execute(ctUnion, solution, pftPositive);
+    c.Execute(ctUnion, solution, pftNonZero);
 
 
-    Paths subj1(smallPolygons.size()), clip1(smallPolygons.size()-1), solution1;
+    Paths subj1(smallPolygons.size()), solution1;
 
     for (unsigned int i = 0; i < smallPolygons.size(); i++){
         for (unsigned int j = 0; j < smallPolygons[i].size(); j++) {
@@ -270,7 +270,7 @@ std::vector<std::vector<std::vector<visgraph::Point>>> joinMultiplePolygons(std:
 
     Clipper c1;
     c1.AddPaths(subj1, ptSubject, true);
-    c1.Execute(ctUnion, solution1, pftPositive);
+    c1.Execute(ctUnion, solution1, pftNonZero);
 
     std::vector<std::vector<std::vector<visgraph::Point>>> returnValues;
 
@@ -279,10 +279,14 @@ std::vector<std::vector<std::vector<visgraph::Point>>> joinMultiplePolygons(std:
     for (unsigned int i = 0; i < solution.size(); i++){
         Path path = solution.at(i);
         std::vector<visgraph::Point> newPath;
-        for(IntPoint p : path){
-            newPath.push_back(visgraph::Point(p.X/1000, p.Y/1000));
+        visgraph::VisGraph visg;
+        if (Orientation(path)) {
+            for(IntPoint p : path){
+                newPath.push_back(visgraph::Point(p.X/1000, p.Y/1000));
+            }
         }
-        intermediateValues.push_back(newPath);
+        if (!newPath.empty())
+            intermediateValues.push_back(newPath);
         newPath.clear();
     }
 
@@ -293,10 +297,14 @@ std::vector<std::vector<std::vector<visgraph::Point>>> joinMultiplePolygons(std:
     for (unsigned int i = 0; i < solution1.size(); i++){
         Path path = solution1.at(i);
         std::vector<visgraph::Point> newPath;
-        for(IntPoint p : path){
-            newPath.push_back(visgraph::Point(p.X/1000, p.Y/1000));
+        visgraph::VisGraph visg;
+        if (Orientation(path)) {
+            for(IntPoint p : path){
+                newPath.push_back(visgraph::Point(p.X/1000, p.Y/1000));
+            }
         }
-        intermediateValues.push_back(newPath);
+        if (!newPath.empty())
+            intermediateValues.push_back(newPath);
         newPath.clear();
     }
 
