@@ -4,54 +4,40 @@
 #include <sstream>
 namespace student
 {
-
-  // void loadImage(cv::Mat &img_out, const std::string &config_folder)
-  // {
-  //   throw std::logic_error("STUDENT FUNCTION - LOAD IMAGE - NOT IMPLEMENTED");
-  // }
-
-  // void genericImageListener(const cv::Mat &img_in, std::string topic, const std::string &config_folder)
-  // {
-  //   throw std::logic_error("STUDENT FUNCTION - IMAGE LISTENER - NOT CORRECTLY IMPLEMENTED");
-  // }
-
-  // bool extrinsicCalib(const cv::Mat &img_in, std::vector<cv::Point3f> object_points, const cv::Mat &camera_matrix, cv::Mat &rvec, cv::Mat &tvec, const std::string &config_folder)
-  // {
-  //   throw std::logic_error("STUDENT FUNCTION - EXTRINSIC CALIB - NOT IMPLEMENTED");
-  // }
-
-  // void imageUndistort(const cv::Mat &img_in, cv::Mat &img_out,
-  //                     const cv::Mat &cam_matrix, const cv::Mat &dist_coeffs, const std::string &config_folder)
-  // {
-
-  //   throw std::logic_error("STUDENT FUNCTION - IMAGE UNDISTORT - NOT IMPLEMENTED");
-  // }
-
-  // void findPlaneTransform(const cv::Mat &cam_matrix, const cv::Mat &rvec,
-  //                         const cv::Mat &tvec, const std::vector<cv::Point3f> &object_points_plane,
-  //                         const std::vector<cv::Point2f> &dest_image_points_plane,
-  //                         cv::Mat &plane_transf, const std::string &config_folder)
-  // {
-  //   throw std::logic_error("STUDENT FUNCTION - FIND PLANE TRANSFORM - NOT IMPLEMENTED");
-  // }
-
-  // void unwarp(const cv::Mat &img_in, cv::Mat &img_out, const cv::Mat &transf,
-  //             const std::string &config_folder)
-  // {
-  //   throw std::logic_error("STUDENT FUNCTION - UNWRAP - NOT IMPLEMENTED");
-  // }
-
-  // bool processMap(const cv::Mat &img_in, const double scale, std::vector<Polygon> &obstacle_list, std::vector<std::pair<int, Polygon>> &victim_list, Polygon &gate, const std::string &config_folder)
-  // {
-  //   throw std::logic_error("STUDENT FUNCTION - PROCESS MAP - NOT IMPLEMENTED");
-  // }
-
-  // bool findRobot(const cv::Mat &img_in, const double scale, Polygon &triangle, double &x, double &y, double &theta, const std::string &config_folder)
-  // {
-  //   throw std::logic_error("STUDENT FUNCTION - FIND ROBOT - NOT IMPLEMENTED");
-  // }
-
+  /*!
+* Plan a safe and fast path in the arena
+* @param[in]  borders        border of the arena [m]
+* @param[out] obstacle_list  list of obstacle polygon [m]
+* @param[out] gate_list      polygon representing the gate [m]
+* @param[out] x              x position of the robot in the arena reference system
+* @param[out] y              y position of the robot in the arena reference system
+* @param[out] theta          yaw of the robot in the arena reference system
+* @param[out] path           list of Pose need to be feed with the path calculated result
+* @param[in]  config_folder  A custom string from config file.
+*/
   bool planPath(const Polygon& borders, const std::vector<Polygon>& obstacle_list, const std::vector<Polygon>& gate_list, const std::vector<float> x, const std::vector<float> y, const std::vector<float> theta, std::vector<Path>& path, const std::string& config_folder){
-    throw std::logic_error( "STUDENT FUNCTION - PLAN PATH - NOT IMPLEMENTED" );
+    throw std::logic_error( "STUDENT FUNCTION - PLAN PATH - OWN IMPLEMENTED" );
+  // modification needed: Polygon: std::vector<Point> -> std::vector<visgraph::Point>
+  // may just add the polygon_id one by one
+
+  /** for our task, the evader can be obtained by calling function 
+
+  professor::processRobot(hsv_img, scale, triangle, x, y, theta, ns);
+  
+  the parameter will lead our function in a mass, also, no data structure up to now deliver this result to student interface!!!
+  May ask the professor to add it, or we should develop it by ourself.
+  **/
+
+  // *****the controllment for the multi robot*****
+  /**  feed the
+  e.g path for robot 0
+    for (float l=0, s=0; l<3; l++, s+=ds) {
+      path[0].points.emplace_back(s, x[0]+ds*l, y[0], 0.0, 0.0);
+    }
+  ******THE ADDED POINT HAVE THE STRUCTURE POSE, NOT POINT******
+  Pose(float s, float x, float y, float theta, float kappa):
+    s(s), x(x), y(y), theta(theta), kappa(kappa)
+  {}
+  **/
   }
 }
