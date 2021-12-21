@@ -4,7 +4,7 @@
 #include <cfloat>
 #include <algorithm>
 
-namespace student
+namespace dubins
 {
     /**
      * @brief Construct a new Dubins:: Dubins object

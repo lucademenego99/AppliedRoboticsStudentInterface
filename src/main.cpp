@@ -7,7 +7,7 @@
 #include "utils.hpp"
 #include <iostream>
 
-using namespace student;
+using namespace dubins;
 
 void shortestPathDubinsTest(Dubins dubins);
 void multipointDubinsTest(Dubins dubins);

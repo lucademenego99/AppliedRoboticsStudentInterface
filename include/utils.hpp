@@ -6,20 +6,19 @@
 #include <vector>
 #include <cstddef>
 
-namespace student
+struct Point 
 {
-  /**
-   * @brief A point structure, that can be used as:
-   * - a simple 2D point (x,y)
-   * - a point representing a position (x,y,theta)
-   * 
-   */
-  struct Point
-  {
-    double x, y, th;
+  float x, y;
 
-    Point(double x = -1, double y = -1, double th = -1) : x(x), y(y), th(th) {}
-  };
+  Point(float x, float y):
+    x(x), y(y)
+  {}
+
+  Point(): 
+    Point(0, 0)
+  {}
+
+};
 
   /**
    * @brief A configuration of the robot along the path, represented by x, y, orientation and curvature
@@ -70,6 +69,21 @@ namespace student
    */
   typedef std::vector<Point> Polygon;
 
+
+namespace dubins
+{
+  /**
+   * @brief A point structure, that can be used as:
+   * - a simple 2D point (x,y)
+   * - a point representing a position (x,y,theta)
+   * 
+   */
+  struct Point
+  {
+    double x, y, th;
+
+    Point(double x = -1, double y = -1, double th = -1) : x(x), y(y), th(th) {}
+  };
   /**
    * @brief Implementation of function sinc(t)
    * 

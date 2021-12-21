@@ -5,7 +5,7 @@
 #include <vector>
 #include <iostream>
 
-namespace student
+namespace dubins
 {
    /**
  * @brief Evaluate an arc (circular or straight) composing a Dubins curve, at a given arc length s

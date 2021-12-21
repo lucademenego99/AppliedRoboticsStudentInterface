@@ -1,6 +1,6 @@
 #include "utils.hpp"
 
-namespace student
+namespace dubins
 {
 
     /**

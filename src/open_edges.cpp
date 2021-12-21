@@ -27,12 +27,12 @@ namespace visgraph
      */
     bool OpenEdges::lessThan(Point p1, Point p2, Edge edge1, Edge edge2)
     {
-        std::vector<student::Point> results; //Just for the sake of passing correct parameters to the function
+        std::vector<dubins::Point> results; //Just for the sake of passing correct parameters to the function
         std::vector<double> t;
-        student::Dubins dubin;
+        dubins::Dubins dubin;
         if (edge1 == edge2)
             return false;
-        if (!dubin.intersLineLine(student::Point(p1.x, p1.y), student::Point(p2.x, p2.y), student::Point(edge2.p1.x, edge2.p1.y), student::Point(edge2.p2.x, edge2.p2.y), results, t))
+        if (!dubin.intersLineLine(dubins::Point(p1.x, p1.y), dubins::Point(p2.x, p2.y), dubins::Point(edge2.p1.x, edge2.p1.y), dubins::Point(edge2.p2.x, edge2.p2.y), results, t))
             return true;
         double edge1Distance = visGraph.pointEdgeDistance(p1, p2, edge1);
         double edge2Distance = visGraph.pointEdgeDistance(p1, p2, edge2);
