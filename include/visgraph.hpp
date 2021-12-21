@@ -16,7 +16,7 @@ namespace visgraph
     class VisGraph
     {
     private:
-        double INF = 10000;
+        double INF = 100000;
         const int CCW = 1;
         const int CW = -1;
         const int COLLINEAR = 0;

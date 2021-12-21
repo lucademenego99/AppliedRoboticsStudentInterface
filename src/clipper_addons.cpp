@@ -259,6 +259,7 @@ std::vector<std::vector<std::vector<visgraph::Point>>> joinMultiplePolygons(std:
     c.AddPaths(subj, ptSubject, true);
     c.Execute(ctUnion, solution, pftNonZero);
 
+    CleanPolygons(solution);
 
     Paths subj1(smallPolygons.size()), solution1;
 
@@ -272,6 +273,8 @@ std::vector<std::vector<std::vector<visgraph::Point>>> joinMultiplePolygons(std:
     c1.AddPaths(subj1, ptSubject, true);
     c1.Execute(ctUnion, solution1, pftNonZero);
 
+    CleanPolygons(solution1);
+
     std::vector<std::vector<std::vector<visgraph::Point>>> returnValues;
 
     std::vector<std::vector<visgraph::Point>> intermediateValues;
@@ -282,7 +285,7 @@ std::vector<std::vector<std::vector<visgraph::Point>>> joinMultiplePolygons(std:
         visgraph::VisGraph visg;
         if (Orientation(path)) {
             for(IntPoint p : path){
-                newPath.push_back(visgraph::Point(p.X/1000, p.Y/1000));
+                newPath.push_back(visgraph::Point(p.X/1000.0, p.Y/1000.0));
             }
         }
         if (!newPath.empty())
@@ -300,7 +303,7 @@ std::vector<std::vector<std::vector<visgraph::Point>>> joinMultiplePolygons(std:
         visgraph::VisGraph visg;
         if (Orientation(path)) {
             for(IntPoint p : path){
-                newPath.push_back(visgraph::Point(p.X/1000, p.Y/1000));
+                newPath.push_back(visgraph::Point(p.X/1000.0, p.Y/1000.0));
             }
         }
         if (!newPath.empty())

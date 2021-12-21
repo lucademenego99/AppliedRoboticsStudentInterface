@@ -13,7 +13,7 @@ namespace visgraph
         double y;
         int polygonId;
 
-        int SCALE_FACTOR = 100;
+        int SCALE_FACTOR = 1000;
 
         /**
         * @brief Point constructor
