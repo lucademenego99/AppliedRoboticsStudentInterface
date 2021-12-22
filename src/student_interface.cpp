@@ -13,27 +13,54 @@
 
 namespace student
 {
-    bool planPath(const Polygon &borders, const std::vector<Polygon> &obstacle_list, const std::vector<std::pair<int, Polygon>> &victim_list, const Polygon &gate, const float x, const float y, const float theta, Path &path)
-    {
-        throw std::logic_error("STUDENT FUNCTION - PLAN PATH - NOT IMPLEMENTED");
-    }
-    /**
-     * @brief NAME STILL TO BE DEFINED, generates an original graph and a visibility graph starting from a vector of polygons
-     * 
-     * @param polygons Obstables present in the map
-     * @param visg Visibility graph we need to obtain
-     * @param g Graph we need to generate starting from the obstacles
-     */
-    void unnamedFunction(std::vector<std::vector<visgraph::Point>> polygons, visgraph::VisGraph visg, visgraph::Graph g){
 
-        //We might want to change these or include them in the parameters
-        visgraph::Point origin = visgraph::Point(9, 2); 
-        visgraph::Point destination = visgraph::Point(2, 5.7);
+  void loadImage(cv::Mat &img_out, const std::string &config_folder)
+  {
+    throw std::logic_error("STUDENT FUNCTION - LOAD IMAGE - NOT IMPLEMENTED");
+  }
 
-        visgraph::Graph originalGraph = visgraph::Graph(polygons, false, true);
+  void genericImageListener(const cv::Mat &img_in, std::string topic, const std::string &config_folder)
+  {
+    throw std::logic_error("STUDENT FUNCTION - IMAGE LISTENER - NOT CORRECTLY IMPLEMENTED");
+  }
 
-        //visg = visgraph::VisGraph();
-        
-        //g = visg.computeVisibilityGraph(polygons, origin, destination);
-    }
+  bool extrinsicCalib(const cv::Mat &img_in, std::vector<cv::Point3f> object_points, const cv::Mat &camera_matrix, cv::Mat &rvec, cv::Mat &tvec, const std::string &config_folder)
+  {
+    throw std::logic_error("STUDENT FUNCTION - EXTRINSIC CALIB - NOT IMPLEMENTED");
+  }
+
+  void imageUndistort(const cv::Mat &img_in, cv::Mat &img_out,
+                      const cv::Mat &cam_matrix, const cv::Mat &dist_coeffs, const std::string &config_folder)
+  {
+
+    throw std::logic_error("STUDENT FUNCTION - IMAGE UNDISTORT - NOT IMPLEMENTED");
+  }
+
+  void findPlaneTransform(const cv::Mat &cam_matrix, const cv::Mat &rvec,
+                          const cv::Mat &tvec, const std::vector<cv::Point3f> &object_points_plane,
+                          const std::vector<cv::Point2f> &dest_image_points_plane,
+                          cv::Mat &plane_transf, const std::string &config_folder)
+  {
+    throw std::logic_error("STUDENT FUNCTION - FIND PLANE TRANSFORM - NOT IMPLEMENTED");
+  }
+
+  void unwarp(const cv::Mat &img_in, cv::Mat &img_out, const cv::Mat &transf,
+              const std::string &config_folder)
+  {
+    throw std::logic_error("STUDENT FUNCTION - UNWRAP - NOT IMPLEMENTED");
+  }
+
+  bool processMap(const cv::Mat &img_in, const double scale, std::vector<Polygon> &obstacle_list, std::vector<std::pair<int, Polygon>> &victim_list, Polygon &gate, const std::string &config_folder)
+  {
+    throw std::logic_error("STUDENT FUNCTION - PROCESS MAP - NOT IMPLEMENTED");
+  }
+
+  bool findRobot(const cv::Mat &img_in, const double scale, Polygon &triangle, double &x, double &y, double &theta, const std::string &config_folder)
+  {
+    throw std::logic_error("STUDENT FUNCTION - FIND ROBOT - NOT IMPLEMENTED");
+  }
+
+  bool planPath(const Polygon& borders, const std::vector<Polygon>& obstacle_list, const std::vector<Polygon>& gate_list, const std::vector<float> x, const std::vector<float> y, const std::vector<float> theta, std::vector<Path>& path, const std::string& config_folder){
+    throw std::logic_error( "STUDENT FUNCTION - PLAN PATH - NOT IMPLEMENTED" );
+  }
 }
