@@ -2,6 +2,8 @@
 
 #include <stdexcept>
 #include <sstream>
+#include <iostream>
+
 namespace student
 {
   /*!
@@ -16,17 +18,52 @@ namespace student
 * @param[in]  config_folder  A custom string from config file.
 */
   bool planPath(const Polygon& borders, const std::vector<Polygon>& obstacle_list, const std::vector<Polygon>& gate_list, const std::vector<float> x, const std::vector<float> y, const std::vector<float> theta, std::vector<Path>& path, const std::string& config_folder){
-    throw std::logic_error( "STUDENT FUNCTION - PLAN PATH - OWN IMPLEMENTED" );
-  // modification needed: Polygon: std::vector<Point> -> std::vector<visgraph::Point>
-  // may just add the polygon_id one by one
+    std::vector<visgraph::Point> pol;
+    std::vector<std::vector<visgraph::Point>> polygons;
+    for(int i = 0; i<obstacle_list.size(); i++) {
+      for(int j = 0; j<obstacle_list[i].size(); j++) {
+        visgraph::Point trans_point = visgraph::Point(obstacle_list[i][j].x, obstacle_list[i][j].y, i);
+        pol.push_back(trans_point);
+      }
+      polygons.push_back(pol);
+    }
 
-  /** for our task, the evader can be obtained by calling function 
+    dubins::Dubins dubins = dubins::Dubins(1.5, 0.005);
+    dubins::DubinsCurve *result = dubins.findShortestPath(x[0], y[0], theta[0], x[1], y[1], theta[1]);
 
-  professor::processRobot(hsv_img, scale, triangle, x, y, theta, ns);
-  
-  the parameter will lead our function in a mass, also, no data structure up to now deliver this result to student interface!!!
-  May ask the professor to add it, or we should develop it by ourself.
-  **/
+    if (!result) {
+      std::cout << "RESULT NOT VALID\n";
+    } else {
+      std::cout << "RESULT: \n\n";
+      std::cout << "L = " << result->L << "\n\n";
+      std::cout << "a1 = \n"
+                << "\tL = " << result->a1->L << "\n"
+                << "\tk = " << result->a1->k << "\n"
+                << "\tx0 = " << result->a1->x0 << "\n"
+                << "\ty0 = " << result->a1->y0 << "\n"
+                << "\tth0 = " << result->a1->th0 << "\n"
+                << "\tdubins_line-x = " << result->a1->dubins_line->x << "\n"
+                << "\tdubins_line-y = " << result->a1->dubins_line->y << "\n"
+                << "\tdubins_line-th = " << result->a1->dubins_line->th << "\n\n";
+      std::cout << "a2 = \n"
+                << "\tL = " << result->a2->L << "\n"
+                << "\tk = " << result->a2->k << "\n"
+                << "\tx0 = " << result->a2->x0 << "\n"
+                << "\ty0 = " << result->a2->y0 << "\n"
+                << "\tth0 = " << result->a2->th0 << "\n"
+                << "\tdubins_line-x = " << result->a2->dubins_line->x << "\n"
+                << "\tdubins_line-y = " << result->a2->dubins_line->y << "\n"
+                << "\tdubins_line-th = " << result->a2->dubins_line->th << "\n\n";
+      std::cout << "a3 = \n"
+                << "\tL = " << result->a3->L << "\n"
+                << "\tk = " << result->a3->k << "\n"
+                << "\tx0 = " << result->a3->x0 << "\n"
+                << "\ty0 = " << result->a3->y0 << "\n"
+                << "\tth0 = " << result->a3->th0 << "\n"
+                << "\tdubins_line-x = " << result->a3->dubins_line->x << "\n"
+                << "\tdubins_line-y = " << result->a3->dubins_line->y << "\n"
+                << "\tdubins_line-th = " << result->a3->dubins_line->th << "\n\n";
+    }
 
   // *****the controllment for the multi robot*****
   /**  feed the
@@ -40,4 +77,5 @@ namespace student
   {}
   **/
   }
+
 }

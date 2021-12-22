@@ -2,6 +2,12 @@
 
 #include "utils.hpp"
 #include <string>
+#include "dubins.hpp"
+#include "graph.hpp"
+#include "visgraph.hpp"
+#include "open_edges.hpp"
+#include "graphPrint.hpp"
+#include <iostream>
 
 namespace student
 {
