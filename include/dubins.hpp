@@ -12,9 +12,9 @@
 namespace student
 {
    /**
- * @brief Evaluate an arc (circular or straight) composing a Dubins curve, at a given arc length s
- * 
- */
+    * @brief Evaluate an arc (circular or straight) composing a Dubins curve, at a given arc length s
+    * 
+    */
    struct DubinsLine
    {
       double x, y, th;
@@ -30,9 +30,9 @@ namespace student
    };
 
    /**
- * @brief Structure representing an arc of a Dubins curve (it can be either straight or circular)
- * 
- */
+    * @brief Structure representing an arc of a Dubins curve (it can be either straight or circular)
+    * 
+    */
    struct DubinsArc
    {
       double x0, y0, th0, k, L;
@@ -56,9 +56,9 @@ namespace student
    };
 
    /**
- * @brief Structure representing a Dubins curve (it is composed by three arcs)
- * 
- */
+    * @brief Structure representing a Dubins curve (it is composed by three arcs)
+    * 
+    */
    struct DubinsCurve
    {
       DubinsArc *a1;
@@ -87,9 +87,9 @@ namespace student
    };
 
    /**
- * @brief Structure representing the scaled parameters of the dubins problem
- * 
- */
+    * @brief Structure representing the scaled parameters of the dubins problem
+    * 
+    */
    struct ParametersResult
    {
       double scaled_th0, scaled_thf, scaled_k_max, lambda;
@@ -98,9 +98,9 @@ namespace student
    };
 
    /**
- * @brief Structure representing the solution of the original problem
- * 
- */
+    * @brief Structure representing the solution of the original problem
+    * 
+    */
    struct CurveSegmentsResult
    {
       bool ok;
@@ -110,22 +110,22 @@ namespace student
    };
 
    /**
- * @brief Class used to find the best path between two or more points using dubins curves
- * 
- */
+    * @brief Class used to find the best path between two or more points using dubins curves
+    * 
+    */
    class Dubins
    {
    private:
       /**
-     * @brief The total possible curves to consider when solving a dubins problem
-     * 
-     */
+       * @brief The total possible curves to consider when solving a dubins problem
+       * 
+       */
       const int TOTAL_POSSIBLE_CURVES = 10;
 
       /**
-     * @brief The types of curves to consider when solving a dubins problem
-     * 
-     */
+       * @brief The types of curves to consider when solving a dubins problem
+       * 
+       */
       enum possible_curves
       {
          LSL,
@@ -141,9 +141,9 @@ namespace student
       };
 
       /**
-     * @brief The curvature signs, where each element corresponds to one of the possible_curves
-     * 
-     */
+       * @brief The curvature signs, where each element corresponds to one of the possible_curves
+       * 
+       */
       const int ksigns[6][3] = {
           {1, 0, 1},
           {-1, 0, -1},
@@ -154,58 +154,58 @@ namespace student
       };
 
       /**
-     * @brief All the possible angles handled by the solution of the multipoint dubins problem
-     * 
-     */
+       * @brief All the possible angles handled by the solution of the multipoint dubins problem
+       * 
+       */
       const double multipointAngles[8] = {0, M_PI / 4, M_PI / 2, 3.0 / 4 * M_PI, M_PI, 5.0 / 4 * M_PI, 3.0 / 2 * M_PI, 7.0 / 4 * M_PI};
       // const double multipointAngles[4] = {0, M_PI / 2, M_PI, 3.0 / 2 * M_PI};
 
       /**
-     * @brief Bound on maximum path curvature
-     * 
-     */
+       * @brief Bound on maximum path curvature
+       * 
+       */
       double k_max = 1;
 
       /**
-     * @brief Given a path of infinite points, what is the discritizer size? Expressed in meters
-     * 
-     */
+       * @brief Given a path of infinite points, what is the discritizer size? Expressed in meters
+       * 
+       */
       double discritizer_size = 0.005;
 
       /**
-     * @brief Check the validity of a provided Dubins solution
-     * 
-     * @param curve_segments 
-     * @param k0 
-     * @param k1 
-     * @param k2 
-     * @param th0 
-     * @param thf 
-     * @return true If the solution is valid
-     * @return false If the solution is not valid
-     */
+       * @brief Check the validity of a provided Dubins solution
+       * 
+       * @param curve_segments 
+       * @param k0 
+       * @param k1 
+       * @param k2 
+       * @param th0 
+       * @param thf 
+       * @return true If the solution is valid
+       * @return false If the solution is not valid
+       */
       bool checkValidity(CurveSegmentsResult *curve_segments_result, double k0, double k1, double k2, double th0, double thf);
 
       /**
-     * @brief Scale the input parameters to standard form (x0: -1, y0: 0, xf: 1, yf: 0)
-     * 
-     * @param x0 Starting x position
-     * @param y0 Starting y position
-     * @param th0 Starting angle
-     * @param xf Final x position
-     * @param yf Final y position
-     * @param thf Final angle
-     * @return ParametersResult* Scaled parameters
-     */
+       * @brief Scale the input parameters to standard form (x0: -1, y0: 0, xf: 1, yf: 0)
+       * 
+       * @param x0 Starting x position
+       * @param y0 Starting y position
+       * @param th0 Starting angle
+       * @param xf Final x position
+       * @param yf Final y position
+       * @param thf Final angle
+       * @return ParametersResult* Scaled parameters
+       */
       ParametersResult *scaleToStandard(double x0, double y0, double th0, double xf, double yf, double thf);
 
       /**
-     * @brief Return to the initial scaling
-     * 
-     * @param lambda 
-     * @param curve_segments 
-     * @return CurveSegmentsResult* 
-     */
+       * @brief Return to the initial scaling
+       * 
+       * @param lambda 
+       * @param curve_segments 
+       * @return CurveSegmentsResult* 
+       */
       CurveSegmentsResult *scaleFromStandard(double lambda, CurveSegmentsResult *curve_segments);
 
       // Functions to create a solution for the dubins problem, using different types of curves
@@ -227,33 +227,31 @@ namespace student
 
    public:
       /**
-     * @brief Construct a new Dubins object
-     * 
-     */
+       * @brief Construct a new Dubins object
+       * 
+       */
       Dubins() = default;
 
       /**
-     * @brief Construct a new Dubins object
-     * 
-     * @param k_max Bound on maximum path curvature
-     * @param discritizer_size Given a path of infinite points, what is the discritizer size? Expressed in meters
-     */
+       * @brief Construct a new Dubins object
+       * 
+       * @param k_max Bound on maximum path curvature
+       * @param discritizer_size Given a path of infinite points, what is the discritizer size? Expressed in meters
+       */
       explicit Dubins(double k_max, double discritizer_size);
 
       /**
-     * @brief Find the shortest path between a starting and a final position
-     * 
-     * @param x0 Starting x position
-     * @param y0 Starting y position
-     * @param th0 Starting angle
-     * @param xf Final x position
-     * @param yf Final y position
-     * @param thf Final angle
-     * @return DubinsCurve* Resulting curve representing the shortest path
-     */
+       * @brief Find the shortest path between a starting and a final position
+       * 
+       * @param x0 Starting x position
+       * @param y0 Starting y position
+       * @param th0 Starting angle
+       * @param xf Final x position
+       * @param yf Final y position
+       * @param thf Final angle
+       * @return DubinsCurve* Resulting curve representing the shortest path
+       */
       DubinsCurve *findShortestPath(double x0, double y0, double th0, double xf, double yf, double thf);
-
-      bool findCenterAndRadiusFromArc(DubinsArc *arc, Point *center, double &radius);
 
       /**
        * @brief Find the shortest path between a starting and a final position, check for collisions
@@ -305,44 +303,44 @@ namespace student
       void printCompletePath(DubinsCurve **curves, int numberOfCurves, std::vector<std::vector<visgraph::Point>> polygons);
 
       /**
-     * @brief Find if there is an intersection between a circle and a segment
-     * 
-     * @param circleCenter Center of the input circle
-     * @param r Radius of the input circle
-     * @param point1 First point used to define the segment
-     * @param point2 Second point used to define the segment
-     * @param pts Array of intersection points this function has found (passed by ref.)
-     * @param t Coefficient to normalize the segment (passed by ref.)
-     * @return true If an intersection has been found
-     * @return false If an intersection has not been found
-     */
+       * @brief Find if there is an intersection between a circle and a segment
+       * 
+       * @param circleCenter Center of the input circle
+       * @param r Radius of the input circle
+       * @param point1 First point used to define the segment
+       * @param point2 Second point used to define the segment
+       * @param pts Array of intersection points this function has found (passed by ref.)
+       * @param t Coefficient to normalize the segment (passed by ref.)
+       * @return true If an intersection has been found
+       * @return false If an intersection has not been found
+       */
       bool intersCircleLine(Point circleCenter, double r, Point point1, Point point2, std::vector<Point> &pts, std::vector<double> &t);
 
       /**
-     * @brief Find if there is an intersection between an arc and a segment
-     * 
-     * @param arc Arc of a Dubins curve
-     * @param point1 First point used to define the segment
-     * @param point2 Second point used to define the segment
-     * @param pts Array of intersection points this function has found (passed by ref.)
-     * @param t Coefficient to normalize the segment (passed by ref.)
-     * @return true If an intersection has been found
-     * @return false If an intersection has not been found
-     */
+       * @brief Find if there is an intersection between an arc and a segment
+       * 
+       * @param arc Arc of a Dubins curve
+       * @param point1 First point used to define the segment
+       * @param point2 Second point used to define the segment
+       * @param pts Array of intersection points this function has found (passed by ref.)
+       * @param t Coefficient to normalize the segment (passed by ref.)
+       * @return true If an intersection has been found
+       * @return false If an intersection has not been found
+       */
       bool intersArcLine(DubinsArc *arc, Point point1, Point point2, std::vector<Point> &pts, std::vector<double> &t);
 
       /**
-     * @brief Find if there is an intersection between two segments
-     * 
-     * @param p1 First point used to define the first segment
-     * @param p2 Second point used to define the first segment
-     * @param p3 First point used to define the second segment
-     * @param p4 Second point used to define the second segment
-     * @param pts Array of intersection points this function has found (passed by ref.)
-     * @param ts ??? (passed by ref.)
-     * @return true If an intersection has been found
-     * @return false If an intersection has not been found
-     */
+       * @brief Find if there is an intersection between two segments
+       * 
+       * @param p1 First point used to define the first segment
+       * @param p2 Second point used to define the first segment
+       * @param p3 First point used to define the second segment
+       * @param p4 Second point used to define the second segment
+       * @param pts Array of intersection points this function has found (passed by ref.)
+       * @param ts ??? (passed by ref.)
+       * @return true If an intersection has been found
+       * @return false If an intersection has not been found
+       */
       bool intersLineLine(Point p1, Point p2, Point p3, Point p4, std::vector<Point> &pts, std::vector<double> &ts);
    };
 

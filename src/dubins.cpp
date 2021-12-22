@@ -888,58 +888,6 @@ namespace student
         return pts.empty() ? false : true;
     }
 
-    bool Dubins::findCenterAndRadiusFromArc(DubinsArc *arc, Point *center, double &radius) {
-        double tanFirstAngle = tan(arc->th0);
-        double tanSecondAngle = tan(arc->dubins_line->th);
-
-        double m1 = tanFirstAngle == 0 ? INFINITY : (-1 / tanFirstAngle);
-        double m2 = tanSecondAngle == 0 ? INFINITY : (-1 / tanSecondAngle);
-
-        if (tanFirstAngle > 500 || tanFirstAngle < -500)
-            tanFirstAngle = 0;
-        if (tanSecondAngle > 500 || tanSecondAngle < -500)
-            tanSecondAngle = 0;
-
-        // Limit case: the slope is the same
-        if (abs(m1 - m2) < 1.e-1 || abs(m1 + m2) < 1.e-1)
-        {
-            if (arc->x0 == arc->dubins_line->x && arc->y0 == arc->dubins_line->y)
-            {
-                // The two points are the same, no intersection?
-                return false;
-            }
-            else
-            {
-                // The segment between the two points forms the diagonal of the circle
-                // This means the center is in the middle
-                center->x = (arc->x0 + arc->dubins_line->x) / 2;
-                center->y = (arc->y0 + arc->dubins_line->y) / 2;
-            }
-        }
-        else
-        {
-            // Intersection between the two perpendicular lines
-            if (m1 == INFINITY) {
-                double q2 = arc->dubins_line->y - (m2*arc->dubins_line->x);
-                center->x = arc->x0;
-                center->y = m2 * arc->x0 + q2;
-            } else if (m2 == INFINITY) {
-                double q1 = arc->y0 - (m1*arc->x0);
-                center->x = arc->dubins_line->x;
-                center->y = m1 * arc->x0 + q1;
-            } else {
-                double q1 = arc->y0 - (m1*arc->x0);
-                double q2 = arc->dubins_line->y - (m2*arc->dubins_line->x);
-                center->x = (q1 - q2) / (m2 - m1);
-                center->y = m1 * arc->x0 + q1;
-            }
-        }
-
-        // Having the center, we can easily find the radius
-        radius = sqrt(pow(arc->x0 - center->x, 2) + pow(arc->y0 - center->y, 2));
-        return true;
-    }
-
     /**
      * @brief Find if there is an intersection between an arc and a segment
      * 

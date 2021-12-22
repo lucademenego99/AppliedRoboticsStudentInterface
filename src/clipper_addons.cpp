@@ -12,6 +12,7 @@ using namespace ClipperLib;
 
 /**
  * @brief Clipper Polygon Offsetting helper function
+ * We multiply the points by 1000 because Clipper works best under the assumption of working on a certain scale
  * 
  * @param points Points of the original polygon
  * @param offset Offset that must be used to enlarge or shrink the polygon
@@ -28,7 +29,7 @@ std::vector<visgraph::Point> enlarge(std::vector<visgraph::Point> points, double
     
     ClipperOffset co;
     co.AddPath(subj, jtMiter, etClosedPolygon);
-    co.Execute(solution, offset*1000);
+    co.Execute(solution, offset*1000.0);
 
     CleanPolygons(solution);
 
@@ -87,12 +88,11 @@ void printSolution(std::vector<IntPoint> startingPoints, Paths solution)
 /**
  * @brief Verifies if two clipper polygons interact
  * 
- * @param subj The first polygon
- * @param clip The second polygon
- * @return true 
- * @return false 
+ * @param subj The first polygon to check for intersections
+ * @param clip The second polygon to check for intersections
+ * @return true If the two polygons intersect
+ * @return false If the two polygons do not intersect
  */
- 
 bool intersect (student::Point *subj, student::Point *clip){
     Path firstPoly;
     Paths firstFinalPoly;
@@ -119,103 +119,14 @@ bool intersect (student::Point *subj, student::Point *clip){
     return solution.size()!=0;
 }
 
-std::vector<std::vector<student::Point>> verifyAndJoin (student::Point *firstPoly, student::Point *secondPoly){
-    //Intersect need to take as input points instead of Paths
-    ClipperLib::Clipper c;
-    if(intersect(firstPoly, secondPoly)){
-        
-        Path subj;
-        Paths finalSubj;
-        for (int i = 0; i < sizeof(firstPoly); i++){
-            subj << IntPoint(firstPoly[i].x*1000, firstPoly[i].y*1000);
-        }
-        finalSubj.push_back(subj);
-
-        Path clip;
-        Paths finalClip;
-        for (int j = 0; j < sizeof(secondPoly); j++){
-            clip << IntPoint(secondPoly[j].x*1000, secondPoly[j].y*1000);
-        }
-
-        ClipperLib::Paths solution;
-        c.AddPaths(finalSubj, ClipperLib::ptSubject, true);
-        c.AddPaths(finalClip, ClipperLib::ptClip, true);
-        c.Execute(ClipperLib::ctUnion, solution, ClipperLib::pftEvenOdd, ClipperLib::pftNonZero);
-
-        std::vector<student::Point> newPath;
-        std::vector<std::vector<student::Point>> finalPoints;
-
-        for (unsigned int i = 0; i < solution.size(); i++){
-            Path path = solution.at(i);
-            for(IntPoint p : path){
-                newPath.push_back(student::Point(p.X, p.Y));
-            }
-            finalPoints.push_back(newPath);
-            newPath.clear();
-        }
-        return finalPoints;
-    }
-}
-
-
-/**
- * @brief Verifies if a list of polygons has some intersections, if so joins them and then enlarges them all
- * 
- * @param points Matrix of polygons
- */
-std::vector<std::vector<visgraph::Point>> joinAndEnlarge (std::vector<std::vector<visgraph::Point>> points){
-
-    Paths subj(1), clip(points.size()-1), solution;
-    cv::Mat plot(500, 500, CV_8UC3, cv::Scalar(255, 255, 255));
-
-    for (unsigned int i = 0; i < points[0].size(); i++){
-        subj[0].push_back(IntPoint(points[0][i].x*1000, points[0][i].y*1000));
-    }
-    for(unsigned int i = 0; i < clip.size(); i++){
-        for(unsigned int j = 0; j < points[i+1].size(); j++){
-            clip[i].push_back(IntPoint(points[i+1][j].x*1000, points[i+1][j].y*1000));
-        }    
-    }
-    Clipper c;
-    c.AddPaths(subj, ptSubject, true);
-    c.AddPaths(clip, ptClip, true);
-    c.Execute(ctUnion, solution, pftNonZero, pftNonZero);
-
-    std::vector<std::vector<visgraph::Point>> enlargedPolygons;
-    int offset = 4; //Modify the offset of the enlargement process
-
-    for (unsigned int i = 0; i < solution.size(); i++){
-        Path path = solution.at(i);
-        std::vector<visgraph::Point> newPath;
-        for(IntPoint p : path){
-            newPath.push_back(visgraph::Point(p.X, p.Y));
-        }
-        enlargedPolygons.push_back(enlarge(newPath, offset));
-        newPath.clear();
-    }
-    return enlargedPolygons;
-    
-    /*
-    for (unsigned int i = 0; i < solution.size(); i++){
-        Path path = solution.at(i);
-        cv::line(plot, cv::Point2f(path.at(path.size() - 1).X, path.at(path.size() - 1).Y), cv::Point2f(path.at(0).X, path.at(0).Y), cv::Scalar(255, 255, 0), 2);
-        for (unsigned int j = 1; j < path.size(); j++){
-            cv::line(plot, cv::Point2f(path.at(j - 1).X, path.at(j - 1).Y), cv::Point2f(path.at(j).X, path.at(j).Y), cv::Scalar(255, 255, 0), 2);
-        }
-    }
-    cv::flip(plot, plot, 0);
-    cv::imshow("Clipper", plot);
-    cv::waitKey(0);
-    */
-}
 /**
  * @brief Given some obstacles and an offset, creates a "bigger" version using clipper and a "slightly bigger" one, then returns them
  * 
  * @param polygon Obstacles we are considering
- * @param offset Offset for obstacle enhancing
- * @return std::vector<std::vector<student::Point>> 
+ * @param offset Offset for obstacle offsetting
+ * @return std::vector<std::vector<student::Point>> Array containing at position 0 the bigger obstacles and at position 1 the smaller ones
  */
-std::vector<std::vector<visgraph::Point>> applyChanges(std::vector<visgraph::Point> polygon, int offset){
+std::vector<std::vector<visgraph::Point>> enlargeObstaclesWithTwoOffsets(std::vector<visgraph::Point> polygon, double offset){
     double variant = 3.0;
     std::vector<visgraph::Point> newPath;
 
@@ -234,15 +145,23 @@ std::vector<std::vector<visgraph::Point>> applyChanges(std::vector<visgraph::Poi
 
     return finalResult;
 }
-//Name still needs to be defined
-std::vector<std::vector<std::vector<visgraph::Point>>> joinMultiplePolygons(std::vector<std::vector<visgraph::Point>> polygonsList, int offset){
+
+/**
+ * @brief Enlarge the obstacles using the function enlargeObstaclesWithTwoOffsets, then join them in case they collide between each other
+ * The function also removes possible holes that can be formed during the join phase
+ * 
+ * @param polygonsList All the obstacles
+ * @param offset Offset for enlarging them
+ * @return std::vector<std::vector<std::vector<visgraph::Point>>> Array containing at position 0 the bigger obstacles and at position 1 the smaller ones, joined in case of collisions
+ */
+std::vector<std::vector<std::vector<visgraph::Point>>> enlargeAndJoinObstacles(std::vector<std::vector<visgraph::Point>> polygonsList, double offset){
 
     std::vector<std::vector<visgraph::Point>> bigPolygons;
     std::vector<std::vector<visgraph::Point>> smallPolygons;
 
     for (int i = 0; i < polygonsList.size(); i++){
         std::vector<std::vector<visgraph::Point>> results;
-        results = applyChanges(polygonsList[i], offset);
+        results = enlargeObstaclesWithTwoOffsets(polygonsList[i], offset);
         bigPolygons.push_back(results[0]);
         smallPolygons.push_back(results[1]);
         results.clear();

@@ -17,6 +17,7 @@ namespace visgraph
 
         /**
         * @brief Point constructor
+        * 
         * @param x coordinate
         * @param Y coordinate
         * @param polygonId the ID of the polygon
@@ -24,8 +25,9 @@ namespace visgraph
         Point(double x_coor, double y_coor, int polygonId = -1);
 
         /**
-        * @brief Prints the coordinates of the point
-        */
+         * @brief Prints the coordinates of the point
+         * 
+         */
         void print();
 
         /**
@@ -57,6 +59,7 @@ namespace visgraph
 
         /**
         * @brief Constructor for Edge
+        * 
         * @param p1 First point
         * @param p2 Second point
         */
@@ -73,6 +76,7 @@ namespace visgraph
 
         /**
         * @brief Fetches the adjacent points to a certain point
+        * 
         * @param point Point we're interested in
         * @return returns the adjacent
         */
@@ -80,6 +84,7 @@ namespace visgraph
 
         /**
         * @brief Checks if a point is part of the edge
+        * 
         * @param point Point we need to find
         * @return return whether or not the point is present
         */
@@ -87,21 +92,22 @@ namespace visgraph
 
         /**
         * @brief Prints the basic information of the edge
+        * 
         */
         void print();
         bool operator==(const Edge &ob) const;
     };
 
-    /* Data structure to represent the graph in which we have
-    a Map with as keys structure Point and as values a vector 
-    of Edge
-    */
+    /**
+     * @brief Data structure to represent the graph in which we have a Map with as keys structure Point and as values a vector of Edge
+     * 
+     */
     typedef std::map<Point, std::vector<Edge>> DictG;
 
-    /* Data structure to represent the polygons that are present
-    in the arena: a Map which has as keys IDs and as values a vector
-    of Edge
-    */
+    /**
+     * @brief Data structure to represent the polygons that are present in the arena: a Map which has as keys IDs and as values a vector of Edge
+     * 
+     */
     typedef std::map<int, std::vector<Edge>> DictP;
 
     class Graph
@@ -120,6 +126,7 @@ namespace visgraph
 
         /**
         * @brief Constructor of the graph
+        * 
         * @param polygons a map of polygons, keys are IDs and values the edges
         * @returns the complete graph
         */
@@ -139,6 +146,7 @@ namespace visgraph
 
         /**
         * @brief returns the adjacent edges to a certain point
+        * 
         * @param point the point we want to consider
         * @param edges an empty list to fill with the edges that have been found
         */
@@ -146,30 +154,35 @@ namespace visgraph
 
         /**
         * @brief returns a list of all the points in the map
+        * 
         * @param points the empty vector of points
         */
         std::vector<Point> getPoints();
 
         /**
         * @brief returns all the edges
+        * 
         * @param edges the empty vector of edges
         */
         std::vector<Edge> getEdges();
 
         /**
         * @brief adds an edge to the list of edges
+        * 
         * @param edge the one we want to insert
         */
         void addEdge(Edge edge);
 
         /**
         * @brief get every edge associated to a point
+        * 
         * @param point point we want to search
         */
         std::vector<Edge> getItems(Point point);
 
         /** 
         * @brief checks if the map contains a point, if it does returns the edges of that point
+        * 
         * @param point the point we need to check
         * @param edges the empty vector to fill
         */
@@ -177,6 +190,7 @@ namespace visgraph
 
         /**
         * @brief checks if the vector of edges contains a specific edge, returns it after retrieving it
+        * 
         * @param e the edge we are looking for
         */
         Edge containsE(Edge e);

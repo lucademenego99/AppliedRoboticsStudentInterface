@@ -11,86 +11,23 @@
 using namespace student;
 
 void shortestPathDubinsTest(Dubins dubins);
-void multipointDubinsTest(Dubins dubins);
 void multipointDubinsAndVisgraphTest(Dubins dubins);
 void intersectionsTest(Dubins dubins);
-void clipperTest();
-void structuresTest();
 void openEdgesTest();
-void visgraphTest();
-void clipperJoinAndEnlargeTest();
 
 int main(int argc, char *argv[])
 {
-    Dubins dubins = Dubins(1.5, 0.005);
+    Dubins dubins = Dubins(1.9, 0.005);
 
     // shortestPathDubinsTest(dubins);
-
-    // multipointDubinsTest(dubins);
 
     multipointDubinsAndVisgraphTest(dubins);
 
     // intersectionsTest(dubins);
 
-    // clipperTest();
-
-    // structuresTest();
-
     // openEdgesTest();
-
-    // visgraphTest();
-
-    //Small test for the alternative intersection we might considers, since the other one is problematic
-    // std::vector<student::Point> points;
-    // std::vector<double> t;
-    // Dubins dubin;
-    // std::cout << dubin.intersLineLine(student::Point(450, 30), student::Point(330,700), student::Point(230,700), student::Point(330,700), points, t) << "\n";
-    // for( student::Point p : points){
-    //     std::cout << "X intersection: " << p.x << "\n";
-    //     std::cout << "Y intersection: " << p.y << "\n";
-    // }
     
     return 0;
-}
-
-void visgraphTest() {
-    std::vector<std::vector<visgraph::Point>> polygons;
-
-    // std::vector<visgraph::Point> pol1 {visgraph::Point(2.0, 1.0), visgraph::Point(3.0, 1.0), visgraph::Point(4.0, 2.0), visgraph::Point(3.0, 3.0), visgraph::Point(2.0, 3.0), visgraph::Point(1.0, 2.0), visgraph::Point(2.0, 1.0)};
-    // std::vector<visgraph::Point> pol2 {visgraph::Point(1.0, 3.5), visgraph::Point(6.0, 6.0), visgraph::Point(1.0, 6.0), visgraph::Point(1.0, 3.5)};
-    // std::vector<visgraph::Point> pol3 {visgraph::Point(7.0, 2.0), visgraph::Point(8.0, 3.0), visgraph::Point(7.0, 5.0), visgraph::Point(6.0, 3.0), visgraph::Point(7.0,2.0)};
-
-    // std::vector<visgraph::Point> pol1 {visgraph::Point(1.0, 1.0), visgraph::Point(3.0, 1.0), visgraph::Point(4.0, 5.0), visgraph::Point(1.0, 4.0)};
-    // std::vector<visgraph::Point> pol2 {visgraph::Point(1.0, 5.0), visgraph::Point(4.0, 5.5), visgraph::Point(4.0, 6.0), visgraph::Point(1.0, 5.5)};
-    // std::vector<visgraph::Point> pol3 {visgraph::Point(6.0, 1.0), visgraph::Point(8.0, 1.0), visgraph::Point(9.0, 3.0), visgraph::Point(6.5, 5.0), visgraph::Point(5.0,3.0)};
-
-    // std::vector<visgraph::Point> pol1 {visgraph::Point(1.0, 1.0), visgraph::Point(10.0, 0.3), visgraph::Point(4.0, 3.0), visgraph::Point(2.0, 2.5), visgraph::Point(1.0, 1.5)};
-    // std::vector<visgraph::Point> pol2 {visgraph::Point(0.7, 2.0), visgraph::Point(2.0, 3.0), visgraph::Point(1.5, 4.5)};
-    // std::vector<visgraph::Point> pol3 {visgraph::Point(2.0, 6.0), visgraph::Point(2.3, 7.0), visgraph::Point(3.3, 7.0), visgraph::Point(6.6, 8.0)};
-
-    std::vector<visgraph::Point> pol1 {visgraph::Point(1.0, 1.0), visgraph::Point(4.0, 1.0), visgraph::Point(4.0, 3.0), visgraph::Point(1.0, 3.0)};
-    std::vector<visgraph::Point> pol2 {visgraph::Point(1.0, 3.5), visgraph::Point(4.0, 3.5), visgraph::Point(4.0, 5.5), visgraph::Point(1.0, 5.5)};
-    std::vector<visgraph::Point> pol3 {visgraph::Point(1.0, 6.0), visgraph::Point(4.0, 6.0), visgraph::Point(4.0, 8.0), visgraph::Point(1.0, 8.0)};
-    std::vector<visgraph::Point> pol4 {visgraph::Point(5.0, 1.0), visgraph::Point(7.0, 1.0), visgraph::Point(7.0, 7.0), visgraph::Point(5.0, 7.0)};
-
-    polygons.push_back(pol1);
-    polygons.push_back(pol2);
-    polygons.push_back(pol3);
-    polygons.push_back(pol4);
-
-    visgraph::Point origin = visgraph::Point(5,0.3);
-    visgraph::Point destination = visgraph::Point(9, 2);
-
-    visgraph::VisGraph visg = visgraph::VisGraph();
-
-    visgraph::Graph g = visg.computeVisibilityGraph(polygons, origin, destination);
-
-    std::cout << "SHORTEST PATH:\n";
-    std::vector<visgraph::Point> path = g.shortestPath(origin, destination);
-    for(int it = 0; it < path.size(); it++)
-        path[it].print();
-    
-    printGraph(g.graph, origin, destination, path);
 }
 
 void openEdgesTest() {
@@ -102,86 +39,6 @@ void openEdgesTest() {
 
     visgraph::Edge edge = openEdges.getEdge(0);
     edge.print();
-}
-
-void structuresTest(){
-    std::cout << "STRUCTURES TEST\n";
-    visgraph::Point p = visgraph::Point(5, 6, 1);
-    std::cout << "Point: \n";
-    std::cout << "x = " << p.x << "\n"
-              << "y = " << p.y << "\n"
-              << "polygon id = " << p.polygonId << "\n";
-    visgraph::Point p2 = visgraph::Point(10, 5, 2);
-    visgraph::Edge e = visgraph::Edge(p, p2);
-    std::cout << "x = " << e.p1.x << "\n"
-              << "y = " << e.p1.y << "\n"
-              << "polygon id = " << e.p1.polygonId << "\n";
-    std::cout << "x = " << e.p2.x << "\n"
-              << "y = " << e.p2.y << "\n"
-              << "polygon id = " << e.p2.polygonId << "\n";
-    visgraph::Point p3 = visgraph::Point(5, 6, 1);
-    bool value = p3 == p;
-    std::cout << "1: Equals : " << value << "\n";
-    value = p3 == p2;
-    std::cout << "2: Equals : " << value << "\n";
-    value = !(p3 == p2);
-    std::cout << "3: Equals : " << value << "\n";
-
-    p.print();
-
-    visgraph::Edge e2 = visgraph::Edge(p3, p2);
-    visgraph::Point p5 = e2.getAdjacent(p2);
-    p5.print();
-
-    value = e2.contains(p3);
-    std::cout << "E2 contains E3? " << value << "\n";
-
-    value = e2 == e;
-    std::cout << "E2 eq E? " << value << "\n";
-    value = !(e2 == e);
-    std::cout << "E2 notEq E? " << value << "\n";
-
-    e2.print();
-    std::vector<visgraph::Point> points;
-    points.push_back(p);
-    points.push_back(p2);
-    points.push_back(p3);
-    points.push_back(p5);
-
-    std::vector<visgraph::Point> points2;
-    points2.push_back(p3);
-    points2.push_back(p5);
-    points2.push_back(p);
-    points2.push_back(p2);
-    std::vector<std::vector<visgraph::Point>> shapes;
-    shapes.push_back(points);
-    shapes.push_back(points2);
-    visgraph::Graph graph = visgraph::Graph(shapes);
-    std::vector<visgraph::Point> results = graph.getAdjacentPoints(p2);
-    /*for(Point p : results){
-        std::cout << "Get Adjacent: " << p.x << " + " << p.y << " + " << p.polygon_id << "\n";
-    }*/
-    results.clear();
-    results = graph.getPoints();
-    /*for(Point p : results){
-        std::cout << "Get points: " << p.x << " + " << p.y << " + " << p.polygon_id << "\n";
-    }*/
-    std::vector<visgraph::Edge> edges = graph.getEdges();
-    /*for(Edge e : edges){
-        e.print();
-    }*/
-    edges.clear();
-    edges = graph.getItems(p);
-    /*for(Edge e : edges){
-        e.print();
-    }*/
-    edges.clear();
-    edges = graph.containsP(p2);
-    /*for(Edge e : edges){
-        e.print();
-    }*/
-    visgraph::Edge result = graph.containsE(e);
-    result.print();
 }
 
 void shortestPathDubinsTest(Dubins dubins)
@@ -239,68 +96,33 @@ void shortestPathDubinsTest(Dubins dubins)
     }
 }
 
-void multipointDubinsTest(Dubins dubins)
-{
-    // std::cout << "MULTIPOINT SHORTEST PATH TEST\n";
-    // student::Point **points = new student::Point *[3];
-    // points[0] = new student::Point(0.2, 0.2, 0);
-    // points[1] = new student::Point(0.9, 0.8);
-    // points[2] = new student::Point(1.4, 0.2, 0);
-    // dubins.multipointShortestPath(points, 3);
-
-    // student::Point **points = new student::Point *[5];
-    // points[0] = new student::Point(0.2, 0.2, M_PI);
-    // points[1] = new student::Point(0.9, 0.8);
-    // points[2] = new student::Point(0.4, 0.5);
-    // points[3] = new student::Point(0.7, 0.8);
-    // points[4] = new student::Point(1.4, 0.2, 0);
-    // dubins.multipointShortestPath(points, 5);
-
-    // student::Point **points = new student::Point*[10];
-    // points[0] = new student::Point(0.2, 0.2, M_PI);
-    // points[1] = new student::Point(0.9, 0.8);
-    // points[2] = new student::Point(0.4, 0.5);
-    // points[3] = new student::Point(0.7, 0.8);
-    // points[4] = new student::Point(0.9, 0.8);
-    // points[5] = new student::Point(0.4, 0.5);
-    // points[6] = new student::Point(0.7, 0.8);
-    // points[7] = new student::Point(0.9, 0.8);
-    // points[8] = new student::Point(0.4, 0.5);
-    // points[9] = new student::Point(1.4, 0.2, 0);
-    // dubins.multipointShortestPath(points, 10);
-
-    // student::Point **points = new student::Point*[3];
-    // points[0] = new student::Point(0.2, 0.2, 0);
-    // points[1] = new student::Point(0.4, 0.2);
-    // points[2] = new student::Point(0.6, 0.2, 0);
-    // dubins.multipointShortestPath(points, 3);
-}
-
 void multipointDubinsAndVisgraphTest(Dubins dubins)
 {
     student::Polygon polTmp;
     std::vector<double> tTmp;
 
     std::vector<std::vector<visgraph::Point>> polygons, polygonsForVisgraph;
-    std::vector<visgraph::Point> pol1 {visgraph::Point(1.5, 1.5), visgraph::Point(3.5, 1.5), visgraph::Point(5.0, 3.0), visgraph::Point(3.5, 4.5), visgraph::Point(1.5, 4.5), visgraph::Point(0.0, 3.0)};
-    std::vector<visgraph::Point> pol2 {visgraph::Point(5.0, 5.0), visgraph::Point(8.0, 5.0), visgraph::Point(8.0, 11.0), visgraph::Point(5.0, 11.0)};
-    std::vector<visgraph::Point> pol3 {visgraph::Point(12.0, 1.0), visgraph::Point(14.0, 4.0), visgraph::Point(12.0, 7.0), visgraph::Point(10.0, 4.0)};
-    std::vector<visgraph::Point> pol4 {visgraph::Point(18.0, 3.0), visgraph::Point(23.0, 7.0), visgraph::Point(12.0, 19.0), visgraph::Point(8.0, 14.0)};
-    // std::vector<visgraph::Point> pol1 {visgraph::Point(2.0, 1.0), visgraph::Point(3.0, 1.0), visgraph::Point(4.0, 2.0), visgraph::Point(3.0, 3.0), visgraph::Point(2.0, 3.0), visgraph::Point(1.0, 2.0), visgraph::Point(2.0, 1.0)};
-    // std::vector<visgraph::Point> pol2 {visgraph::Point(1.0, 3.5), visgraph::Point(6.0, 6.0), visgraph::Point(1.0, 6.0), visgraph::Point(1.0, 3.5)};
-    // std::vector<visgraph::Point> pol3 {visgraph::Point(7.0, 2.0), visgraph::Point(8.0, 3.0), visgraph::Point(7.0, 5.0), visgraph::Point(6.0, 3.0), visgraph::Point(7.0,2.0)};
+    // std::vector<visgraph::Point> pol1 {visgraph::Point(1.5, 1.5), visgraph::Point(3.5, 1.5), visgraph::Point(5.0, 3.0), visgraph::Point(3.5, 4.5), visgraph::Point(1.5, 4.5), visgraph::Point(0.0, 3.0)};
+    // std::vector<visgraph::Point> pol2 {visgraph::Point(5.0, 5.0), visgraph::Point(8.0, 5.0), visgraph::Point(8.0, 11.0), visgraph::Point(5.0, 11.0)};
+    // std::vector<visgraph::Point> pol3 {visgraph::Point(12.0, 1.0), visgraph::Point(14.0, 4.0), visgraph::Point(12.0, 7.0), visgraph::Point(10.0, 4.0)};
+    // std::vector<visgraph::Point> pol4 {visgraph::Point(18.0, 3.0), visgraph::Point(23.0, 7.0), visgraph::Point(12.0, 19.0), visgraph::Point(8.0, 14.0)};
+    // visgraph::Point origin = visgraph::Point(1.0, 8.0);
+    // visgraph::Point destination = visgraph::Point(24.0, 2.0);
+
+    std::vector<visgraph::Point> pol1 {visgraph::Point(2.0, 1.0), visgraph::Point(3.0, 1.0), visgraph::Point(4.0, 2.0), visgraph::Point(3.0, 3.0), visgraph::Point(2.0, 3.0), visgraph::Point(1.0, 2.0), visgraph::Point(2.0, 1.0)};
+    std::vector<visgraph::Point> pol2 {visgraph::Point(1.0, 3.5), visgraph::Point(6.0, 6.0), visgraph::Point(1.0, 6.0), visgraph::Point(1.0, 3.5)};
+    std::vector<visgraph::Point> pol3 {visgraph::Point(7.0, 2.0), visgraph::Point(8.0, 3.0), visgraph::Point(7.0, 5.0), visgraph::Point(6.0, 3.0), visgraph::Point(7.0,2.0)};
+    visgraph::Point origin = visgraph::Point(1.0, 8.0);
+    visgraph::Point destination = visgraph::Point(5.0, 4.0);
 
     polygons.push_back(pol1);
     polygons.push_back(pol2);
     polygons.push_back(pol3);
-    polygons.push_back(pol4);
-    std::vector<std::vector<std::vector<visgraph::Point>>> pols = joinMultiplePolygons(polygons, 1);
+    // polygons.push_back(pol4);
+    std::vector<std::vector<std::vector<visgraph::Point>>> pols = enlargeAndJoinObstacles(polygons, 0.5);
 
     polygonsForVisgraph = pols[0];
     polygons = pols[1];
-
-    visgraph::Point origin = visgraph::Point(1.0, 8.0);
-    visgraph::Point destination = visgraph::Point(24.0, 2.0);
 
     visgraph::VisGraph visg;
 
@@ -324,7 +146,7 @@ void multipointDubinsAndVisgraphTest(Dubins dubins)
     // COMPUTE MULTIPOINT DUBINS SHORTEST PATH
     std::cout << "MULTIPOINT SHORTEST PATH TEST\n";
     student::Point **points = new student::Point *[path.size()];
-    points[0] = new student::Point(path[0].x, path[0].y, -2.5);
+    points[0] = new student::Point(path[0].x, path[0].y, 0);
     for(int i = 1; i < path.size()-1; i++) {
         points[i] = new student::Point(path[i].x, path[i].y);
     }
@@ -396,54 +218,4 @@ void intersectionsTest(Dubins dubins)
     //         std::cout << ts[i] << "\n";
     //     }
     // }
-}
-
-void clipperTest()
-{
-    // std::cout << "CLIPPER TEST\n";
-    // std::vector<ClipperLib::IntPoint> points;
-    // points.push_back(ClipperLib::IntPoint(348, 257));
-    // points.push_back(ClipperLib::IntPoint(364, 148));
-    // points.push_back(ClipperLib::IntPoint(362, 148));
-    // points.push_back(ClipperLib::IntPoint(326, 241));
-    // points.push_back(ClipperLib::IntPoint(295, 219));
-    // points.push_back(ClipperLib::IntPoint(258, 88));
-    // points.push_back(ClipperLib::IntPoint(440, 129));
-    // points.push_back(ClipperLib::IntPoint(370, 196));
-    // points.push_back(ClipperLib::IntPoint(372, 275));
-
-    // ClipperLib::Paths paths = enlarge(points, 7.0);
-    // printSolution(points, paths);
-}
-
-void clipperJoinAndEnlargeTest(){
-    // std::vector<IntPoint> points;
-    // points.push_back(ClipperLib::IntPoint(150, 110));
-    // points.push_back(ClipperLib::IntPoint(150, 200));
-    // points.push_back(ClipperLib::IntPoint(360, 200));
-    // points.push_back(ClipperLib::IntPoint(400, 110));
-    // points.push_back(ClipperLib::IntPoint(150, 110));
-
-    // std::vector<std::vector<IntPoint>> polygons;
-    // polygons.push_back(points);
-
-    // std::vector<IntPoint> points1;
-    // points1.push_back(ClipperLib::IntPoint(10, 10));
-    // points1.push_back(ClipperLib::IntPoint(80, 80));
-    // points1.push_back(ClipperLib::IntPoint(150, 80));
-    // points1.push_back(ClipperLib::IntPoint(10, 10));
-
-    // polygons.push_back(points1);
-
-    // std::vector<IntPoint> points2;
-    // points2.push_back(ClipperLib::IntPoint(410, 410));
-    // points2.push_back(ClipperLib::IntPoint(320, 320));
-    // points2.push_back(ClipperLib::IntPoint(330, 320));
-    // points2.push_back(ClipperLib::IntPoint(410, 410));
-
-    // polygons.push_back(points2);
-
-    // std::vector<Paths> enlargedPolygons;
-
-    // enlargedPolygons = joinAndEnlarge(polygons);
 }
