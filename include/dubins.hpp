@@ -223,7 +223,7 @@ namespace dubins
        * @param numberOfPoints The number of points provided
        * @return double* Array of optimal angles
        */
-      double *multipointShortestPathAngles(Point **points, unsigned int numberOfPoints, visgraph::Graph &graph);
+      double *multipointShortestPathAngles(DubinsPoint **points, unsigned int numberOfPoints, visgraph::Graph &graph);
 
    public:
       /**
@@ -274,7 +274,7 @@ namespace dubins
        * @param numberOfPoints Number of points we have
        * @return DubinsCurve** Array of DubinsCurves
        */
-      DubinsCurve **multipointShortestPath(Point **points, unsigned int numberOfPoints, visgraph::Graph &graph);
+      DubinsCurve **multipointShortestPath(DubinsPoint **points, unsigned int numberOfPoints, visgraph::Graph &graph);
 
       /**
        * @brief Helper function to plot with opencv a Dubins Arc
@@ -314,7 +314,7 @@ namespace dubins
        * @return true If an intersection has been found
        * @return false If an intersection has not been found
        */
-      bool intersCircleLine(Point circleCenter, double r, Point point1, Point point2, std::vector<Point> &pts, std::vector<double> &t);
+      bool intersCircleLine(DubinsPoint circleCenter, double r, DubinsPoint point1, DubinsPoint point2, std::vector<DubinsPoint> &pts, std::vector<double> &t);
 
       /**
        * @brief Find if there is an intersection between an arc and a segment
@@ -327,7 +327,7 @@ namespace dubins
        * @return true If an intersection has been found
        * @return false If an intersection has not been found
        */
-      bool intersArcLine(DubinsArc *arc, Point point1, Point point2, std::vector<Point> &pts, std::vector<double> &t);
+      bool intersArcLine(DubinsArc *arc, DubinsPoint point1, DubinsPoint point2, std::vector<DubinsPoint> &pts, std::vector<double> &t);
 
       /**
        * @brief Find if there is an intersection between two segments
@@ -341,7 +341,7 @@ namespace dubins
        * @return true If an intersection has been found
        * @return false If an intersection has not been found
        */
-      bool intersLineLine(Point p1, Point p2, Point p3, Point p4, std::vector<Point> &pts, std::vector<double> &ts);
+      bool intersLineLine(DubinsPoint p1, DubinsPoint p2, DubinsPoint p3, DubinsPoint p4, std::vector<DubinsPoint> &pts, std::vector<double> &ts);
    };
 
 }

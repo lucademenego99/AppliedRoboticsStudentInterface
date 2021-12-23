@@ -70,7 +70,7 @@ namespace dubins
      * @param b Second input point
      * @return double Cross product between provided points
      */
-    double crossProduct(Point a, Point b)
+    double crossProduct(DubinsPoint a, DubinsPoint b)
     {
         return a.x * b.y - a.y * b.x;
     }
@@ -82,7 +82,7 @@ namespace dubins
      * @param b Second input point
      * @return double Dot product between provided points
      */
-    double dot2D(Point a, Point b)
+    double dot2D(DubinsPoint a, DubinsPoint b)
     {
         return a.x * b.x + a.y * b.y;
     }

@@ -3,8 +3,6 @@
 
 #include "clipper.hpp"
 
-using namespace ClipperLib;
-
 /**
  * @brief Clipper Polygon Offsetting helper function
  * We multiply the points by 1000 because Clipper works best under the assumption of working on a certain scale
@@ -21,7 +19,7 @@ std::vector<visgraph::Point> enlarge(std::vector<visgraph::Point> points, double
  * @param startingPoints Points of the original polygon
  * @param solution Solution given by clipper
  */
-void printSolution(std::vector<IntPoint> points, Paths solution);
+void printSolution(std::vector<ClipperLib::IntPoint> points, ClipperLib::Paths solution);
 
 
 /**
@@ -32,7 +30,7 @@ void printSolution(std::vector<IntPoint> points, Paths solution);
  * @return true If the two polygons intersect
  * @return false If the two polygons do not intersect
  */
-bool intersect (dubins::Point *subj, dubins::Point *clip);
+bool intersect (dubins::DubinsPoint *subj, dubins::DubinsPoint *clip);
 
 /**
  * @brief Given some obstacles and an offset, creates a "bigger" version using clipper and a "slightly bigger" one, then returns them

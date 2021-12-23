@@ -6,65 +6,6 @@
 #include <vector>
 #include <cstddef>
 
-namespace student {
-  struct Point 
-  {
-    float x, y;
-
-    Point(float x, float y): x(x), y(y) {}
-    Point(): Point(0, 0) {}
-  };
-
-  /**
-   * @brief A polygon, expessed as a list of 2D points
-   * 
-   */
-  typedef std::vector<Point> Polygon;
-
-  /**
-   * @brief A configuration of the robot along the path, represented by x, y, orientation and curvature
-   * 
-   */
-  struct Pose
-  {
-    float s, x, y, theta, kappa;
-
-    Pose(float s, float x, float y, float theta, float kappa) : s(s), x(x), y(y), theta(theta), kappa(kappa)
-    {
-    }
-
-    Pose() : Pose(0, 0, 0, 0, 0)
-    {
-    }
-
-    float distance(float _x, float _y)
-    {
-      return std::hypot(x - _x, y - _y);
-    }
-  };
-
-  /**
-   * @brief A sequence of sampled robot configurations composing a (discretization of the) path
-   * 
-   */
-  struct Path
-  {
-    std::vector<Pose> points;
-
-    Path(std::vector<Pose> const &points) : points(points)
-    {
-    }
-
-    Path()
-    {
-    }
-
-    bool empty() { return points.empty(); }
-    size_t size() { return points.size(); }
-    void setPoints(const std::vector<Pose> &points) { this->points = points; }
-  };
-}
-
 namespace dubins
 {
   /**
@@ -73,18 +14,12 @@ namespace dubins
    * - a point representing a position (x,y,theta)
    * 
    */
-  struct Point
+  struct DubinsPoint
   {
     double x, y, th;
 
-    Point(double x = -1, double y = -1, double th = -1) : x(x), y(y), th(th) {}
+    DubinsPoint(double x = -1, double y = -1, double th = -1) : x(x), y(y), th(th) {}
   };
-
-  /**
-   * @brief A polygon, expessed as a list of 2D points
-   * 
-   */
-  typedef std::vector<Point> Polygon;
 
   /**
    * @brief Implementation of function sinc(t)
@@ -117,7 +52,7 @@ namespace dubins
    * @param b Second input point
    * @return double Cross product between provided points
    */
-  double crossProduct(Point a, Point b);
+  double crossProduct(DubinsPoint a, DubinsPoint b);
 
   /**
    * @brief Calculates the dot product between two Points
@@ -126,7 +61,7 @@ namespace dubins
    * @param b Second input point
    * @return double Dot product between provided points
    */
-  double dot2D(Point a, Point b);
+  double dot2D(DubinsPoint a, DubinsPoint b);
 
 }
 

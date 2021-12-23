@@ -144,12 +144,12 @@ void multipointDubinsAndVisgraphTest(Dubins dubins)
 
     // COMPUTE MULTIPOINT DUBINS SHORTEST PATH
     std::cout << "MULTIPOINT SHORTEST PATH TEST\n";
-    dubins::Point **points = new dubins::Point *[path.size()];
-    points[0] = new dubins::Point(path[0].x, path[0].y, 0);
+    dubins::DubinsPoint **points = new dubins::DubinsPoint *[path.size()];
+    points[0] = new dubins::DubinsPoint(path[0].x, path[0].y, 0);
     for(int i = 1; i < path.size()-1; i++) {
-        points[i] = new dubins::Point(path[i].x, path[i].y);
+        points[i] = new dubins::DubinsPoint(path[i].x, path[i].y);
     }
-    points[path.size()-1] = new dubins::Point(path[path.size()-1].x, path[path.size()-1].y);
+    points[path.size()-1] = new dubins::DubinsPoint(path[path.size()-1].x, path[path.size()-1].y);
 
     DubinsCurve **curves = dubins.multipointShortestPath(points, path.size(), originalGraph);
     if (curves == nullptr) {
@@ -163,10 +163,10 @@ void multipointDubinsAndVisgraphTest(Dubins dubins)
 void intersectionsTest(Dubins dubins)
 {
     std::cout << "INTERSECTIONS TEST\n";
-    std::vector<dubins::Point> intersections = std::vector<dubins::Point>();
+    std::vector<dubins::DubinsPoint> intersections = std::vector<dubins::DubinsPoint>();
     std::vector<double> ts = std::vector<double>();
 
-    bool res = dubins.intersLineLine(dubins::Point(1, 1), dubins::Point(66.57, 0.367), dubins::Point(56.01, 18.22), dubins::Point(56.01, 0.067), intersections, ts);
+    bool res = dubins.intersLineLine(dubins::DubinsPoint(1, 1), dubins::DubinsPoint(66.57, 0.367), dubins::DubinsPoint(56.01, 18.22), dubins::DubinsPoint(56.01, 0.067), intersections, ts);
     std::cout << "RES: " << res << "\n";
     if (res)
     {
@@ -182,7 +182,7 @@ void intersectionsTest(Dubins dubins)
         }
     }
 
-    // bool res = dubins.intersCircleLine(dubins::Point(2, 2), 1, dubins::Point(0, 0), dubins::Point(4, 4), intersections, ts);
+    // bool res = dubins.intersCircleLine(dubins::DubinsPoint(2, 2), 1, dubins::DubinsPoint(0, 0), dubins::DubinsPoint(4, 4), intersections, ts);
     // std::cout << "RES: " << res << "\n";
     // if (res)
     // {
@@ -202,7 +202,7 @@ void intersectionsTest(Dubins dubins)
     // std::cout << "ARC:\n"
     //           << arc->x0 << " , " << arc->y0 << " , " << arc->th0 << "\n";
     // std::cout << arc->dubins_line->x << " , " << arc->dubins_line->y << " , " << arc->dubins_line->th << "\n";
-    // bool res = dubins.intersArcLine(arc, dubins::Point(0, -1), dubins::Point(1, 0), intersections, ts);
+    // bool res = dubins.intersArcLine(arc, dubins::DubinsPoint(0, -1), dubins::DubinsPoint(1, 0), intersections, ts);
     // std::cout << "\n\nRES: " << res << "\n";
     // if (res)
     // {
