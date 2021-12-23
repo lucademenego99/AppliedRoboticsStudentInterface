@@ -44,7 +44,7 @@ namespace visgraph
         for (int i = 0; i < allPoints.size(); i++)
         {
             // Get the visible vertices from the point we are considering
-            vector<Point> visibleVertices = getVisibleVertices(allPoints[i], initial);
+            vector<Point> visibleVertices = getVisibleVertices(allPoints[i], initial, origin, destination);
             // Add an edge (a,b) if b is visible from a
             for (int j = 0; j < visibleVertices.size(); j++)
             {
@@ -225,10 +225,6 @@ namespace visgraph
         for (Edge edge : polygonEdges) {
             // Check if the line segment from p1 to p2 intersects the edge
             if (dubin.intersLineLine(student::Point(p1.x, p1.y), student::Point(p2.x, p2.y), student::Point(edge.p1.x, edge.p1.y), student::Point(edge.p2.x, edge.p2.y), results, t)) {
-                // Special case: they are all collinear
-                if (getOrientation(edge.p1, p1, edge.p2) == COLLINEAR)
-                    return onSegment(edge.p1, p1, edge.p2);
-                
                 // Another special case to manage collinear points - if we are intersecting an edge on its vertex, then
                 // we don't want to calculate two intersections, but one. So in that case we
                 // add 1 to intersectCount only if the collinearPoint's y is greater than p1.y
@@ -350,7 +346,7 @@ namespace visgraph
     {
         // See https://www.geeksforgeeks.org/orientation-3-ordered-points/
         // for details of below formula.
-        int val = (q.y - p.y) * (r.x - q.x) -
+        double val = (q.y - p.y) * (r.x - q.x) -
                   (q.x - p.x) * (r.y - q.y);
 
         if (val == 0)

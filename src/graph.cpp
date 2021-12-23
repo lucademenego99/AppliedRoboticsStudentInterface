@@ -4,6 +4,9 @@
 #include <vector>
 #include <set>
 #include "graph.hpp"
+#include "visgraph.hpp"
+#include "utils.hpp"
+#include "dubins.hpp"
 
 using namespace visgraph;
 
@@ -108,9 +111,9 @@ bool Edge::operator==(const Edge &ob) const{
  * @param polygons a map of polygons, keys are IDs and values the edges
  * @returns the complete graph
  */
-Graph::Graph (std::vector<std::vector<Point>> shapes, bool isVisGraph){
+Graph::Graph (std::vector<std::vector<Point>> shapes, bool isVisGraph, bool isOriginalGraph){
     isVisibilityGraph = isVisGraph; // Remember if we are dealing with a visibility graph
-    if (!isVisibilityGraph) {
+    if (!isVisibilityGraph && !isOriginalGraph) {
         // Work with enlarged numbers by a factor ENLARGE_FACTOR
         // In this way during the computation of the visibility graph,
         // there will be no floating point calculations errors due to too small numbers

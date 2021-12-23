@@ -10,8 +10,7 @@
  * @param origin starting point
  * @param destination destination point
  * @param shortestPath points that compose the shortest path
- * @return int 
  */
-int printGraph(std::map<visgraph::Point, std::vector<visgraph::Edge>> g, visgraph::Point origin, visgraph::Point destination, std::vector<visgraph::Point> shortestPath);
+void printGraph(std::map<visgraph::Point, std::vector<visgraph::Edge>> g, visgraph::Point origin, visgraph::Point destination, std::vector<visgraph::Point> shortestPath);
 
 #endif

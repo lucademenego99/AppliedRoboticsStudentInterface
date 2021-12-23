@@ -1,7 +1,16 @@
 #include "student_planning_interface.hpp"
+#include "graph.hpp"
+#include "dubins.hpp"
+#include "clipper_addons.hpp"
+#include "visgraph.hpp"
+#include "open_edges.hpp"
+#include "graphPrint.hpp"
+#include "utils.hpp"
+#include "clipper.hpp"
 
 #include <stdexcept>
 #include <sstream>
+
 namespace student
 {
 

@@ -17,9 +17,8 @@ using namespace std;
  * @param origin starting point
  * @param destination destination point
  * @param shortestPath points that compose the shortest path
- * @return int 
  */
-int printGraph(std::map<visgraph::Point, std::vector<visgraph::Edge>> g, visgraph::Point origin, visgraph::Point destination, std::vector<visgraph::Point> shortestPath){
+void printGraph(std::map<visgraph::Point, std::vector<visgraph::Edge>> g, visgraph::Point origin, visgraph::Point destination, std::vector<visgraph::Point> shortestPath){
     std::map<visgraph::Point, std::vector<visgraph::Edge>>::iterator it;
 
     double smallestX = INFINITY, biggestX = -INFINITY, smallestY = INFINITY, biggestY = -INFINITY;
@@ -31,6 +30,10 @@ int printGraph(std::map<visgraph::Point, std::vector<visgraph::Edge>> g, visgrap
         smallestY = p.y < smallestY ? p.y : smallestY;
         biggestY = p.y > biggestY ? p.y : biggestY;
     }
+    smallestX = origin.x < smallestX ? origin.x : smallestX;
+    smallestY = origin.y < smallestY ? origin.y : smallestY;
+    biggestX = origin.x > biggestX ? origin.x : biggestX;
+    biggestY = origin.y > biggestY ? origin.y : biggestY;
     double size = max(biggestX-smallestX, biggestY-smallestY);
     size *= 1.1;
 
@@ -41,7 +44,7 @@ int printGraph(std::map<visgraph::Point, std::vector<visgraph::Edge>> g, visgrap
 
     if(!image.data){
         cout << "Could not open of find the image";
-        return 0;
+        return;
     }
 
     int thickness = 1;
@@ -66,6 +69,4 @@ int printGraph(std::map<visgraph::Point, std::vector<visgraph::Edge>> g, visgrap
     flip(image, flipped, 0);
     imshow("Output", flipped);
     cv::waitKey(0);
-
-    return 0;
 }
