@@ -31,51 +31,41 @@ namespace student
     dubins::Dubins dubins = dubins::Dubins(1.5, 0.005);
     dubins::DubinsCurve *result = dubins.findShortestPath(x[0], y[0], theta[0], x[1], y[1], theta[1]);
 
+    std::cout << "Start pose x = " << x[0] << ", y = " << y[0] << " , theta = " << theta[0] << std::endl;
+    std::cout << "End pose x = " << x[1] << ", y = " << y[1] << " , theta = " << theta[1] << std::endl;
+
     if (!result) {
       std::cout << "RESULT NOT VALID\n";
-    } else {
-      std::cout << "RESULT: \n\n";
-      std::cout << "L = " << result->L << "\n\n";
-      std::cout << "a1 = \n"
-                << "\tL = " << result->a1->L << "\n"
-                << "\tk = " << result->a1->k << "\n"
-                << "\tx0 = " << result->a1->x0 << "\n"
-                << "\ty0 = " << result->a1->y0 << "\n"
-                << "\tth0 = " << result->a1->th0 << "\n"
-                << "\tdubins_line-x = " << result->a1->dubins_line->x << "\n"
-                << "\tdubins_line-y = " << result->a1->dubins_line->y << "\n"
-                << "\tdubins_line-th = " << result->a1->dubins_line->th << "\n\n";
-      std::cout << "a2 = \n"
-                << "\tL = " << result->a2->L << "\n"
-                << "\tk = " << result->a2->k << "\n"
-                << "\tx0 = " << result->a2->x0 << "\n"
-                << "\ty0 = " << result->a2->y0 << "\n"
-                << "\tth0 = " << result->a2->th0 << "\n"
-                << "\tdubins_line-x = " << result->a2->dubins_line->x << "\n"
-                << "\tdubins_line-y = " << result->a2->dubins_line->y << "\n"
-                << "\tdubins_line-th = " << result->a2->dubins_line->th << "\n\n";
-      std::cout << "a3 = \n"
-                << "\tL = " << result->a3->L << "\n"
-                << "\tk = " << result->a3->k << "\n"
-                << "\tx0 = " << result->a3->x0 << "\n"
-                << "\ty0 = " << result->a3->y0 << "\n"
-                << "\tth0 = " << result->a3->th0 << "\n"
-                << "\tdubins_line-x = " << result->a3->dubins_line->x << "\n"
-                << "\tdubins_line-y = " << result->a3->dubins_line->y << "\n"
-                << "\tdubins_line-th = " << result->a3->dubins_line->th << "\n\n";
+    } 
+
+    int npts = 100;
+
+    for (int i = 0; i < npts; i++) {
+      double s = result->a1->L/npts * i;
+      dubins::DubinsLine *tmp = new dubins::DubinsLine(s, result->a1->x0, result->a1->y0, result->a1->th0, result->a1->k);
+      // pts.push_back(cv::Point(tmp->x / size * 500, tmp->y / size * 500));
+      path[0].points.emplace_back(s, tmp->x, tmp->y, tmp->th, result->a1->k);
+      delete tmp;
     }
 
-  // *****the controllment for the multi robot*****
-  /**  feed the
-  e.g path for robot 0
-    for (float l=0, s=0; l<3; l++, s+=ds) {
-      path[0].points.emplace_back(s, x[0]+ds*l, y[0], 0.0, 0.0);
+    for (int i = 0; i < npts; i++) {
+      double s = result->a2->L/npts * i;
+      dubins::DubinsLine *tmp = new dubins::DubinsLine(s, result->a2->x0, result->a2->y0, result->a2->th0, result->a2->k);
+      // pts.push_back(cv::Point(tmp->x / size * 500, tmp->y / size * 500));
+      path[0].points.emplace_back(s, tmp->x, tmp->y, tmp->th, result->a2->k);
+      delete tmp;
     }
-  ******THE ADDED POINT HAVE THE STRUCTURE POSE, NOT POINT******
-  Pose(float s, float x, float y, float theta, float kappa):
-    s(s), x(x), y(y), theta(theta), kappa(kappa)
-  {}
-  **/
+
+    for (int i = 0; i < npts; i++) {
+      double s = result->a3->L/npts * i;
+      dubins::DubinsLine *tmp = new dubins::DubinsLine(s, result->a3->x0, result->a3->y0, result->a3->th0, result->a3->k);
+      // pts.push_back(cv::Point(tmp->x / size * 500, tmp->y / size * 500));
+      path[0].points.emplace_back(s, tmp->x, tmp->y, tmp->th, result->a3->k);
+      if(i == npts-1) {
+        std::cout << "x = " << tmp->x << ", y = " << tmp->y << ", theta = " << tmp->th << ", result.theta = " << result->a3->th0 <<std::endl;
+      }
+      delete tmp;
+    }
   }
 
 }
