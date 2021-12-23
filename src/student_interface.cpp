@@ -1,4 +1,12 @@
 #include "student_planning_interface.hpp"
+#include "graph.hpp"
+#include "dubins.hpp"
+#include "clipper_addons.hpp"
+#include "visgraph.hpp"
+#include "open_edges.hpp"
+#include "graphPrint.hpp"
+#include "utils.hpp"
+#include "clipper.hpp"
 
 #include <stdexcept>
 #include <sstream>
@@ -6,17 +14,20 @@
 
 namespace student
 {
-  /*!
-* Plan a safe and fast path in the arena
-* @param[in]  borders        border of the arena [m]
-* @param[out] obstacle_list  list of obstacle polygon [m]
-* @param[out] gate_list      polygon representing the gate [m]
-* @param[out] x              x position of the robot in the arena reference system
-* @param[out] y              y position of the robot in the arena reference system
-* @param[out] theta          yaw of the robot in the arena reference system
-* @param[out] path           list of Pose need to be feed with the path calculated result
-* @param[in]  config_folder  A custom string from config file.
-*/
+  /**
+   * @brief Plan a safe and fast path in the arena
+   * 
+   * @param borders Border of the arena, expressed in meters
+   * @param obstacle_list List of obstacle polygons
+   * @param gate_list List of possible gates, expressed as polygons
+   * @param x x positions of the robots in the arena
+   * @param y y positions of the robots in the arena
+   * @param theta Yaw of the robot in the arena reference system
+   * @param path List of poses representing the final path of the robot, passed by ref.
+   * @param config_folder A custom string from config file
+   * @return true We have a valid path available
+   * @return false We don't have a valid path available
+   */
   bool planPath(const Polygon& borders, const std::vector<Polygon>& obstacle_list, const std::vector<Polygon>& gate_list, const std::vector<float> x, const std::vector<float> y, const std::vector<float> theta, std::vector<Path>& path, const std::string& config_folder){
     std::vector<visgraph::Point> pol;
     std::vector<std::vector<visgraph::Point>> polygons;
@@ -67,5 +78,4 @@ namespace student
       delete tmp;
     }
   }
-
 }

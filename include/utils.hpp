@@ -6,19 +6,20 @@
 #include <vector>
 #include <cstddef>
 
-struct Point 
-{
-  float x, y;
+namespace student {
+  struct Point 
+  {
+    float x, y;
 
-  Point(float x, float y):
-    x(x), y(y)
-  {}
+    Point(float x, float y): x(x), y(y) {}
+    Point(): Point(0, 0) {}
+  };
 
-  Point(): 
-    Point(0, 0)
-  {}
-
-};
+  /**
+   * @brief A polygon, expessed as a list of 2D points
+   * 
+   */
+  typedef std::vector<Point> Polygon;
 
   /**
    * @brief A configuration of the robot along the path, represented by x, y, orientation and curvature
@@ -62,13 +63,7 @@ struct Point
     size_t size() { return points.size(); }
     void setPoints(const std::vector<Pose> &points) { this->points = points; }
   };
-
-  /**
-   * @brief A polygon, expessed as a list of 2D points
-   * 
-   */
-  typedef std::vector<Point> Polygon;
-
+}
 
 namespace dubins
 {
@@ -84,6 +79,13 @@ namespace dubins
 
     Point(double x = -1, double y = -1, double th = -1) : x(x), y(y), th(th) {}
   };
+
+  /**
+   * @brief A polygon, expessed as a list of 2D points
+   * 
+   */
+  typedef std::vector<Point> Polygon;
+
   /**
    * @brief Implementation of function sinc(t)
    * 

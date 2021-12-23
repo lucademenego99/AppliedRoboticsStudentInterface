@@ -1,10 +1,11 @@
 #ifndef VISGRAPH
 #define VISGRAPH
 
-#include "utils.hpp"
 #include "graph.hpp"
 #include <vector>
 #include <iostream>
+
+using namespace visgraph;
 
 namespace visgraph
 {
@@ -15,13 +16,10 @@ namespace visgraph
     class VisGraph
     {
     private:
-        double INF = 10000;
+        double INF = 100000;
         const int CCW = 1;
         const int CW = -1;
         const int COLLINEAR = 0;
-        const int COLIN_TOLERANCE = 10;
-        const int T = pow(10, COLIN_TOLERANCE);
-        const double T2 = pow(10.0, COLIN_TOLERANCE);
 
         /**
         * @brief Computes the visible points given a starting point
@@ -42,37 +40,6 @@ namespace visgraph
         * @return double 
         */
         double getAngle(Point center, Point p);
-
-        /**
-        * @brief Checks if given three points p, q, r point q lies on line segment "pr"
-        * 
-        * @param p First input point
-        * @param q Second input point
-        * @param r Third input point
-        * @return true 
-        * @return false 
-        */
-        bool onSegment(Point p, Point q, Point r);
-
-        /**
-        * @brief Finds the orientation of ordered triplet
-        * 
-        * @param p First input point
-        * @param q Second input point
-        * @param r Third input point
-        * @return int 0, if the points are collinear, -1 if clockwise and 1 if counterclockwise
-        */
-        int getOrientation(Point p, Point q, Point r);
-
-        /**
-        * @brief Verifies if a point crosses the edges of a polygon
-        * 
-        * @param p1 The point we consider
-        * @param polygonEdges The list of edges of the polygon
-        * @return true 
-        * @return false 
-        */
-        bool polygonCrossing(Point p, std::vector<Edge> polygonEdges);
 
         /**
         * @brief Is the edge from point p1 to point p2 interior to any polygon?
@@ -140,6 +107,37 @@ namespace visgraph
         * @return double 
         */
         double pointEdgeDistance(Point p1, Point p2, Edge edge);
+
+        /**
+        * @brief Verifies if a point crosses the edges of a polygon
+        * 
+        * @param p1 The point we consider
+        * @param polygonEdges The list of edges of the polygon
+        * @return true 
+        * @return false 
+        */
+        bool polygonCrossing(Point p, std::vector<Edge> polygonEdges);
+
+        /**
+        * @brief Checks if given three points p, q, r point q lies on line segment "pr"
+        * 
+        * @param p First input point
+        * @param q Second input point
+        * @param r Third input point
+        * @return true 
+        * @return false 
+        */
+        bool onSegment(Point p, Point q, Point r);
+
+        /**
+        * @brief Finds the orientation of ordered triplet
+        * 
+        * @param p First input point
+        * @param q Second input point
+        * @param r Third input point
+        * @return int 0, if the points are collinear, -1 if clockwise and 1 if counterclockwise
+        */
+        int getOrientation(Point p, Point q, Point r);
 
         /**
         * @brief Returns the radiant value of an angle given three points
