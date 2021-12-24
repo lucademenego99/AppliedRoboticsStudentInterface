@@ -21,6 +21,8 @@ int main(int argc, char *argv[])
 
     // shortestPathDubinsTest(dubins);
 
+    std::cout<<"Let's start";
+
     multipointDubinsAndVisgraphTest(dubins);
 
     // intersectionsTest(dubins);
@@ -108,18 +110,25 @@ void multipointDubinsAndVisgraphTest(Dubins dubins)
     // visgraph::Point origin = visgraph::Point(1.0, 8.0);
     // visgraph::Point destination = visgraph::Point(24.0, 2.0);
 
-    std::vector<visgraph::Point> pol1 {visgraph::Point(2.0, 1.0), visgraph::Point(3.0, 1.0), visgraph::Point(4.0, 2.0), visgraph::Point(3.0, 3.0), visgraph::Point(2.0, 3.0), visgraph::Point(1.0, 2.0), visgraph::Point(2.0, 1.0)};
+    //The first position is always the wall
+    std::cout << "Inizia il test";
+    
+    std::vector<visgraph::Point> pol1 {visgraph::Point(1.0, 2.0), visgraph::Point(1.0, 15.0), visgraph::Point(16.0, 15.0), visgraph::Point(16.0, 2.0)};
+    std::vector<visgraph::Point> hole {visgraph::Point(2.0, 3.0), visgraph::Point(15.0, 3.0), visgraph::Point(15.0, 14.0), visgraph::Point(2.0, 14.0)};
     std::vector<visgraph::Point> pol2 {visgraph::Point(1.0, 3.5), visgraph::Point(6.0, 6.0), visgraph::Point(1.0, 6.0), visgraph::Point(1.0, 3.5)};
     std::vector<visgraph::Point> pol3 {visgraph::Point(7.0, 2.0), visgraph::Point(8.0, 3.0), visgraph::Point(7.0, 5.0), visgraph::Point(6.0, 3.0), visgraph::Point(7.0,2.0)};
+    std::vector<visgraph::Point> pol4 {visgraph::Point(2.0, 1.0), visgraph::Point(3.0, 1.0), visgraph::Point(4.0, 2.0), visgraph::Point(3.0, 3.0), visgraph::Point(2.0, 3.0), visgraph::Point(1.0, 2.0), visgraph::Point(2.0, 1.0)};
     visgraph::Point origin = visgraph::Point(1.0, 8.0);
     visgraph::Point destination = visgraph::Point(5.0, 4.0);
-
+    
     polygons.push_back(pol1);
+    polygons.push_back(hole);
     polygons.push_back(pol2);
     polygons.push_back(pol3);
-    // polygons.push_back(pol4);
+    polygons.push_back(pol4);
+    std::cout << "Sto entrando in enlargeAndJoinObstacles";
     std::vector<std::vector<std::vector<visgraph::Point>>> pols = enlargeAndJoinObstacles(polygons, 0.5);
-
+    
     polygonsForVisgraph = pols[0];
     polygons = pols[1];
 
@@ -158,6 +167,7 @@ void multipointDubinsAndVisgraphTest(Dubins dubins)
         std::cout << "COMPLETED MULTIPOINT SHORTEST PATH SUCCESSFULLY\n";
         dubins.printCompletePath(curves, path.size()-1, polygons);
     }
+    
 }
 
 void intersectionsTest(Dubins dubins)

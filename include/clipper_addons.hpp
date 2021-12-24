@@ -14,6 +14,16 @@
 std::vector<visgraph::Point> enlarge(std::vector<visgraph::Point> points, double offset);
 
 /**
+ * @brief Function that constructs the walls of the map by using the etClosedLine
+ * 
+ * @param wallPoints Four vertices of the walls
+ * @param innerHole The hole of the walls
+ * @param offset Offset for enlargement
+ * @return std::vector<visgraph::Point> 
+ */
+std::vector<visgraph::Point> enlargeWalls(std::vector<visgraph::Point> wallPoints, std::vector<visgraph::Point> innerHole, double offset);
+
+/**
  * @brief Print a clipper polygon offsetting solution using OpenCV
  * 
  * @param startingPoints Points of the original polygon
@@ -40,6 +50,16 @@ bool intersect (dubins::DubinsPoint *subj, dubins::DubinsPoint *clip);
  * @return std::vector<std::vector<visgraph::Point>> Array containing at position 0 the bigger obstacles and at position 1 the smaller ones
  */
 std::vector<std::vector<visgraph::Point>> enlargeObstaclesWithTwoOffsets(std::vector<visgraph::Point> polygon, double offset);
+
+/**
+ * @brief Variant of the previous function but for walls
+ * 
+ * @param polygon The four vertices of the walls
+ * @param offset The enlargement factor
+ * @param innerHole The "hole" of the walls
+ * @return std::vector<std::vector<visgraph::Point>> 
+ */
+std::vector<std::vector<visgraph::Point>> enlargeObstaclesWithTwoOffsetsWalls(std::vector<visgraph::Point> polygon, std::vector<visgraph::Point> innerHole, double offset);
 
 /**
  * @brief Enlarge the obstacles using the function enlargeObstaclesWithTwoOffsets, then join them in case they collide between each other

@@ -1,0 +1,17 @@
+[core]
+	repositoryformatversion = 0
+	filemode = true
+	bare = false
+	logallrefupdates = true
+[remote "origin"]
+	url = https://github.com/lucademenego99/AppliedRoboticsStudentInterface.git
+	fetch = +refs/heads/*:refs/remotes/origin/*
+[branch "master"]
+	remote = origin
+	merge = refs/heads/master
+[branch "motion-planning"]
+	remote = origin
+	merge = refs/heads/motion-planning
+[branch "dubins-visgraph-integration"]
+	remote = origin
+	merge = refs/heads/dubins-visgraph-integration

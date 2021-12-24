@@ -44,6 +44,47 @@ std::vector<visgraph::Point> enlarge(std::vector<visgraph::Point> points, double
 }
 
 /**
+ * @brief Function that constructs the walls of the map by using the etClosedLine
+ * 
+ * @param wallPoints Four vertices of the walls
+ * @param offset Offset for enlargement
+ * @param innerHole Hole of the walls
+ * @return std::vector<visgraph::Point> 
+ */
+std::vector<visgraph::Point> enlargeWalls(std::vector<visgraph::Point> wallPoints, std::vector<visgraph::Point> innerHole, double offset)
+{
+    ClipperLib::Paths subj;
+    ClipperLib::Paths solution;
+    std::cout << "Bastardo il dio maiale";
+    for (int i = 0; i < wallPoints.size(); i++)
+    {
+        subj[0] << ClipperLib::IntPoint(wallPoints[i].x*1000, wallPoints[i].y*1000);
+    }
+    
+    for (int i = 0; i < innerHole.size(); i++)
+    {
+        subj[1] << ClipperLib::IntPoint(innerHole[i].x*1000, innerHole[i].y*1000);
+    }
+    std::cout << "Porcamadonnatroia";
+    ClipperLib::ClipperOffset co;
+    co.AddPaths(subj, ClipperLib::jtMiter, ClipperLib::etClosedLine);
+    co.Execute(solution, offset*1000.0);
+
+    CleanPolygons(solution);
+
+    std::vector<visgraph::Point> result;
+    if (solution.size() > 0) {
+        for (ClipperLib::IntPoint p : solution[0]) {
+            result.push_back(visgraph::Point(p.X / 1000.0, p.Y / 1000.0));
+        }
+    }
+
+    // printSolution(subj, solution);
+
+    return result;
+}
+
+/**
  * @brief Print a clipper polygon offsetting solution using OpenCV
  * 
  * @param startingPoints Points of the original polygon
@@ -145,6 +186,43 @@ std::vector<std::vector<visgraph::Point>> enlargeObstaclesWithTwoOffsets(std::ve
 }
 
 /**
+ * @brief Variant of the previous function but for walls
+ * 
+ * @param polygon The four vertices of the walls
+ * @param offset The enlargement factor
+ * @return std::vector<std::vector<visgraph::Point>> 
+ */
+std::vector<std::vector<visgraph::Point>> enlargeObstaclesWithTwoOffsetsWalls(std::vector<visgraph::Point> polygon, std::vector<visgraph::Point> innerHole, double offset){
+    double variant = 3.0;
+    std::vector<visgraph::Point> newPath;
+    std::vector<visgraph::Point> newPathInnerHole;
+    
+    //Convert the polygon to the data structure for enlarge, we need a vector of visgraph points
+    for(unsigned int i = 0; i < polygon.size(); i++){
+        newPath.push_back(visgraph::Point(polygon[i].x, polygon[i].y));
+    }
+    
+    
+    for(unsigned int j = 0; j < innerHole.size(); j++){
+        newPathInnerHole.push_back(visgraph::Point(innerHole[j].x, innerHole[j].y));
+    }
+    std::vector<visgraph::Point> bigSolution;
+    std::vector<visgraph::Point> smallSolution;
+    smallSolution = enlargeWalls(newPath, newPathInnerHole, offset);
+    bigSolution = enlargeWalls(newPath, newPathInnerHole, offset + (offset/variant));
+    //Take both solutions, push them back a vector, return it
+    std::vector<std::vector<visgraph::Point>> finalResult;
+    finalResult.push_back(bigSolution);
+    finalResult.push_back(smallSolution);
+
+    for(visgraph::Point p : finalResult[0]){
+        std::cout << "X : " << p.x << "\n";
+        std::cout << "Y : " << p.y << "\n";
+    }
+    return finalResult;
+}
+
+/**
  * @brief Enlarge the obstacles using the function enlargeObstaclesWithTwoOffsets, then join them in case they collide between each other
  * The function also removes possible holes that can be formed during the join phase
  * 
@@ -157,8 +235,15 @@ std::vector<std::vector<std::vector<visgraph::Point>>> enlargeAndJoinObstacles(s
     std::vector<std::vector<visgraph::Point>> bigPolygons;
     std::vector<std::vector<visgraph::Point>> smallPolygons;
 
-    for (int i = 0; i < polygonsList.size(); i++){
-        std::vector<std::vector<visgraph::Point>> results;
+    //In order to make it clearer and simpler the walls are always in the first position so we can call the variant of the function for walls
+    std::vector<std::vector<visgraph::Point>> results;
+    results = enlargeObstaclesWithTwoOffsetsWalls(polygonsList[0], polygonsList[1], offset);
+    bigPolygons.push_back(results[0]);
+    smallPolygons.push_back(results[1]);
+    results.clear();
+
+    //All the other polygons are treated the same way as before
+    for (int i = 2; i < polygonsList.size(); i++){
         results = enlargeObstaclesWithTwoOffsets(polygonsList[i], offset);
         bigPolygons.push_back(results[0]);
         smallPolygons.push_back(results[1]);

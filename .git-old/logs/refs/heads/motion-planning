@@ -1,0 +1,14 @@
+0000000000000000000000000000000000000000 4273ce12ee25e33b443e1c1f840458c81bf952bd DEIDARA285231 <edo.schioccola@me.com> 1638384945 +0100	branch: Created from refs/remotes/origin/motion-planning
+4273ce12ee25e33b443e1c1f840458c81bf952bd d580e7b59b9933c21654344f51524cdb5b8c1eaa DEIDARA285231 <edo.schioccola@me.com> 1638539698 +0100	pull: Fast-forward
+d580e7b59b9933c21654344f51524cdb5b8c1eaa ad301fe53bd74548e8615331b1204776793c6e96 DEIDARA285231 <edo.schioccola@me.com> 1638626431 +0100	pull: Fast-forward
+ad301fe53bd74548e8615331b1204776793c6e96 b9524624067faf38a09d8b4b17eaff39d9570f09 DEIDARA285231 <edo.schioccola@me.com> 1638724800 +0100	pull: Fast-forward
+b9524624067faf38a09d8b4b17eaff39d9570f09 6494193606f21e37fe5f1e6d9b7863302b657cfc DEIDARA285231 <edo.schioccola@me.com> 1638884061 +0100	pull: Fast-forward
+6494193606f21e37fe5f1e6d9b7863302b657cfc 0e4517a36bd1f66aaf401b74dad148e110fdfcd0 DEIDARA285231 <edo.schioccola@me.com> 1638884141 +0100	commit: Files with function to print a visGraph::Graph object
+0e4517a36bd1f66aaf401b74dad148e110fdfcd0 12a69afb463ce2a60c18c1ec9223e1373a63d169 DEIDARA285231 <edo.schioccola@me.com> 1638887015 +0100	commit: Added a little test in the main file, pay attention that the points as input need to be multiplied by a scaling factor X in order to be displayed better
+12a69afb463ce2a60c18c1ec9223e1373a63d169 be4d8ca4cbc6eee26995d540d175f1961be218c6 DEIDARA285231 <edo.schioccola@me.com> 1638957958 +0100	commit (merge): Ignore this commit
+be4d8ca4cbc6eee26995d540d175f1961be218c6 a1c7257dfdfb2455d2e4c221588a6fb2418c8f8e DEIDARA285231 <edo.schioccola@me.com> 1638959622 +0100	pull: Fast-forward
+a1c7257dfdfb2455d2e4c221588a6fb2418c8f8e e8de562168cb65734d9504b87cbd75db937ad735 DEIDARA285231 <edo.schioccola@me.com> 1638972217 +0100	pull: Fast-forward
+e8de562168cb65734d9504b87cbd75db937ad735 0448731b6596b75feada6454f5c8de698effc780 DEIDARA285231 <edo.schioccola@me.com> 1638979408 +0100	pull: Fast-forward
+0448731b6596b75feada6454f5c8de698effc780 a7ff3b3b4c19133c6c8faf0de05993563d2c36de DEIDARA285231 <edo.schioccola@me.com> 1639147731 +0100	commit: Fixed errors regarding the shortestPath
+a7ff3b3b4c19133c6c8faf0de05993563d2c36de 0aec8188aabfa7d4fbb53b03e2c8e2e8411b7e50 DEIDARA285231 <edo.schioccola@me.com> 1639240862 +0100	pull: Fast-forward
+0aec8188aabfa7d4fbb53b03e2c8e2e8411b7e50 49e1c33726edf2e431425ee019410de4dde9c248 DEIDARA285231 <edo.schioccola@me.com> 1639312735 +0100	commit: Added documentation to all files that were missing one
