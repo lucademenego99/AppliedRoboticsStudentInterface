@@ -53,9 +53,8 @@ std::vector<visgraph::Point> enlarge(std::vector<visgraph::Point> points, double
  */
 std::vector<visgraph::Point> enlargeWalls(std::vector<visgraph::Point> wallPoints, std::vector<visgraph::Point> innerHole, double offset)
 {
-    ClipperLib::Paths subj;
+    ClipperLib::Paths subj(2);
     ClipperLib::Paths solution;
-    std::cout << "Bastardo il dio maiale";
     for (int i = 0; i < wallPoints.size(); i++)
     {
         subj[0] << ClipperLib::IntPoint(wallPoints[i].x*1000, wallPoints[i].y*1000);
@@ -65,7 +64,6 @@ std::vector<visgraph::Point> enlargeWalls(std::vector<visgraph::Point> wallPoint
     {
         subj[1] << ClipperLib::IntPoint(innerHole[i].x*1000, innerHole[i].y*1000);
     }
-    std::cout << "Porcamadonnatroia";
     ClipperLib::ClipperOffset co;
     co.AddPaths(subj, ClipperLib::jtMiter, ClipperLib::etClosedLine);
     co.Execute(solution, offset*1000.0);
@@ -198,12 +196,14 @@ std::vector<std::vector<visgraph::Point>> enlargeObstaclesWithTwoOffsetsWalls(st
     std::vector<visgraph::Point> newPathInnerHole;
     
     //Convert the polygon to the data structure for enlarge, we need a vector of visgraph points
-    for(unsigned int i = 0; i < polygon.size(); i++){
+    std::cout << "Polygon size: " << polygon.size() << "\n";
+    std::cout << "innerHole size: " << innerHole.size() << "\n";
+
+    for(int i = 0; i < polygon.size(); i++){
         newPath.push_back(visgraph::Point(polygon[i].x, polygon[i].y));
     }
-    
-    
-    for(unsigned int j = 0; j < innerHole.size(); j++){
+
+    for(int j = 0; j < innerHole.size(); j++){
         newPathInnerHole.push_back(visgraph::Point(innerHole[j].x, innerHole[j].y));
     }
     std::vector<visgraph::Point> bigSolution;
@@ -220,6 +220,7 @@ std::vector<std::vector<visgraph::Point>> enlargeObstaclesWithTwoOffsetsWalls(st
         std::cout << "Y : " << p.y << "\n";
     }
     return finalResult;
+    
 }
 
 /**

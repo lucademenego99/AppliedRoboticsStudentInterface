@@ -126,7 +126,7 @@ void multipointDubinsAndVisgraphTest(Dubins dubins)
     polygons.push_back(pol2);
     polygons.push_back(pol3);
     polygons.push_back(pol4);
-    std::cout << "Sto entrando in enlargeAndJoinObstacles";
+    
     std::vector<std::vector<std::vector<visgraph::Point>>> pols = enlargeAndJoinObstacles(polygons, 0.5);
     
     polygonsForVisgraph = pols[0];
