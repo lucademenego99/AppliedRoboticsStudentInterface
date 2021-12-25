@@ -101,6 +101,7 @@ void multipointDubinsAndVisgraphTest(Dubins dubins)
     std::vector<double> tTmp;
 
     std::vector<std::vector<visgraph::Point>> polygons, polygonsForVisgraph;
+    //std::vector<std::vector<visgraph::Point>> outerWalls;
     // std::vector<visgraph::Point> pol1 {visgraph::Point(1.5, 1.5), visgraph::Point(3.5, 1.5), visgraph::Point(5.0, 3.0), visgraph::Point(3.5, 4.5), visgraph::Point(1.5, 4.5), visgraph::Point(0.0, 3.0)};
     // std::vector<visgraph::Point> pol2 {visgraph::Point(5.0, 5.0), visgraph::Point(8.0, 5.0), visgraph::Point(8.0, 11.0), visgraph::Point(5.0, 11.0)};
     // std::vector<visgraph::Point> pol3 {visgraph::Point(12.0, 1.0), visgraph::Point(14.0, 4.0), visgraph::Point(12.0, 7.0), visgraph::Point(10.0, 4.0)};
@@ -108,19 +109,32 @@ void multipointDubinsAndVisgraphTest(Dubins dubins)
     // visgraph::Point origin = visgraph::Point(1.0, 8.0);
     // visgraph::Point destination = visgraph::Point(24.0, 2.0);
 
-    std::vector<visgraph::Point> pol1 {visgraph::Point(2.0, 1.0), visgraph::Point(3.0, 1.0), visgraph::Point(4.0, 2.0), visgraph::Point(3.0, 3.0), visgraph::Point(2.0, 3.0), visgraph::Point(1.0, 2.0), visgraph::Point(2.0, 1.0)};
-    std::vector<visgraph::Point> pol2 {visgraph::Point(1.0, 3.5), visgraph::Point(6.0, 6.0), visgraph::Point(1.0, 6.0), visgraph::Point(1.0, 3.5)};
-    std::vector<visgraph::Point> pol3 {visgraph::Point(7.0, 2.0), visgraph::Point(8.0, 3.0), visgraph::Point(7.0, 5.0), visgraph::Point(6.0, 3.0), visgraph::Point(7.0,2.0)};
-    visgraph::Point origin = visgraph::Point(1.0, 8.0);
-    visgraph::Point destination = visgraph::Point(5.0, 4.0);
+    //The first four polygons are the walls
+    std::vector<visgraph::Point> pol1 {visgraph::Point(1.0, 1.0), visgraph::Point(2.0, 1.0), visgraph::Point(2.0, 22.0), visgraph::Point(1.0, 22.0)};
+    std::vector<visgraph::Point> pol2 {visgraph::Point(2.0, 1.0), visgraph::Point(30.0, 1.0), visgraph::Point(30.0, 2.0), visgraph::Point(2.0, 2.0)};
+    std::vector<visgraph::Point> pol3 {visgraph::Point(29.0, 2.0), visgraph::Point(30.0, 2.0), visgraph::Point(30.0, 22.0), visgraph::Point(29.0, 22.0)};
+    std::vector<visgraph::Point> pol4 {visgraph::Point(2.0, 21.0), visgraph::Point(29.0, 21.0), visgraph::Point(29.0, 22.0), visgraph::Point(2.0, 22.0)};
+
+    std::vector<visgraph::Point> pol5 {visgraph::Point(7.0, 6.0), visgraph::Point(9.0, 6.0), visgraph::Point(9.0, 8.0), visgraph::Point(7.0, 8.0)};
+    std::vector<visgraph::Point> pol6 {visgraph::Point(15.0, 8.0), visgraph::Point(22.0, 8.0), visgraph::Point(22.0, 12.0), visgraph::Point(15.0, 12.0)};
+    std::vector<visgraph::Point> pol7 {visgraph::Point(7.0, 14.0), visgraph::Point(10.0, 14.0), visgraph::Point(10.0, 17.0), visgraph::Point(7.0, 17.0)};
+    visgraph::Point origin = visgraph::Point(4.0, 4.0);
+    visgraph::Point destination = visgraph::Point(29.0, 19.0);
 
     polygons.push_back(pol1);
     polygons.push_back(pol2);
     polygons.push_back(pol3);
-    // polygons.push_back(pol4);
+    polygons.push_back(pol4);
+
+    polygons.push_back(pol5);
+    polygons.push_back(pol6);
+    polygons.push_back(pol7);
     std::vector<std::vector<std::vector<visgraph::Point>>> pols = enlargeAndJoinObstacles(polygons, 0.5);
 
-    polygonsForVisgraph = pols[0];
+    //std::cout << "Pols.size()" << pols[0].size();
+    for(int i = 1; i < pols[0].size(); i++){
+        polygonsForVisgraph.push_back(pols[0][i]);
+    }
     polygons = pols[1];
 
     visgraph::VisGraph visg;
