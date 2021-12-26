@@ -44,6 +44,41 @@ std::vector<visgraph::Point> enlarge(std::vector<visgraph::Point> points, double
 }
 
 /**
+ * @brief Clipper Polygon Offsetting helper function, works only for Walls
+ * We multiply the points by 1000 because Clipper works best under the assumption of working on a certain scale
+ * 
+ * @param points Points of the original line that describes the wall
+ * @param offset Offset that must be used to enlarge or shrink the wall
+ * @return std::vector<visgraph::Point> Array of points of the resulting line
+ */
+std::vector<visgraph::Point> enlargeWalls(std::vector<visgraph::Point> points, double offset)
+{
+    ClipperLib::Path subj;
+    ClipperLib::Paths solution;
+    for (int i = 0; i < points.size(); i++)
+    {
+        subj << ClipperLib::IntPoint(points[i].x*1000, points[i].y*1000);
+    }
+    
+    ClipperLib::ClipperOffset co;
+    co.AddPath(subj, ClipperLib::jtMiter, ClipperLib::etClosedLine);
+    co.Execute(solution, offset*1000.0);
+
+    CleanPolygons(solution);
+
+    std::vector<visgraph::Point> result;
+    if (solution.size() > 0) {
+        for (ClipperLib::IntPoint p : solution[0]) {
+            result.push_back(visgraph::Point(p.X / 1000.0, p.Y / 1000.0));
+        }
+    }
+
+    // printSolution(subj, solution);
+
+    return result;
+}
+
+/**
  * @brief Print a clipper polygon offsetting solution using OpenCV
  * 
  * @param startingPoints Points of the original polygon
@@ -145,6 +180,33 @@ std::vector<std::vector<visgraph::Point>> enlargeObstaclesWithTwoOffsets(std::ve
 }
 
 /**
+ * @brief Given some walls and an offset, creates a "bigger" version using clipper and a "slightly bigger" one, then returns them
+ * 
+ * @param polygon Walls we are considering
+ * @param offset Offset for Walls offsetting
+ * @return std::vector<std::vector<student::Point>> Array containing at position 0 the bigger Walls and at position 1 the smaller ones
+ */
+std::vector<std::vector<visgraph::Point>> enlargeObstaclesWithTwoOffsetsWalls(std::vector<visgraph::Point> polygon, double offset){
+    double variant = 3.0;
+    std::vector<visgraph::Point> newPath;
+
+    //Convert the polygon to the data structure for enlarge, we need a vector of visgraph points
+    for(unsigned int i = 0; i < polygon.size(); i++){
+        newPath.push_back(visgraph::Point(polygon[i].x, polygon[i].y));
+    }
+    std::vector<visgraph::Point> bigSolution;
+    std::vector<visgraph::Point> smallSolution;
+    smallSolution = enlargeWalls(newPath, offset);
+    bigSolution = enlargeWalls(newPath, offset + (offset/variant));
+    //Take both solutions, push them back a vector, return it
+    std::vector<std::vector<visgraph::Point>> finalResult;
+    finalResult.push_back(bigSolution);
+    finalResult.push_back(smallSolution);
+
+    return finalResult;
+}
+
+/**
  * @brief Enlarge the obstacles using the function enlargeObstaclesWithTwoOffsets, then join them in case they collide between each other
  * The function also removes possible holes that can be formed during the join phase
  * 
@@ -158,11 +220,20 @@ std::vector<std::vector<std::vector<visgraph::Point>>> enlargeAndJoinObstacles(s
     std::vector<std::vector<visgraph::Point>> smallPolygons;
 
     for (int i = 0; i < polygonsList.size(); i++){
-        std::vector<std::vector<visgraph::Point>> results;
-        results = enlargeObstaclesWithTwoOffsets(polygonsList[i], offset);
-        bigPolygons.push_back(results[0]);
-        smallPolygons.push_back(results[1]);
-        results.clear();
+        //The first four polygons are walls, hence we treat them differently
+        if(i < 4){
+            std::vector<std::vector<visgraph::Point>> results;
+            results = enlargeObstaclesWithTwoOffsetsWalls(polygonsList[i], offset);
+            bigPolygons.push_back(results[0]);
+            smallPolygons.push_back(results[1]);
+            results.clear();
+        }else{
+            std::vector<std::vector<visgraph::Point>> results;
+            results = enlargeObstaclesWithTwoOffsets(polygonsList[i], offset);
+            bigPolygons.push_back(results[0]);
+            smallPolygons.push_back(results[1]);
+            results.clear();
+        }
     }
 
     ClipperLib::Paths subj(bigPolygons.size()), solution;
