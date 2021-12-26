@@ -32,7 +32,7 @@ namespace student
     std::vector<std::vector<visgraph::Point>> polygons, polygonsForVisgraph;
 
     // TODO: find the correct offset based on the robot's size for polygon offsetting
-    double offset = 0.065;
+    double offset = 0.065, variant = 10.0;
 
     // Find the border's points
     double borderMaxX = -INFINITY, borderMinX = INFINITY;
@@ -94,20 +94,20 @@ namespace student
 
     // Add borders for collision detection
     pol.clear();
-    pol.push_back(visgraph::Point(borderMinX+offset, borderMinY+offset));
-    pol.push_back(visgraph::Point(borderMaxX-offset, borderMinY+offset));
+    pol.push_back(visgraph::Point(borderMinX+(offset + (offset / variant)), borderMinY+(offset + (offset / variant))));
+    pol.push_back(visgraph::Point(borderMaxX-(offset + (offset / variant)), borderMinY+(offset + (offset / variant))));
     polygons.push_back(pol);
     pol.clear();
-    pol.push_back(visgraph::Point(borderMaxX-offset, borderMinY+offset));
-    pol.push_back(visgraph::Point(borderMaxX-offset, borderMaxY-offset));
+    pol.push_back(visgraph::Point(borderMaxX-(offset + (offset / variant)), borderMinY+(offset + (offset / variant))));
+    pol.push_back(visgraph::Point(borderMaxX-(offset + (offset / variant)), borderMaxY-(offset + (offset / variant))));
     polygons.push_back(pol);
     pol.clear();
-    pol.push_back(visgraph::Point(borderMaxX-offset, borderMaxY-offset));
-    pol.push_back(visgraph::Point(borderMinX+offset, borderMaxY-offset));
+    pol.push_back(visgraph::Point(borderMaxX-(offset + (offset / variant)), borderMaxY-(offset + (offset / variant))));
+    pol.push_back(visgraph::Point(borderMinX+(offset + (offset / variant)), borderMaxY-(offset + (offset / variant))));
     polygons.push_back(pol);
     pol.clear();
-    pol.push_back(visgraph::Point(borderMinX+offset, borderMaxY-offset));
-    pol.push_back(visgraph::Point(borderMinX+offset, borderMinY+offset));
+    pol.push_back(visgraph::Point(borderMinX+(offset + (offset / variant)), borderMaxY-(offset + (offset / variant))));
+    pol.push_back(visgraph::Point(borderMinX+(offset + (offset / variant)), borderMinY+(offset + (offset / variant))));
     polygons.push_back(pol);
 
 
