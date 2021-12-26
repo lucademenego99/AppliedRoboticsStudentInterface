@@ -111,9 +111,9 @@ void multipointDubinsAndVisgraphTest(Dubins dubins)
 
     //The first four polygons are the walls
     std::vector<visgraph::Point> pol1 {visgraph::Point(1.0, 1.0), visgraph::Point(1.0, 22.0)};
-    std::vector<visgraph::Point> pol2 {visgraph::Point(2.0, 1.0), visgraph::Point(30.0, 1.0)};
-    std::vector<visgraph::Point> pol3 {visgraph::Point(30.0, 2.0), visgraph::Point(30.0, 22.0)};
-    std::vector<visgraph::Point> pol4 {visgraph::Point(29.0, 22.0), visgraph::Point(2.0, 22.0)};
+    std::vector<visgraph::Point> pol2 {visgraph::Point(1.0, 22.0), visgraph::Point(30.0, 22.0)};
+    std::vector<visgraph::Point> pol3 {visgraph::Point(30.0, 22.0), visgraph::Point(30.0, 1.0)};
+    std::vector<visgraph::Point> pol4 {visgraph::Point(30.0, 1.0), visgraph::Point(1.0, 1.0)};
 
     std::vector<visgraph::Point> pol5 {visgraph::Point(7.0, 6.0), visgraph::Point(9.0, 6.0), visgraph::Point(9.0, 8.0), visgraph::Point(7.0, 8.0)};
     std::vector<visgraph::Point> pol6 {visgraph::Point(15.0, 8.0), visgraph::Point(22.0, 8.0), visgraph::Point(22.0, 12.0), visgraph::Point(15.0, 12.0)};

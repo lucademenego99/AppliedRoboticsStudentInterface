@@ -491,7 +491,7 @@ namespace dubins
     double *Dubins::multipointShortestPathAngles(DubinsPoint **points, unsigned int numberOfPoints, visgraph::Graph &graph)
     {
         std::vector<visgraph::Edge> edges = graph.getEdges();
-        std::cout << "INPUT: \n";
+        std::cout << "INPUT WITH " << numberOfPoints << " POINTS: \n";
         std::cout << "X\tY\tTHETA\n";
         for (int i = 0; i < numberOfPoints; i++)
         {
