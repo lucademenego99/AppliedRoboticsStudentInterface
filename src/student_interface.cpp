@@ -31,22 +31,26 @@ namespace student
     std::vector<visgraph::Point> pol;
     std::vector<std::vector<visgraph::Point>> polygons, polygonsForVisgraph;
 
-    // Add borders
-    pol.push_back(visgraph::Point(borders[0].x, borders[0].y));
-    pol.push_back(visgraph::Point(borders[1].x, borders[1].y));
-    polygons.push_back(pol);
-    pol.clear();
-    pol.push_back(visgraph::Point(borders[1].x, borders[1].y));
-    pol.push_back(visgraph::Point(borders[2].x, borders[2].y));
-    polygons.push_back(pol);
-    pol.clear();
-    pol.push_back(visgraph::Point(borders[2].x, borders[2].y));
-    pol.push_back(visgraph::Point(borders[3].x, borders[3].y));
-    polygons.push_back(pol);
-    pol.clear();
-    pol.push_back(visgraph::Point(borders[3].x, borders[3].y));
-    pol.push_back(visgraph::Point(borders[0].x, borders[0].y));
-    polygons.push_back(pol);
+    // TODO: find the correct offset based on the robot's size for polygon offsetting
+    double offset = 0.065;
+
+    // Find the border's points
+    double borderMaxX = -INFINITY, borderMinX = INFINITY;
+    double borderMaxY = -INFINITY, borderMinY = INFINITY;
+    for(int i = 0; i < borders.size(); i++) {
+      if (borders[i].x > borderMaxX) {
+        borderMaxX = borders[i].x;
+      }
+      if (borders[i].x < borderMinX) {
+        borderMinX = borders[i].x;
+      }
+      if (borders[i].y > borderMaxY) {
+        borderMaxY = borders[i].y;
+      }
+      if (borders[i].y < borderMinY) {
+        borderMinY = borders[i].y;
+      }
+    }
 
     // Add obstacles
     for(int i = 0; i<obstacle_list.size(); i++) {
@@ -84,17 +88,31 @@ namespace student
     visgraph::Graph originalGraphFirst = visgraph::Graph(polygons, false, true);
 
     // POLYGON OFFSETTING AND JOIN
-    // TODO: find the correct offset based on the robot's size for polygon offsetting
-    double offset = 0.065;
     std::vector<std::vector<std::vector<visgraph::Point>>> pols = enlargeAndJoinObstacles(polygons, offset);
-    for(int i = 1; i < pols[0].size(); i++) {
-        polygonsForVisgraph.push_back(pols[0][i]);
-    }
+    polygonsForVisgraph = pols[0];
     polygons = pols[1];
 
-    visgraph::VisGraph visg;
+    // Add borders for collision detection
+    pol.clear();
+    pol.push_back(visgraph::Point(borderMinX+offset, borderMinY+offset));
+    pol.push_back(visgraph::Point(borderMaxX-offset, borderMinY+offset));
+    polygons.push_back(pol);
+    pol.clear();
+    pol.push_back(visgraph::Point(borderMaxX-offset, borderMinY+offset));
+    pol.push_back(visgraph::Point(borderMaxX-offset, borderMaxY-offset));
+    polygons.push_back(pol);
+    pol.clear();
+    pol.push_back(visgraph::Point(borderMaxX-offset, borderMaxY-offset));
+    pol.push_back(visgraph::Point(borderMinX+offset, borderMaxY-offset));
+    polygons.push_back(pol);
+    pol.clear();
+    pol.push_back(visgraph::Point(borderMinX+offset, borderMaxY-offset));
+    pol.push_back(visgraph::Point(borderMinX+offset, borderMinY+offset));
+    polygons.push_back(pol);
+
 
     // COMPUTE VISIBILITY GRAPH
+    visgraph::VisGraph visg;
     visgraph::Graph originalGraph = visgraph::Graph(polygons, false, true);
     visgraph::Graph g = visg.computeVisibilityGraph(polygonsForVisgraph, origin, destination);
 
