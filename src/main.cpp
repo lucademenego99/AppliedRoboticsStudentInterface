@@ -120,7 +120,7 @@ void multipointDubinsAndVisgraphTest(Dubins dubins)
     std::vector<visgraph::Point> pol6 {visgraph::Point(3.0, 8.0), visgraph::Point(3.0, 12.0), visgraph::Point(22.0, 12.0), visgraph::Point(22.0, 8.0)};
     std::vector<visgraph::Point> pol7 {visgraph::Point(7.0, 14.0), visgraph::Point(7.0, 17.0), visgraph::Point(10.0, 17.0), visgraph::Point(10.0, 14.0)};
     visgraph::Point origin = visgraph::Point(4.0, 4.0);
-    visgraph::Point destination = visgraph::Point(31.0, 19.0);
+    visgraph::Point destination = visgraph::Point(26.0, 19.0);
 
     //Point in the left-down part
     wallL[0].y = wallL[0].y-offset;

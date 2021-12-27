@@ -701,9 +701,10 @@ namespace dubins
 
         // Now that we have everything we need, calculate the optimal multipoint shortest path
         DubinsCurve **curves = new DubinsCurve*[numberOfPoints-1];
-        for (int i = 1; i < numberOfPoints; i++) {
-            curves[i-1] = findShortestPathCollisionDetection(newPoints[i-1]->x, newPoints[i-1]->y, angles[i-1], newPoints[i]->x, newPoints[i]->y, angles[i], graph);
-            if (curves[i-1] == nullptr) {
+        for (int i = 0; i < numberOfPoints-1; i++) {
+            int index = numberOfPoints-i-1;
+            curves[i] = findShortestPathCollisionDetection(newPoints[index]->x, newPoints[index]->y, mod2pi(angles[index] + M_PI), newPoints[index-1]->x, newPoints[index-1]->y, mod2pi(angles[index-1] + M_PI), graph);
+            if (curves[i] == nullptr) {
                 return nullptr;
             }
         }
