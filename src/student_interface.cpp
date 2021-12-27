@@ -31,6 +31,8 @@ namespace student
     std::vector<visgraph::Point> pol;
     std::vector<std::vector<visgraph::Point>> polygons, polygonsForVisgraph;
 
+    // TODO: find the correct bound k and the inter size of the dubins
+    double max_k = 10, size = 0.005;
     // TODO: find the correct offset based on the robot's size for polygon offsetting
     double offset = 0.065, variant = 10.0;
 
@@ -82,7 +84,8 @@ namespace student
         minY = gate_list[0][i].y;
       }
     }
-    visgraph::Point destination = visgraph::Point((maxX + minX) / 2.0, (maxY + minY) / 2.0);
+    /****************IMPORTANT: remember to remove the 0.1 if it works on your machine!!!*************/
+    visgraph::Point destination = visgraph::Point((maxX + minX) / 2.0, (maxY + minY) / 2.0 - 0.1); 
 
     // DEBUG - create the original graph
     visgraph::Graph originalGraphFirst = visgraph::Graph(polygons, false, true);
@@ -124,7 +127,7 @@ namespace student
     printGraph(g.graph, origin, destination, shortestPath);
 
     // COMPUTE MULTIPOINT DUBINS SHORTEST PATH
-    dubins::Dubins dubins = dubins::Dubins(10, 0.005);
+    dubins::Dubins dubins = dubins::Dubins(max_k, size);
     dubins::DubinsPoint **points = new dubins::DubinsPoint *[shortestPath.size()];
     points[0] = new dubins::DubinsPoint(shortestPath[0].x, shortestPath[0].y, theta[0]);
     for(int i = 1; i < shortestPath.size()-1; i++) {
@@ -140,43 +143,32 @@ namespace student
         dubins.printCompletePath(curves, shortestPath.size()-1, polygons);
     }
 
-    // dubins::Dubins dubins = dubins::Dubins(1.5, 0.005);
-    // dubins::DubinsCurve *result = dubins.findShortestPath(x[0], y[0], theta[0], x[1], y[1], theta[1]);
+    for(int n = 0; n < shortestPath.size()-1; n++) {
+      dubins::DubinsCurve *result = curves[n];
+      int npts = result->a1->L/size;
 
-    // std::cout << "Start pose x = " << x[0] << ", y = " << y[0] << " , theta = " << theta[0] << std::endl;
-    // std::cout << "End pose x = " << x[1] << ", y = " << y[1] << " , theta = " << theta[1] << std::endl;
+      for (int i = 0; i < npts; i++) {
+        double s = result->a1->L/npts * i;
+        dubins::DubinsLine *tmp = new dubins::DubinsLine(s, result->a1->x0, result->a1->y0, result->a1->th0, result->a1->k);
+        path[0].points.emplace_back(s, tmp->x, tmp->y, tmp->th, result->a1->k);
+        delete tmp;
+      }
 
-    // if (!result) {
-    //   std::cout << "RESULT NOT VALID\n";
-    // } 
+      npts = result->a2->L/size;
+      for (int i = 0; i < npts; i++) {
+        double s = result->a2->L/npts * i;
+        dubins::DubinsLine *tmp = new dubins::DubinsLine(s, result->a2->x0, result->a2->y0, result->a2->th0, result->a2->k);
+        path[0].points.emplace_back(s, tmp->x, tmp->y, tmp->th, result->a2->k);
+        delete tmp;
+      }
 
-    // int npts = 100;
-
-    // for (int i = 0; i < npts; i++) {
-    //   double s = result->a1->L/npts * i;
-    //   dubins::DubinsLine *tmp = new dubins::DubinsLine(s, result->a1->x0, result->a1->y0, result->a1->th0, result->a1->k);
-    //   // pts.push_back(cv::Point(tmp->x / size * 500, tmp->y / size * 500));
-    //   path[0].points.emplace_back(s, tmp->x, tmp->y, tmp->th, result->a1->k);
-    //   delete tmp;
-    // }
-
-    // for (int i = 0; i < npts; i++) {
-    //   double s = result->a2->L/npts * i;
-    //   dubins::DubinsLine *tmp = new dubins::DubinsLine(s, result->a2->x0, result->a2->y0, result->a2->th0, result->a2->k);
-    //   // pts.push_back(cv::Point(tmp->x / size * 500, tmp->y / size * 500));
-    //   path[0].points.emplace_back(s, tmp->x, tmp->y, tmp->th, result->a2->k);
-    //   delete tmp;
-    // }
-
-    // for (int i = 0; i < npts; i++) {
-    //   double s = result->a3->L/npts * i;
-    //   dubins::DubinsLine *tmp = new dubins::DubinsLine(s, result->a3->x0, result->a3->y0, result->a3->th0, result->a3->k);
-    //   // pts.push_back(cv::Point(tmp->x / size * 500, tmp->y / size * 500));
-    //   path[0].points.emplace_back(s, tmp->x, tmp->y, tmp->th, result->a3->k);
-    //   if(i == npts-1) {
-    //     std::cout << "x = " << tmp->x << ", y = " << tmp->y << ", theta = " << tmp->th << ", result.theta = " << result->a3->th0 <<std::endl;
-    //   }
-    //   delete tmp;
-    // }
+      npts = result->a3->L/size;
+      for (int i = 0; i < npts; i++) {
+        double s = result->a3->L/npts * i;
+        dubins::DubinsLine *tmp = new dubins::DubinsLine(s, result->a3->x0, result->a3->y0, result->a3->th0, result->a3->k);
+        path[0].points.emplace_back(s, tmp->x, tmp->y, tmp->th, result->a3->k);
+        delete tmp;
+      }
+    }
   }
 }
