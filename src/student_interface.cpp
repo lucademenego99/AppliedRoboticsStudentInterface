@@ -70,7 +70,7 @@ namespace student
     std::vector<std::vector<visgraph::Point>> polygons, polygonsForVisgraph;
 
     // TODO: find the correct bound k and the inter size of the dubins
-    double max_k = 10, size = 0.0001;
+    double max_k = 16, size = 0.0001;
     // TODO: find the correct offset based on the robot's size for polygon offsetting
     double offset = 0.076, variant = 20.0;
 
@@ -154,6 +154,35 @@ namespace student
       }
     }
 
+
+    // ************************ DEBUG - Test a simple shortest path ********************************
+    // visgraph::Point destination = visgraph::Point(borderMinX + 0.2, borderMaxY - 0.2);
+    // dubins::Dubins dubins = dubins::Dubins(max_k, size);
+    // dubins::DubinsCurve *curve = dubins.findShortestPath(origin.x, origin.y, theta[0], destination.x, destination.y, M_PI);
+    // int npts = curve->a1->L/size;
+    // for (int i = 0; i < npts; i++) {
+    //   double s = curve->a1->L/npts * i;
+    //   dubins::DubinsLine *tmp = new dubins::DubinsLine(s, curve->a1->x0, curve->a1->y0, curve->a1->th0, curve->a1->k);
+    //   path[0].points.emplace_back(s, tmp->x, tmp->y, tmp->th, curve->a1->k);
+    //   delete tmp;
+    // }
+    // npts = curve->a2->L/size;
+    // for (int i = 0; i < npts; i++) {
+    //   double s = curve->a2->L/npts * i;
+    //   dubins::DubinsLine *tmp = new dubins::DubinsLine(s, curve->a2->x0, curve->a2->y0, curve->a2->th0, curve->a2->k);
+    //   path[0].points.emplace_back(s, tmp->x, tmp->y, tmp->th, curve->a2->k);
+    //   delete tmp;
+    // }
+    // npts = curve->a3->L/size;
+    // for (int i = 0; i < npts; i++) {
+    //   double s = curve->a3->L/npts * i;
+    //   dubins::DubinsLine *tmp = new dubins::DubinsLine(s, curve->a3->x0, curve->a3->y0, curve->a3->th0, curve->a3->k);
+    //   path[0].points.emplace_back(s, tmp->x, tmp->y, tmp->th, curve->a3->k);
+    //   delete tmp;
+    // }
+
+
+    // ************************ SOLUTION - acutal multipoint shortest path **************************
     visgraph::Point destination = findValidDestinationPoint(borderPoints, minX, maxX, minY, maxY);
     if (destination == visgraph::Point(-1, -1)) {
       std::cout << "UNABLE TO DETERMINE A VALID DESTINATION POINT\n";
