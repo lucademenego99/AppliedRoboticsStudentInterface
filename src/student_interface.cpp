@@ -64,28 +64,45 @@ namespace student
     for(int n = 0; n < pathSize; n++) {
       dubins::DubinsCurve *result = curves[n];
       int npts = result->a1->L/size;
+      double s = 0;
+      dubins::DubinsLine *tmp;
 
       for (int i = 0; i < npts; i++) {
-        double s = result->a1->L/npts * i;
-        dubins::DubinsLine *tmp = new dubins::DubinsLine(s, result->a1->x0, result->a1->y0, result->a1->th0, result->a1->k);
+        s = result->a1->L/npts * i;
+        tmp = new dubins::DubinsLine(s, result->a1->x0, result->a1->y0, result->a1->th0, result->a1->k);
         path[robotId].points.emplace_back(s, tmp->x, tmp->y, tmp->th, result->a1->k);
-        delete tmp;
+      }
+
+      if(result->a1->L - result->a1->L/npts*npts > 0.0) {
+        s = result->a1->L/npts * npts;
+        tmp = new dubins::DubinsLine(s, result->a1->x0, result->a1->y0, result->a1->th0, result->a1->k);
+        path[robotId].points.emplace_back(s, tmp->x, tmp->y, tmp->th, result->a1->k);
       }
 
       npts = result->a2->L/size;
       for (int i = 0; i < npts; i++) {
-        double s = result->a2->L/npts * i;
-        dubins::DubinsLine *tmp = new dubins::DubinsLine(s, result->a2->x0, result->a2->y0, result->a2->th0, result->a2->k);
+        s = result->a2->L/npts * i;
+        tmp = new dubins::DubinsLine(s, result->a2->x0, result->a2->y0, result->a2->th0, result->a2->k);
         path[robotId].points.emplace_back(s, tmp->x, tmp->y, tmp->th, result->a2->k);
-        delete tmp;
+      }
+
+      if(result->a2->L - result->a2->L/npts*npts > 0.0) {
+        s = result->a2->L/npts * npts;
+        tmp = new dubins::DubinsLine(s, result->a2->x0, result->a2->y0, result->a2->th0, result->a2->k);
+        path[robotId].points.emplace_back(s, tmp->x, tmp->y, tmp->th, result->a2->k);
       }
 
       npts = result->a3->L/size;
       for (int i = 0; i < npts; i++) {
-        double s = result->a3->L/npts * i;
-        dubins::DubinsLine *tmp = new dubins::DubinsLine(s, result->a3->x0, result->a3->y0, result->a3->th0, result->a3->k);
+        s = result->a3->L/npts * i;
+        tmp = new dubins::DubinsLine(s, result->a3->x0, result->a3->y0, result->a3->th0, result->a3->k);
         path[robotId].points.emplace_back(s, tmp->x, tmp->y, tmp->th, result->a3->k);
-        delete tmp;
+      }
+
+      if(result->a3->L - result->a3->L/npts*npts > 0.0) {
+        s = result->a3->L/npts * npts;
+        tmp = new dubins::DubinsLine(s, result->a3->x0, result->a3->y0, result->a3->th0, result->a3->k);
+        path[robotId].points.emplace_back(s, tmp->x, tmp->y, tmp->th, result->a3->k);
       }
     }
   }
