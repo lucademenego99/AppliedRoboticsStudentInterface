@@ -52,6 +52,62 @@ namespace student
   }
 
   /**
+   * @brief fulfill the path for the robots
+   * 
+   * @param curves result of the multi-point shortest path
+   * @param path pointer to the structure which will be returned in the function planPath
+   * @param pathSize number of segments of the segmented path
+   * @param size integrate distance for seperated dubin path
+   * @param robotId ID for the robot to be controlled
+   */
+  void fillPath(dubins::DubinsCurve **curves, std::vector<Path>& path, int pathSize, double size, int robotId) {
+    for(int n = 0; n < pathSize; n++) {
+      dubins::DubinsCurve *result = curves[n];
+      int npts = result->a1->L/size;
+      double s = 0;
+      dubins::DubinsLine *tmp;
+
+      for (int i = 0; i < npts; i++) {
+        s = result->a1->L/npts * i;
+        tmp = new dubins::DubinsLine(s, result->a1->x0, result->a1->y0, result->a1->th0, result->a1->k);
+        path[robotId].points.emplace_back(s, tmp->x, tmp->y, tmp->th, result->a1->k);
+      }
+
+      if(result->a1->L - result->a1->L/npts*npts > 0.0) {
+        s = result->a1->L/npts * npts;
+        tmp = new dubins::DubinsLine(s, result->a1->x0, result->a1->y0, result->a1->th0, result->a1->k);
+        path[robotId].points.emplace_back(s, tmp->x, tmp->y, tmp->th, result->a1->k);
+      }
+
+      npts = result->a2->L/size;
+      for (int i = 0; i < npts; i++) {
+        s = result->a2->L/npts * i;
+        tmp = new dubins::DubinsLine(s, result->a2->x0, result->a2->y0, result->a2->th0, result->a2->k);
+        path[robotId].points.emplace_back(s, tmp->x, tmp->y, tmp->th, result->a2->k);
+      }
+
+      if(result->a2->L - result->a2->L/npts*npts > 0.0) {
+        s = result->a2->L/npts * npts;
+        tmp = new dubins::DubinsLine(s, result->a2->x0, result->a2->y0, result->a2->th0, result->a2->k);
+        path[robotId].points.emplace_back(s, tmp->x, tmp->y, tmp->th, result->a2->k);
+      }
+
+      npts = result->a3->L/size;
+      for (int i = 0; i < npts; i++) {
+        s = result->a3->L/npts * i;
+        tmp = new dubins::DubinsLine(s, result->a3->x0, result->a3->y0, result->a3->th0, result->a3->k);
+        path[robotId].points.emplace_back(s, tmp->x, tmp->y, tmp->th, result->a3->k);
+      }
+
+      if(result->a3->L - result->a3->L/npts*npts > 0.0) {
+        s = result->a3->L/npts * npts;
+        tmp = new dubins::DubinsLine(s, result->a3->x0, result->a3->y0, result->a3->th0, result->a3->k);
+        path[robotId].points.emplace_back(s, tmp->x, tmp->y, tmp->th, result->a3->k);
+      }
+    }
+  }
+
+  /**
    * @brief Plan a safe and fast path in the arena
    * 
    * @param borders Border of the arena, expressed in meters
@@ -214,38 +270,13 @@ namespace student
         std::cout << "UNABLE TO COMPUTE A PATH FOR GIVEN INPUT\n";
         // return false;
     } else {
-      std::cout << "COMPLETED MULTIPOINT SHORTEST PATH SUCCESSFULLY\n";
-      // DEBUG
-      // dubins.printCompletePath(curves, shortestPath.size()-1, polygons);
-
-      for(int n = 0; n < shortestPath.size()-1; n++) {
-        dubins::DubinsCurve *result = curves[n];
-        int npts = result->a1->L/size;
-
-        for (int i = 0; i < npts; i++) {
-          double s = result->a1->L/npts * i;
-          dubins::DubinsLine *tmp = new dubins::DubinsLine(s, result->a1->x0, result->a1->y0, result->a1->th0, result->a1->k);
-          path[0].points.emplace_back(s, tmp->x, tmp->y, tmp->th, result->a1->k);
-          delete tmp;
-        }
-
-        npts = result->a2->L/size;
-        for (int i = 0; i < npts; i++) {
-          double s = result->a2->L/npts * i;
-          dubins::DubinsLine *tmp = new dubins::DubinsLine(s, result->a2->x0, result->a2->y0, result->a2->th0, result->a2->k);
-          path[0].points.emplace_back(s, tmp->x, tmp->y, tmp->th, result->a2->k);
-          delete tmp;
-        }
-
-        npts = result->a3->L/size;
-        for (int i = 0; i < npts; i++) {
-          double s = result->a3->L/npts * i;
-          dubins::DubinsLine *tmp = new dubins::DubinsLine(s, result->a3->x0, result->a3->y0, result->a3->th0, result->a3->k);
-          path[0].points.emplace_back(s, tmp->x, tmp->y, tmp->th, result->a3->k);
-          delete tmp;
-        }
-      }
+        std::cout << "COMPLETED MULTIPOINT SHORTEST PATH SUCCESSFULLY\n";
+        // DEBUG
+        // dubins.printCompletePath(curves, shortestPath.size()-1, polygons);
+        fillPath(curves, path, shortestPath.size()-1, size, 0);
     }
+    
     return true;
   }
+
 }
