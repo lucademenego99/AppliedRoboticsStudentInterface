@@ -289,53 +289,12 @@ namespace dubins
             curve_segments = nullptr;
         }
 
-        // std::cout << "BEST CURVE SEGMENTS:\n"
-        //           << best_curve_segments->s1 << "\n"
-        //           << best_curve_segments->s2 << "\n"
-        //           << best_curve_segments->s3 << "\n";
-
-        // std::cout << "PIDX: " << pidx << " BEST_L: " << best_L;
-
         bool valid = false;
         if (pidx >= 0)
         {
             CurveSegmentsResult *curve_result = scaleFromStandard(scaled_parameters->lambda, best_curve_segments);
 
-            // std::cout << "CURVE RESULT: " << curve_result->s1 << " " << curve_result->s2 << " " << curve_result->s3 << "\n\n";
-
             curve = new DubinsCurve(x0, y0, th0, curve_result->s1, curve_result->s2, curve_result->s3, ksigns[pidx][0] * k_max, ksigns[pidx][1] * k_max, ksigns[pidx][2] * k_max);
-
-            // std::cout << "GENERAL L: " << curve->L << "\n";
-
-            // std::cout << "a1 = \n"
-            //       << "\tL = " << curve->a1->L << "\n"
-            //       << "\tk = " << curve->a1->k << "\n"
-            //       << "\tx0 = " << curve->a1->x0 << "\n"
-            //       << "\ty0 = " << curve->a1->y0 << "\n"
-            //       << "\tth0 = " << curve->a1->th0 << "\n"
-            //       << "\tdubins_line-x = " << curve->a1->dubins_line->x << "\n"
-            //       << "\tdubins_line-y = " << curve->a1->dubins_line->y << "\n"
-            //       << "\tdubins_line-th = " << curve->a1->dubins_line->th << "\n\n";
-
-            // std::cout << "a2 = \n"
-            //       << "\tL = " << curve->a2->L << "\n"
-            //       << "\tk = " << curve->a2->k << "\n"
-            //       << "\tx0 = " << curve->a2->x0 << "\n"
-            //       << "\ty0 = " << curve->a2->y0 << "\n"
-            //       << "\tth0 = " << curve->a2->th0 << "\n"
-            //       << "\tdubins_line-x = " << curve->a2->dubins_line->x << "\n"
-            //       << "\tdubins_line-y = " << curve->a2->dubins_line->y << "\n"
-            //       << "\tdubins_line-th = " << curve->a2->dubins_line->th << "\n\n";
-
-            // std::cout << "a3 = \n"
-            //       << "\tL = " << curve->a3->L << "\n"
-            //       << "\tk = " << curve->a3->k << "\n"
-            //       << "\tx0 = " << curve->a3->x0 << "\n"
-            //       << "\ty0 = " << curve->a3->y0 << "\n"
-            //       << "\tth0 = " << curve->a3->th0 << "\n"
-            //       << "\tdubins_line-x = " << curve->a3->dubins_line->x << "\n"
-            //       << "\tdubins_line-y = " << curve->a3->dubins_line->y << "\n"
-            //       << "\tdubins_line-th = " << curve->a3->dubins_line->th << "\n\n";
 
             bool valid = checkValidity(best_curve_segments, ksigns[pidx][0] * scaled_parameters->scaled_k_max, ksigns[pidx][1] * scaled_parameters->scaled_k_max, ksigns[pidx][2] * scaled_parameters->scaled_k_max, scaled_parameters->scaled_th0, scaled_parameters->scaled_thf);
             if (!valid)
@@ -598,9 +557,6 @@ namespace dubins
                                 S[n][i] = -1;
                             }
                         }
-                    } else {
-                        L[n][i] = INFINITY;
-                        S[n][i] = -1;
                     }
                 }
             }

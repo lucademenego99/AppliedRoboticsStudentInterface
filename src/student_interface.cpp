@@ -70,7 +70,7 @@ namespace student
     std::vector<std::vector<visgraph::Point>> polygons, polygonsForVisgraph;
 
     // TODO: find the correct bound k and the inter size of the dubins
-    double max_k = 16, size = 0.0001;
+    double max_k = 8, size = 0.0001;
     // TODO: find the correct offset based on the robot's size for polygon offsetting
     double offset = 0.076, variant = 20.0;
 
@@ -206,18 +206,17 @@ namespace student
     dubins::Dubins dubins = dubins::Dubins(max_k, size);
     dubins::DubinsPoint **points = new dubins::DubinsPoint *[shortestPath.size()];
     points[0] = new dubins::DubinsPoint(shortestPath[0].x, shortestPath[0].y, theta[0]);
-    for(int i = 1; i < shortestPath.size()-1; i++) {
+    for(int i = 1; i < shortestPath.size(); i++) {
         points[i] = new dubins::DubinsPoint(shortestPath[i].x, shortestPath[i].y);
     }
-    points[shortestPath.size()-1] = new dubins::DubinsPoint(shortestPath[shortestPath.size()-1].x, shortestPath[shortestPath.size()-1].y);
     dubins::DubinsCurve **curves = dubins.multipointShortestPath(points, shortestPath.size(), originalGraph);
     if (curves == nullptr) {
         std::cout << "UNABLE TO COMPUTE A PATH FOR GIVEN INPUT\n";
         // return false;
     } else {
-        std::cout << "COMPLETED MULTIPOINT SHORTEST PATH SUCCESSFULLY\n";
-        // DEBUG
-        // dubins.printCompletePath(curves, shortestPath.size()-1, polygons);
+      std::cout << "COMPLETED MULTIPOINT SHORTEST PATH SUCCESSFULLY\n";
+      // DEBUG
+      // dubins.printCompletePath(curves, shortestPath.size()-1, polygons);
 
       for(int n = 0; n < shortestPath.size()-1; n++) {
         dubins::DubinsCurve *result = curves[n];
