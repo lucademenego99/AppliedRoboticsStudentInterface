@@ -132,7 +132,7 @@ namespace student
     std::vector<std::vector<visgraph::Point>> polygons, polygonsForVisgraph;
 
     // TODO: find the correct bound k and the inter size of the dubins
-    double max_k = 8, size = 0.0001;
+    double max_k = 30, size = 0.0001;
     // TODO: find the correct offset based on the robot's size for polygon offsetting
     double offset = 0.076, variant = 20.0;
 
@@ -260,9 +260,9 @@ namespace student
     std::vector<visgraph::Point> shortestPath = g.shortestPath(origin, destination);
 
     // DEBUG
-    // printGraph(originalGraphFirst.graph, origin, destination, shortestPath);
-    // printGraph(originalGraph.graph, origin, destination, shortestPath);
-    // printGraph(g.graph, origin, destination, shortestPath);
+    printGraph(originalGraphFirst.graph, origin, destination, shortestPath);
+    printGraph(originalGraph.graph, origin, destination, shortestPath);
+    printGraph(g.graph, origin, destination, shortestPath);
 
     // COMPUTE MULTIPOINT DUBINS SHORTEST PATH
     dubins::Dubins dubins = dubins::Dubins(max_k, size);
@@ -278,7 +278,7 @@ namespace student
     } else {
         std::cout << "COMPLETED MULTIPOINT SHORTEST PATH SUCCESSFULLY\n";
         // DEBUG
-        // dubins.printCompletePath(curves, shortestPath.size()-1, polygons);
+        dubins.printCompletePath(curves, shortestPath.size()-1, polygons);
         fillPath(curves, path, shortestPath.size()-1, size, 0);
     }
     
