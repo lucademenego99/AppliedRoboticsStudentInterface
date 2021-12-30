@@ -264,9 +264,9 @@ namespace student
    * @return true If a path has been found
    * @return false If a path hasn't been found
    */
-  bool reachDestinationForRobot(int robot, visgraph::Point origin, std::vector<visgraph::Point> destinations, double theta, visgraph::Graph originalGraph, visgraph::Graph g, std::vector<Path> &path, double max_k, double size) {
+  bool reachDestinationForRobot(int robot, visgraph::Point origin, std::vector<visgraph::Point> destinations, double theta, visgraph::Graph originalGraph, visgraph::Graph g, std::vector<visgraph::Point> &shortestPath, std::vector<Path> &path, double max_k, double size) {
     // ********** COMPUTE SHORTEST PATH FROM ORIGIN TO DESTINATION ********** //
-    std::vector<visgraph::Point> shortestPath = g.shortestPathMultipleD(origin, destinations);
+    shortestPath = g.shortestPathMultipleD(origin, destinations);
 
     // DEBUG - print graphs using opencv
     // printGraph(originalGraph.graph, origin, destination, shortestPath);
@@ -415,61 +415,70 @@ namespace student
       // *** Try to reach the destination *** //
       std::cout << "THERE IS ONE ONLY ROBOT\nTry to reach the gate\n";
 
+      std::vector<visgraph::Point> shortestPath;
 
       // ********** SET THE ORIGIN ********** //
       visgraph::Point origin = visgraph::Point(x[0], y[0]);
 
 
       // ********** TRY TO REACH THE DESTINATION ********** //
-      bool foundPath = reachDestinationForRobot(0, origin, destinations, theta[0], originalGraph, g, path, max_k, size);
+      bool foundPath = reachDestinationForRobot(0, origin, destinations, theta[0], originalGraph, g, shortestPath, path, max_k, size);
       if (!foundPath) {
         std::cout << "NO PATH FOUND!\n";
       }
 
 
     } else if (numberOfRobots == 2) {
+
       // ********** TWO ROBOTS - PROJECT NUMBER 1 - PURSUER EVADER GAME ********** //
       std::cout << "THERE ARE TWO ROBOTS\nPursuer Evader game\n";
 
-      // DEBUG - try to reach a destination with both robots
-      bool foundPathFirst = reachDestinationForRobot(0, visgraph::Point(x[0], y[0]), destinations, theta[0], originalGraph, g, path, max_k, size);
+      std::vector<visgraph::Point> shortestPathEvader, shortestPathPursuer;
+      
+      // ********** EVADER - Try to reach the closer destination ********** //
+      bool foundPathFirst = reachDestinationForRobot(0, visgraph::Point(x[0], y[0]), destinations, theta[0], originalGraph, g, shortestPathEvader, path, max_k, size);
       if (!foundPathFirst) {
-        std::cout << "NO PATH FOUND FOR FIRST ROBOT!\n";
+        std::cout << "NO PATH FOUND FOR THE EVADER!\n";
       }
-      /*
-      bool foundPathSecond = reachDestinationForRobot(1, visgraph::Point(x[1], y[1]), destinations, theta[1], originalGraph, g, path, max_k, size);
-      if (!foundPathSecond) {
-        std::cout << "NO PATH FOUND FOR SECOND ROBOT!\n";
-      }
-      */
+      
+      // DEBUG - Try to reach the closer destination with the pursuer
+      // bool foundPathSecond = reachDestinationForRobot(1, visgraph::Point(x[1], y[1]), destinations, theta[1], originalGraph, g, path, max_k, size);
+      // if (!foundPathSecond) {
+      //   std::cout << "NO PATH FOUND FOR SECOND ROBOT!\n";
+      // }
+
+
+      // ********** PURSUER - Find the path to intercept the evader ********** //
       //Calculate the shortestPathDict both for the first robot position and the second
-      std::map<visgraph::Point, double> distancesR1 = g.shortestPathMultipleDDict(visgraph::Point(x[0], y[0]), destinations);
-      std::map<visgraph::Point, double> distancesR2 = g.shortestPathMultipleDDict(visgraph::Point(x[1], y[1]), destinations);
+      std::map<visgraph::Point, double> distancesEvader = g.shortestPathMultipleDDict(visgraph::Point(x[0], y[0]), destinations);
+      std::map<visgraph::Point, double> distancesPursuer = g.shortestPathMultipleDDict(visgraph::Point(x[1], y[1]), destinations);
       // Algorithm for the pursuer evader game
       // We assume the evader is in position 0
-      for(int i=1; i<path[0].points.size(); i++){
-
-        if(distancesR2[visgraph::Point(path[0].points[i].x, path[0].points[i].y)] < distancesR1[visgraph::Point(path[0].points[i].x, path[0].points[i].y)]){
-          std::cout << "Entriamo nell'if\n";
-          std::vector<visgraph::Point> finalDestination;
-          finalDestination.push_back(visgraph::Point(path[0].points[i].x, path[0].points[i].y));
-          bool foundPathPursuer = reachDestinationForRobot(1, visgraph::Point(x[1], y[1]), finalDestination, theta[1], originalGraph, g, path, max_k, size);
-          //Debug
+      int i;
+      for(i = 1; i < shortestPathEvader.size(); i++){
+        if (distancesPursuer[shortestPathEvader[i]] < distancesEvader[shortestPathEvader[i]]) {
+          std::vector<visgraph::Point> finalDestinations;
+          finalDestinations.push_back(visgraph::Point(shortestPathEvader[i].x, shortestPathEvader[i].y));
+          bool foundPathPursuer = reachDestinationForRobot(1, visgraph::Point(x[1], y[1]), finalDestinations, theta[1], originalGraph, g, shortestPathPursuer, path, max_k, size);
           if (foundPathPursuer) {
-            std::cout << "Pursuer has found a path!\n";
+            break;
           }
-          break;
         }
+      }
+      if (i == shortestPathEvader.size()) {
+        std::cout << "THE PURSUER WASN'T ABLE TO FIND A PATH TO REACH THE EVADER\n";
       }
       
     } else if (numberOfRobots == 3) {
       // ********** THREE ROBOTS - PROJECT NUMBER 2 - NOT DONE ********** //
       std::cout << "THERE ARE THREE ROBOTS\nProject number 2 not done\n";
 
+      std::vector<visgraph::Point> shortestPathTmp;
+
       // DEBUG - try to reach a destination with all robots
-      reachDestinationForRobot(0, visgraph::Point(x[0], y[0]), destinations, theta[0], originalGraph, g, path, max_k, size);
-      reachDestinationForRobot(1, visgraph::Point(x[1], y[1]), destinations, theta[1], originalGraph, g, path, max_k, size);
-      reachDestinationForRobot(2, visgraph::Point(x[2], y[2]), destinations, theta[2], originalGraph, g, path, max_k, size);
+      reachDestinationForRobot(0, visgraph::Point(x[0], y[0]), destinations, theta[0], originalGraph, g, shortestPathTmp, path, max_k, size);
+      reachDestinationForRobot(1, visgraph::Point(x[1], y[1]), destinations, theta[1], originalGraph, g, shortestPathTmp, path, max_k, size);
+      reachDestinationForRobot(2, visgraph::Point(x[2], y[2]), destinations, theta[2], originalGraph, g, shortestPathTmp, path, max_k, size);
 
     }
 

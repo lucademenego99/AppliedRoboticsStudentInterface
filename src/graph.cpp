@@ -494,8 +494,7 @@ std::map<Point, double> Graph::shortestPathMultipleDDict(Point origin, std::vect
 
     // Create a map to store the distances for all points
     std::map<Point, double> dist;
-    // Create a map to reconstruct the final solution
-    std::map<Point, Point> prev;
+    
     // Create a set to store vertices that are being processed
     std::set<std::pair<double, Point>> setds;
 
@@ -522,35 +521,14 @@ std::map<Point, double> Graph::shortestPathMultipleDDict(Point origin, std::vect
                 // If we already had a distance from v through u, erase it (then we will insert the new one)
                 if (dist.count(v)) {
                     setds.erase(setds.find(std::make_pair(dist[v], v)));
-                    prev.erase(prev.find(v));
                 }
                 
                 // Update the distance from the point v
                 dist[v] = dist[u] + weight;
                 setds.insert(std::make_pair(dist[v], v));
-                prev.insert(std::make_pair(v,u));
             }
         }
     }
-
-    // Check the best destination available
-    Point bestDestination = Point(-1, -1);
-    double shortestDistance = INFINITY;
-    for (int i = 0; i < destinations.size(); i++) {
-        if (dist[destinations[i]] < shortestDistance) {
-            shortestDistance = dist[destinations[i]];
-            bestDestination = destinations[i];
-        }
-    }
-    // Reconstruct the path using prev and starting from the best destination found
-    std::vector<Point> path;
-    while(true){
-        path.push_back(bestDestination);
-        if(bestDestination == origin) break;
-        bestDestination = prev.find(bestDestination)->second;
-    }
-    // Reverse the path
-    reverse(path.begin(), path.end());
 
     return dist;
 }
