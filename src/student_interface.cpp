@@ -436,9 +436,30 @@ namespace student
       if (!foundPathFirst) {
         std::cout << "NO PATH FOUND FOR FIRST ROBOT!\n";
       }
+      /*
       bool foundPathSecond = reachDestinationForRobot(1, visgraph::Point(x[1], y[1]), destinations, theta[1], originalGraph, g, path, max_k, size);
       if (!foundPathSecond) {
         std::cout << "NO PATH FOUND FOR SECOND ROBOT!\n";
+      }
+      */
+      //Calculate the shortestPathDict both for the first robot position and the second
+      std::map<visgraph::Point, double> distancesR1 = g.shortestPathMultipleDDict(visgraph::Point(x[0], y[0]), destinations);
+      std::map<visgraph::Point, double> distancesR2 = g.shortestPathMultipleDDict(visgraph::Point(x[1], y[1]), destinations);
+      // Algorithm for the pursuer evader game
+      // We assume the evader is in position 0
+      for(int i=1; i<path[0].points.size(); i++){
+
+        if(distancesR2[visgraph::Point(path[0].points[i].x, path[0].points[i].y)] < distancesR1[visgraph::Point(path[0].points[i].x, path[0].points[i].y)]){
+          std::cout << "Entriamo nell'if\n";
+          std::vector<visgraph::Point> finalDestination;
+          finalDestination.push_back(visgraph::Point(path[0].points[i].x, path[0].points[i].y));
+          bool foundPathPursuer = reachDestinationForRobot(1, visgraph::Point(x[1], y[1]), finalDestination, theta[1], originalGraph, g, path, max_k, size);
+          //Debug
+          if (foundPathPursuer) {
+            std::cout << "Pursuer has found a path!\n";
+          }
+          break;
+        }
       }
       
     } else if (numberOfRobots == 3) {

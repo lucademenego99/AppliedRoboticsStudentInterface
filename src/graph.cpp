@@ -395,3 +395,162 @@ std::vector<Point> Graph::shortestPath(Point origin, Point destination) {
 
     return path;
 }
+
+/**
+ * @brief Dijkstra Shortest path.
+ * Reference: https://www.geeksforgeeks.org/dijkstras-shortest-path-algorithm-using-set-in-stl/
+ * Complexity: O(E logV)
+ * 
+ * @param graph A map <Point, vector of adjacent edges>
+ * @param origin The origin point in which we want to start
+ * @param destination Our destination
+ * @return std::map<Point, double> The complete shortest path from origin to destination
+ */
+std::map<Point, double> Graph::shortestPathDict(Point origin, Point destination) {
+    // Check the input
+    if(graph.find(origin) == graph.end() || graph.find(destination) == graph.end()) {
+        std::cout << "ERROR: origin point or destination point not available in graph!" << std::endl;
+        std::map<Point, double> dist;
+        return dist;
+    }
+
+    // Create a map to store the distances for all points
+    std::map<Point, double> dist;
+    // Create a map to reconstruct the final solution
+    std::map<Point, Point> prev;
+    // Create a set to store vertices that are being processed
+    std::set<std::pair<double, Point>> setds;
+
+    // Insert the origin point to start the algorithm
+    setds.insert(std::make_pair(0, origin));
+    dist[origin] = 0;
+
+    // Loop until all shortest distances are finalized (or until the destination is found)
+    while(!setds.empty()) {
+        // First vertex in the set - the min distance vertex
+        std::pair<double, Point> tmp = *(setds.begin());
+        setds.erase(setds.begin());
+
+        Point u = tmp.second;
+
+        // If we reached the destination, we can stop
+        if(u == destination) {
+            break;
+        }
+
+        // Loop through all adjacent vertices of the point u
+        for (Edge e : graph[u]) {
+            Point v = e.getAdjacent(u);
+            // The weight is simply the distance between the points
+            double weight = e.weight();
+
+            // If there is a shortest path from v through u (or it's the first one we find)
+            if (!dist.count(v) || dist[v] > dist[u]+weight) {
+                // If we already had a distance from v through u, erase it (then we will insert the new one)
+                if (dist.count(v)) {
+                    setds.erase(setds.find(std::make_pair(dist[v], v)));
+                    prev.erase(prev.find(v));
+                }
+                
+                // Update the distance from the point v
+                dist[v] = dist[u] + weight;
+                setds.insert(std::make_pair(dist[v], v));
+                prev.insert(std::make_pair(v,u));
+            }
+        }
+    }
+
+    // Reconstruct the path using prev. Start from destination
+    std::vector<Point> path;
+    while(true){
+        path.push_back(destination);
+        if(destination == origin) break;
+        destination = prev.find(destination)->second;
+    }
+    // Reverse the path
+    reverse(path.begin(), path.end());
+
+    return dist;
+}
+
+/**
+ * @brief Dijkstra Shortest path, multiple destinations.
+ * Reference: https://www.geeksforgeeks.org/dijkstras-shortest-path-algorithm-using-set-in-stl/
+ * Complexity: O(E logV)
+ * 
+ * @param graph A map <Point, vector of adjacent edges>
+ * @param origin The origin point in which we want to start
+ * @param destinations All possible destinations
+ * @return std::map<Point, double> The complete shortest path from origin to destination
+ */
+std::map<Point, double> Graph::shortestPathMultipleDDict(Point origin, std::vector<Point> destinations) 
+{
+    // Check the input
+    if(graph.find(origin) == graph.end()) {
+        std::cout << "ERROR: origin point not available in graph!" << std::endl;
+        std::map<Point, double> dist;
+        return dist;
+    }
+
+    // Create a map to store the distances for all points
+    std::map<Point, double> dist;
+    // Create a map to reconstruct the final solution
+    std::map<Point, Point> prev;
+    // Create a set to store vertices that are being processed
+    std::set<std::pair<double, Point>> setds;
+
+    // Insert the origin point to start the algorithm
+    setds.insert(std::make_pair(0, origin));
+    dist[origin] = 0;
+
+    // Loop until all shortest distances are finalized
+    while(!setds.empty()) {
+        // First vertex in the set - the min distance vertex
+        std::pair<double, Point> tmp = *(setds.begin());
+        setds.erase(setds.begin());
+
+        Point u = tmp.second;
+
+        // Loop through all adjacent vertices of the point u
+        for (Edge e : graph[u]) {
+            Point v = e.getAdjacent(u);
+            // The weight is simply the distance between the points
+            double weight = e.weight();
+
+            // If there is a shortest path from v through u (or it's the first one we find)
+            if (!dist.count(v) || dist[v] > dist[u]+weight) {
+                // If we already had a distance from v through u, erase it (then we will insert the new one)
+                if (dist.count(v)) {
+                    setds.erase(setds.find(std::make_pair(dist[v], v)));
+                    prev.erase(prev.find(v));
+                }
+                
+                // Update the distance from the point v
+                dist[v] = dist[u] + weight;
+                setds.insert(std::make_pair(dist[v], v));
+                prev.insert(std::make_pair(v,u));
+            }
+        }
+    }
+
+    // Check the best destination available
+    Point bestDestination = Point(-1, -1);
+    double shortestDistance = INFINITY;
+    for (int i = 0; i < destinations.size(); i++) {
+        if (dist[destinations[i]] < shortestDistance) {
+            shortestDistance = dist[destinations[i]];
+            bestDestination = destinations[i];
+        }
+    }
+    // Reconstruct the path using prev and starting from the best destination found
+    std::vector<Point> path;
+    while(true){
+        path.push_back(bestDestination);
+        if(bestDestination == origin) break;
+        bestDestination = prev.find(bestDestination)->second;
+    }
+    // Reverse the path
+    reverse(path.begin(), path.end());
+
+    return dist;
+}
