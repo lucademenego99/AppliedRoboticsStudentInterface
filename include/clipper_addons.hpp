@@ -3,15 +3,13 @@
 
 #include "clipper.hpp"
 
-using namespace ClipperLib;
-
 /**
  * @brief Clipper Polygon Offsetting helper function
  * We multiply the points by 1000 because Clipper works best under the assumption of working on a certain scale
  * 
  * @param points Points of the original polygon
  * @param offset Offset that must be used to enlarge or shrink the polygon
- * @return std::vector<student::Point> Array of points of the resulting polygon
+ * @return std::vector<visgraph::Point> Array of points of the resulting polygon
  */
 std::vector<visgraph::Point> enlarge(std::vector<visgraph::Point> points, double offset);
 
@@ -21,7 +19,7 @@ std::vector<visgraph::Point> enlarge(std::vector<visgraph::Point> points, double
  * @param startingPoints Points of the original polygon
  * @param solution Solution given by clipper
  */
-void printSolution(std::vector<IntPoint> points, Paths solution);
+void printSolution(std::vector<ClipperLib::IntPoint> points, ClipperLib::Paths solution);
 
 
 /**
@@ -32,14 +30,14 @@ void printSolution(std::vector<IntPoint> points, Paths solution);
  * @return true If the two polygons intersect
  * @return false If the two polygons do not intersect
  */
-bool intersect (student::Point *subj, student::Point *clip);
+bool intersect (dubins::DubinsPoint *subj, dubins::DubinsPoint *clip);
 
 /**
  * @brief Given some obstacles and an offset, creates a "bigger" version using clipper and a "slightly bigger" one, then returns them
  * 
  * @param polygon Obstacles we are considering
  * @param offset Offset for obstacle offsetting
- * @return std::vector<std::vector<student::Point>> Array containing at position 0 the bigger obstacles and at position 1 the smaller ones
+ * @return std::vector<std::vector<visgraph::Point>> Array containing at position 0 the bigger obstacles and at position 1 the smaller ones
  */
 std::vector<std::vector<visgraph::Point>> enlargeObstaclesWithTwoOffsets(std::vector<visgraph::Point> polygon, double offset);
 

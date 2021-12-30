@@ -8,7 +8,7 @@
 #include "clipper.hpp"
 #include <iostream>
 
-using namespace student;
+using namespace dubins;
 
 void shortestPathDubinsTest(Dubins dubins);
 void multipointDubinsAndVisgraphTest(Dubins dubins);
@@ -98,10 +98,11 @@ void shortestPathDubinsTest(Dubins dubins)
 
 void multipointDubinsAndVisgraphTest(Dubins dubins)
 {
-    student::Polygon polTmp;
     std::vector<double> tTmp;
 
     std::vector<std::vector<visgraph::Point>> polygons, polygonsForVisgraph;
+    double offset = 0.5;
+    //std::vector<std::vector<visgraph::Point>> outerWalls;
     // std::vector<visgraph::Point> pol1 {visgraph::Point(1.5, 1.5), visgraph::Point(3.5, 1.5), visgraph::Point(5.0, 3.0), visgraph::Point(3.5, 4.5), visgraph::Point(1.5, 4.5), visgraph::Point(0.0, 3.0)};
     // std::vector<visgraph::Point> pol2 {visgraph::Point(5.0, 5.0), visgraph::Point(8.0, 5.0), visgraph::Point(8.0, 11.0), visgraph::Point(5.0, 11.0)};
     // std::vector<visgraph::Point> pol3 {visgraph::Point(12.0, 1.0), visgraph::Point(14.0, 4.0), visgraph::Point(12.0, 7.0), visgraph::Point(10.0, 4.0)};
@@ -109,20 +110,55 @@ void multipointDubinsAndVisgraphTest(Dubins dubins)
     // visgraph::Point origin = visgraph::Point(1.0, 8.0);
     // visgraph::Point destination = visgraph::Point(24.0, 2.0);
 
-    std::vector<visgraph::Point> pol1 {visgraph::Point(2.0, 1.0), visgraph::Point(3.0, 1.0), visgraph::Point(4.0, 2.0), visgraph::Point(3.0, 3.0), visgraph::Point(2.0, 3.0), visgraph::Point(1.0, 2.0), visgraph::Point(2.0, 1.0)};
-    std::vector<visgraph::Point> pol2 {visgraph::Point(1.0, 3.5), visgraph::Point(6.0, 6.0), visgraph::Point(1.0, 6.0), visgraph::Point(1.0, 3.5)};
-    std::vector<visgraph::Point> pol3 {visgraph::Point(7.0, 2.0), visgraph::Point(8.0, 3.0), visgraph::Point(7.0, 5.0), visgraph::Point(6.0, 3.0), visgraph::Point(7.0,2.0)};
-    visgraph::Point origin = visgraph::Point(1.0, 8.0);
-    visgraph::Point destination = visgraph::Point(5.0, 4.0);
+    //The first four polygons are the walls
+    std::vector<visgraph::Point> wallL {visgraph::Point(1.0, 1.0), visgraph::Point(1.0, 22.0)};
+    std::vector<visgraph::Point> wallN {visgraph::Point(1.0, 22.0), visgraph::Point(30.0, 22.0)};
+    std::vector<visgraph::Point> wallR {visgraph::Point(30.0, 22.0), visgraph::Point(30.0, 1.0)};
+    std::vector<visgraph::Point> wallS {visgraph::Point(30.0, 1.0), visgraph::Point(1.0, 1.0)};
 
-    polygons.push_back(pol1);
-    polygons.push_back(pol2);
-    polygons.push_back(pol3);
-    // polygons.push_back(pol4);
-    std::vector<std::vector<std::vector<visgraph::Point>>> pols = enlargeAndJoinObstacles(polygons, 0.5);
+    std::vector<visgraph::Point> pol5 {visgraph::Point(7.0, 6.0), visgraph::Point(7.0, 8.0), visgraph::Point(9.0, 8.0), visgraph::Point(9.0, 6.0)};
+    std::vector<visgraph::Point> pol6 {visgraph::Point(3.0, 8.0), visgraph::Point(3.0, 12.0), visgraph::Point(22.0, 12.0), visgraph::Point(22.0, 8.0)};
+    std::vector<visgraph::Point> pol7 {visgraph::Point(7.0, 14.0), visgraph::Point(7.0, 17.0), visgraph::Point(10.0, 17.0), visgraph::Point(10.0, 14.0)};
+    visgraph::Point origin = visgraph::Point(4.0, 4.0);
+    visgraph::Point destination = visgraph::Point(26.0, 19.0);
 
+    //Point in the left-down part
+    wallL[0].y = wallL[0].y-offset;
+
+    //Poin in the left-up part
+    wallL[1].y = wallL[1].y+offset;
+
+    //Point in the left-up part
+    wallN[0].x = wallN[0].x-offset;
+
+    //Point in the right-up part
+    wallN[1].x = wallN[1].x+offset;
+
+    //Point in the right-up part
+    wallR[0].y = wallR[0].y+offset;
+
+    //Point in the right-down part
+    wallR[1].y = wallR[1].y-offset;
+
+    //Point in the right-down part
+    wallS[0].x = wallS[0].x+offset;
+
+    //Point in the lfeft-down part
+    wallS[1].x = wallS[1].x-offset;
+
+
+    polygons.push_back(pol5);
+    polygons.push_back(pol6);
+    polygons.push_back(pol7);
+    std::vector<std::vector<std::vector<visgraph::Point>>> pols = enlargeAndJoinObstacles(polygons, offset);
+
+    
     polygonsForVisgraph = pols[0];
     polygons = pols[1];
+    polygons.push_back(wallL);
+    polygons.push_back(wallN);
+    polygons.push_back(wallR);
+    polygons.push_back(wallS);
 
     visgraph::VisGraph visg;
 
@@ -145,12 +181,12 @@ void multipointDubinsAndVisgraphTest(Dubins dubins)
 
     // COMPUTE MULTIPOINT DUBINS SHORTEST PATH
     std::cout << "MULTIPOINT SHORTEST PATH TEST\n";
-    student::Point **points = new student::Point *[path.size()];
-    points[0] = new student::Point(path[0].x, path[0].y, 0);
+    dubins::DubinsPoint **points = new dubins::DubinsPoint *[path.size()];
+    points[0] = new dubins::DubinsPoint(path[0].x, path[0].y, 0);
     for(int i = 1; i < path.size()-1; i++) {
-        points[i] = new student::Point(path[i].x, path[i].y);
+        points[i] = new dubins::DubinsPoint(path[i].x, path[i].y);
     }
-    points[path.size()-1] = new student::Point(path[path.size()-1].x, path[path.size()-1].y);
+    points[path.size()-1] = new dubins::DubinsPoint(path[path.size()-1].x, path[path.size()-1].y);
 
     DubinsCurve **curves = dubins.multipointShortestPath(points, path.size(), originalGraph);
     if (curves == nullptr) {
@@ -164,10 +200,10 @@ void multipointDubinsAndVisgraphTest(Dubins dubins)
 void intersectionsTest(Dubins dubins)
 {
     std::cout << "INTERSECTIONS TEST\n";
-    std::vector<student::Point> intersections = std::vector<student::Point>();
+    std::vector<dubins::DubinsPoint> intersections = std::vector<dubins::DubinsPoint>();
     std::vector<double> ts = std::vector<double>();
 
-    bool res = dubins.intersLineLine(student::Point(1, 1), student::Point(66.57, 0.367), student::Point(56.01, 18.22), student::Point(56.01, 0.067), intersections, ts);
+    bool res = dubins.intersLineLine(dubins::DubinsPoint(1, 1), dubins::DubinsPoint(66.57, 0.367), dubins::DubinsPoint(56.01, 18.22), dubins::DubinsPoint(56.01, 0.067), intersections, ts);
     std::cout << "RES: " << res << "\n";
     if (res)
     {
@@ -183,7 +219,7 @@ void intersectionsTest(Dubins dubins)
         }
     }
 
-    // bool res = dubins.intersCircleLine(student::Point(2, 2), 1, student::Point(0, 0), student::Point(4, 4), intersections, ts);
+    // bool res = dubins.intersCircleLine(dubins::DubinsPoint(2, 2), 1, dubins::DubinsPoint(0, 0), dubins::DubinsPoint(4, 4), intersections, ts);
     // std::cout << "RES: " << res << "\n";
     // if (res)
     // {
@@ -203,7 +239,7 @@ void intersectionsTest(Dubins dubins)
     // std::cout << "ARC:\n"
     //           << arc->x0 << " , " << arc->y0 << " , " << arc->th0 << "\n";
     // std::cout << arc->dubins_line->x << " , " << arc->dubins_line->y << " , " << arc->dubins_line->th << "\n";
-    // bool res = dubins.intersArcLine(arc, student::Point(0, -1), student::Point(1, 0), intersections, ts);
+    // bool res = dubins.intersArcLine(arc, dubins::DubinsPoint(0, -1), dubins::DubinsPoint(1, 0), intersections, ts);
     // std::cout << "\n\nRES: " << res << "\n";
     // if (res)
     // {

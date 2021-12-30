@@ -7,7 +7,7 @@
 
 using namespace cv;
 
-namespace student
+namespace dubins
 {
     /**
      * @brief Construct a new Dubins:: Dubins object
@@ -289,53 +289,12 @@ namespace student
             curve_segments = nullptr;
         }
 
-        // std::cout << "BEST CURVE SEGMENTS:\n"
-        //           << best_curve_segments->s1 << "\n"
-        //           << best_curve_segments->s2 << "\n"
-        //           << best_curve_segments->s3 << "\n";
-
-        // std::cout << "PIDX: " << pidx << " BEST_L: " << best_L;
-
         bool valid = false;
         if (pidx >= 0)
         {
             CurveSegmentsResult *curve_result = scaleFromStandard(scaled_parameters->lambda, best_curve_segments);
 
-            // std::cout << "CURVE RESULT: " << curve_result->s1 << " " << curve_result->s2 << " " << curve_result->s3 << "\n\n";
-
             curve = new DubinsCurve(x0, y0, th0, curve_result->s1, curve_result->s2, curve_result->s3, ksigns[pidx][0] * k_max, ksigns[pidx][1] * k_max, ksigns[pidx][2] * k_max);
-
-            // std::cout << "GENERAL L: " << curve->L << "\n";
-
-            // std::cout << "a1 = \n"
-            //       << "\tL = " << curve->a1->L << "\n"
-            //       << "\tk = " << curve->a1->k << "\n"
-            //       << "\tx0 = " << curve->a1->x0 << "\n"
-            //       << "\ty0 = " << curve->a1->y0 << "\n"
-            //       << "\tth0 = " << curve->a1->th0 << "\n"
-            //       << "\tdubins_line-x = " << curve->a1->dubins_line->x << "\n"
-            //       << "\tdubins_line-y = " << curve->a1->dubins_line->y << "\n"
-            //       << "\tdubins_line-th = " << curve->a1->dubins_line->th << "\n\n";
-
-            // std::cout << "a2 = \n"
-            //       << "\tL = " << curve->a2->L << "\n"
-            //       << "\tk = " << curve->a2->k << "\n"
-            //       << "\tx0 = " << curve->a2->x0 << "\n"
-            //       << "\ty0 = " << curve->a2->y0 << "\n"
-            //       << "\tth0 = " << curve->a2->th0 << "\n"
-            //       << "\tdubins_line-x = " << curve->a2->dubins_line->x << "\n"
-            //       << "\tdubins_line-y = " << curve->a2->dubins_line->y << "\n"
-            //       << "\tdubins_line-th = " << curve->a2->dubins_line->th << "\n\n";
-
-            // std::cout << "a3 = \n"
-            //       << "\tL = " << curve->a3->L << "\n"
-            //       << "\tk = " << curve->a3->k << "\n"
-            //       << "\tx0 = " << curve->a3->x0 << "\n"
-            //       << "\ty0 = " << curve->a3->y0 << "\n"
-            //       << "\tth0 = " << curve->a3->th0 << "\n"
-            //       << "\tdubins_line-x = " << curve->a3->dubins_line->x << "\n"
-            //       << "\tdubins_line-y = " << curve->a3->dubins_line->y << "\n"
-            //       << "\tdubins_line-th = " << curve->a3->dubins_line->th << "\n\n";
 
             bool valid = checkValidity(best_curve_segments, ksigns[pidx][0] * scaled_parameters->scaled_k_max, ksigns[pidx][1] * scaled_parameters->scaled_k_max, ksigns[pidx][2] * scaled_parameters->scaled_k_max, scaled_parameters->scaled_th0, scaled_parameters->scaled_thf);
             if (!valid)
@@ -429,15 +388,15 @@ namespace student
             if (curve_segments->ok && current_L < best_L)
             {
                 bool areThereCollisions = false;
-                Polygon polTmp;
+                std::vector<DubinsPoint> polTmp;
                 std::vector<double> tTmp;
                 for (int z = 0; z < edges.size(); z++) {
-                    areThereCollisions = areThereCollisions || intersArcLine(tmpCurve->a1, Point(edges[z].p1.x, edges[z].p1.y), Point(edges[z].p2.x, edges[z].p2.y), polTmp, tTmp);
+                    areThereCollisions = areThereCollisions || intersArcLine(tmpCurve->a1, DubinsPoint(edges[z].p1.x, edges[z].p1.y), DubinsPoint(edges[z].p2.x, edges[z].p2.y), polTmp, tTmp);
                     if (isThereAStraightLine)
-                        areThereCollisions = areThereCollisions || intersLineLine(Point(tmpCurve->a2->x0, tmpCurve->a2->y0), Point(tmpCurve->a2->dubins_line->x, tmpCurve->a2->dubins_line->y),Point(edges[z].p1.x, edges[z].p1.y), Point(edges[z].p2.x, edges[z].p2.y), polTmp, tTmp);
+                        areThereCollisions = areThereCollisions || intersLineLine(DubinsPoint(tmpCurve->a2->x0, tmpCurve->a2->y0), DubinsPoint(tmpCurve->a2->dubins_line->x, tmpCurve->a2->dubins_line->y),DubinsPoint(edges[z].p1.x, edges[z].p1.y), DubinsPoint(edges[z].p2.x, edges[z].p2.y), polTmp, tTmp);
                     else
-                        areThereCollisions = areThereCollisions || intersArcLine(tmpCurve->a2, Point(edges[z].p1.x, edges[z].p1.y), Point(edges[z].p2.x, edges[z].p2.y), polTmp, tTmp);
-                    areThereCollisions = areThereCollisions || intersArcLine(tmpCurve->a3, Point(edges[z].p1.x, edges[z].p1.y), Point(edges[z].p2.x, edges[z].p2.y), polTmp, tTmp);
+                        areThereCollisions = areThereCollisions || intersArcLine(tmpCurve->a2, DubinsPoint(edges[z].p1.x, edges[z].p1.y), DubinsPoint(edges[z].p2.x, edges[z].p2.y), polTmp, tTmp);
+                    areThereCollisions = areThereCollisions || intersArcLine(tmpCurve->a3, DubinsPoint(edges[z].p1.x, edges[z].p1.y), DubinsPoint(edges[z].p2.x, edges[z].p2.y), polTmp, tTmp);
                 }
                 if (!areThereCollisions) {
                     best_L = current_L;
@@ -488,10 +447,10 @@ namespace student
      * @param numberOfPoints The number of points provided
      * @return DubinsCurve** Resulting array of curves that together represent the shortest path
      */
-    double *Dubins::multipointShortestPathAngles(Point **points, unsigned int numberOfPoints, visgraph::Graph &graph)
+    double *Dubins::multipointShortestPathAngles(DubinsPoint **points, unsigned int numberOfPoints, visgraph::Graph &graph)
     {
         std::vector<visgraph::Edge> edges = graph.getEdges();
-        std::cout << "INPUT: \n";
+        std::cout << "INPUT WITH " << numberOfPoints << " POINTS: \n";
         std::cout << "X\tY\tTHETA\n";
         for (int i = 0; i < numberOfPoints; i++)
         {
@@ -598,9 +557,6 @@ namespace student
                                 S[n][i] = -1;
                             }
                         }
-                    } else {
-                        L[n][i] = INFINITY;
-                        S[n][i] = -1;
                     }
                 }
             }
@@ -686,9 +642,9 @@ namespace student
      * @param numberOfPoints Number of points we have
      * @return DubinsCurve** Array of DubinsCurves
      */
-    DubinsCurve **Dubins::multipointShortestPath(Point **points, unsigned int numberOfPoints, visgraph::Graph &graph)
+    DubinsCurve **Dubins::multipointShortestPath(DubinsPoint **points, unsigned int numberOfPoints, visgraph::Graph &graph)
     {
-        Point **newPoints = new Point*[numberOfPoints];
+        DubinsPoint **newPoints = new DubinsPoint*[numberOfPoints];
         for (int i = 0; i < numberOfPoints; i++) {
             newPoints[i] = points[numberOfPoints - i - 1];
         }
@@ -701,9 +657,10 @@ namespace student
 
         // Now that we have everything we need, calculate the optimal multipoint shortest path
         DubinsCurve **curves = new DubinsCurve*[numberOfPoints-1];
-        for (int i = 1; i < numberOfPoints; i++) {
-            curves[i-1] = findShortestPathCollisionDetection(newPoints[i-1]->x, newPoints[i-1]->y, angles[i-1], newPoints[i]->x, newPoints[i]->y, angles[i], graph);
-            if (curves[i-1] == nullptr) {
+        for (int i = 0; i < numberOfPoints-1; i++) {
+            int index = numberOfPoints-i-1;
+            curves[i] = findShortestPathCollisionDetection(newPoints[index]->x, newPoints[index]->y, mod2pi(angles[index] + M_PI), newPoints[index-1]->x, newPoints[index-1]->y, mod2pi(angles[index-1] + M_PI), graph);
+            if (curves[i] == nullptr) {
                 return nullptr;
             }
         }
@@ -722,7 +679,7 @@ namespace student
      * @return true If an intersection has been found
      * @return false If an intersection has not been found
      */
-    bool Dubins::intersLineLine(Point p1, Point p2, Point p3, Point p4, std::vector<Point> &pts, std::vector<double> &ts)
+    bool Dubins::intersLineLine(DubinsPoint p1, DubinsPoint p2, DubinsPoint p3, DubinsPoint p4, std::vector<DubinsPoint> &pts, std::vector<double> &ts)
     {
         const double EPSILON = 0.0000001;
         // Initialize the resulting arrays as empty arrays
@@ -747,13 +704,13 @@ namespace student
             return false;
         }
 
-        Point q = Point(p1.x, p1.y);
-        Point s = Point((p2.x - p1.x), (p2.y - p1.y));
+        DubinsPoint q = DubinsPoint(p1.x, p1.y);
+        DubinsPoint s = DubinsPoint((p2.x - p1.x), (p2.y - p1.y));
 
-        Point p = Point(p3.x, p3.y);
-        Point r = Point((p4.x - p3.x), (p4.y - p3.y));
+        DubinsPoint p = DubinsPoint(p3.x, p3.y);
+        DubinsPoint r = DubinsPoint((p4.x - p3.x), (p4.y - p3.y));
 
-        Point diffPQ = Point((p1.x - p3.x), (p1.y - p3.y));
+        DubinsPoint diffPQ = DubinsPoint((p1.x - p3.x), (p1.y - p3.y));
 
         double crossRS = crossProduct(r, s);
         double crossDiffR = crossProduct(diffPQ, r);
@@ -800,7 +757,7 @@ namespace student
         }
         for (int i = 0; i < ts.size(); i++)
         {
-            pts.push_back(Point((ts[i] * r.x) + p.x, (ts[i] * r.y) + p.y));
+            pts.push_back(DubinsPoint((ts[i] * r.x) + p.x, (ts[i] * r.y) + p.y));
         }
 
         return pts.empty() ? false : true;
@@ -818,7 +775,7 @@ namespace student
      * @return true If an intersection has been found
      * @return false If an intersection has not been found
      */
-    bool Dubins::intersCircleLine(Point circleCenter, double r, Point point1, Point point2, std::vector<Point> &pts, std::vector<double> &t)
+    bool Dubins::intersCircleLine(DubinsPoint circleCenter, double r, DubinsPoint point1, DubinsPoint point2, std::vector<DubinsPoint> &pts, std::vector<double> &t)
     {
         // Initialize the resulting arrays as empty arrays
         pts.clear();
@@ -862,20 +819,20 @@ namespace student
             }
         }
 
-        std::vector<std::pair<Point, double>> intersections = std::vector<std::pair<Point, double>>();
+        std::vector<std::pair<DubinsPoint, double>> intersections = std::vector<std::pair<DubinsPoint, double>>();
 
         if (t1 >= 0 && t1 <= 1)
         {
-            intersections.push_back(std::pair<Point, double>(Point((point1.x * t1) + (point2.x * (1 - t1)), (point1.y * t1) + (point2.y * (1 - t1))), t1));
+            intersections.push_back(std::pair<DubinsPoint, double>(DubinsPoint((point1.x * t1) + (point2.x * (1 - t1)), (point1.y * t1) + (point2.y * (1 - t1))), t1));
         }
 
         if (t2 >= 0 && t2 <= 1 && t2 != t1)
         {
-            intersections.push_back(std::pair<Point, double>(Point((point1.x * t2) + (point2.x * (1 - t2)), (point1.y * t2) + (point2.y * (1 - t2))), t2));
+            intersections.push_back(std::pair<DubinsPoint, double>(DubinsPoint((point1.x * t2) + (point2.x * (1 - t2)), (point1.y * t2) + (point2.y * (1 - t2))), t2));
         }
 
         // Sort the intersections using t values
-        std::sort(intersections.begin(), intersections.end(), [](const std::pair<Point, double> a, const std::pair<Point, double> b)
+        std::sort(intersections.begin(), intersections.end(), [](const std::pair<DubinsPoint, double> a, const std::pair<DubinsPoint, double> b)
                   { return a.second < b.second; });
 
         // Fill the resulting arrays
@@ -899,7 +856,7 @@ namespace student
      * @return true If an intersection has been found
      * @return false If an intersection has not been found
      */
-    bool Dubins::intersArcLine(DubinsArc *arc, Point point1, Point point2, std::vector<Point> &pts, std::vector<double> &t)
+    bool Dubins::intersArcLine(DubinsArc *arc, DubinsPoint point1, DubinsPoint point2, std::vector<DubinsPoint> &pts, std::vector<double> &t)
     {
         const double EPSILON = 0.0000001;
         // Find the circle containing the provided arc
@@ -924,7 +881,7 @@ namespace student
         if (abs(tanSecondAngle) <= 0+EPSILON)
             m2 = INFINITY;
 
-        Point circleCenter = Point(-1, -1);
+        DubinsPoint circleCenter = DubinsPoint(-1, -1);
 
         // Limit case: the slope is the same
         if (abs(m1 - m2) < 1.e-1 || abs(m1 + m2) < 1.e-1)
@@ -1006,20 +963,20 @@ namespace student
             }
         }
 
-        std::vector<std::pair<Point, double>> intersections = std::vector<std::pair<Point, double>>();
+        std::vector<std::pair<DubinsPoint, double>> intersections = std::vector<std::pair<DubinsPoint, double>>();
 
         if (t1 >= 0 && t1 <= 1)
         {
-            intersections.push_back(std::pair<Point, double>(Point((point1.x * t1) + (point2.x * (1 - t1)), (point1.y * t1) + (point2.y * (1 - t1))), t1));
+            intersections.push_back(std::pair<DubinsPoint, double>(DubinsPoint((point1.x * t1) + (point2.x * (1 - t1)), (point1.y * t1) + (point2.y * (1 - t1))), t1));
         }
 
         if (t2 >= 0 && t2 <= 1 && t2 != t1)
         {
-            intersections.push_back(std::pair<Point, double>(Point((point1.x * t2) + (point2.x * (1 - t2)), (point1.y * t2) + (point2.y * (1 - t2))), t2));
+            intersections.push_back(std::pair<DubinsPoint, double>(DubinsPoint((point1.x * t2) + (point2.x * (1 - t2)), (point1.y * t2) + (point2.y * (1 - t2))), t2));
         }
 
         // Sort the intersections using t values
-        std::sort(intersections.begin(), intersections.end(), [](const std::pair<Point, double> a, const std::pair<Point, double> b)
+        std::sort(intersections.begin(), intersections.end(), [](const std::pair<DubinsPoint, double> a, const std::pair<DubinsPoint, double> b)
                   { return a.second < b.second; });
 
 

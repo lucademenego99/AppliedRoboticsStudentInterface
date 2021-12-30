@@ -8,34 +8,32 @@
 
 #include "clipper_addons.hpp"
 
-using namespace ClipperLib;
-
 /**
  * @brief Clipper Polygon Offsetting helper function
  * We multiply the points by 1000 because Clipper works best under the assumption of working on a certain scale
  * 
  * @param points Points of the original polygon
  * @param offset Offset that must be used to enlarge or shrink the polygon
- * @return std::vector<student::Point> Array of points of the resulting polygon
+ * @return std::vector<visgraph::Point> Array of points of the resulting polygon
  */
 std::vector<visgraph::Point> enlarge(std::vector<visgraph::Point> points, double offset)
 {
-    Path subj;
-    Paths solution;
+    ClipperLib::Path subj;
+    ClipperLib::Paths solution;
     for (int i = 0; i < points.size(); i++)
     {
-        subj << IntPoint(points[i].x*1000, points[i].y*1000);
+        subj << ClipperLib::IntPoint(points[i].x*1000, points[i].y*1000);
     }
     
-    ClipperOffset co;
-    co.AddPath(subj, jtMiter, etClosedPolygon);
+    ClipperLib::ClipperOffset co;
+    co.AddPath(subj, ClipperLib::jtMiter, ClipperLib::etClosedPolygon);
     co.Execute(solution, offset*1000.0);
 
     CleanPolygons(solution);
 
     std::vector<visgraph::Point> result;
     if (solution.size() > 0) {
-        for (IntPoint p : solution[0]) {
+        for (ClipperLib::IntPoint p : solution[0]) {
             result.push_back(visgraph::Point(p.X / 1000.0, p.Y / 1000.0));
         }
     }
@@ -51,13 +49,13 @@ std::vector<visgraph::Point> enlarge(std::vector<visgraph::Point> points, double
  * @param startingPoints Points of the original polygon
  * @param solution Solution given by clipper
  */
-void printSolution(std::vector<IntPoint> startingPoints, Paths solution)
+void printSolution(std::vector<ClipperLib::IntPoint> startingPoints, ClipperLib::Paths solution)
 {
     // Create opencv plotting tool
     cv::Mat plot(500, 500, CV_8UC3, cv::Scalar(255, 255, 255));
 
     // Get the initial path
-    Path subj;
+    ClipperLib::Path subj;
     for (int i = 0; i < startingPoints.size(); i++)
     {
         subj.push_back(startingPoints[i]);
@@ -72,7 +70,7 @@ void printSolution(std::vector<IntPoint> startingPoints, Paths solution)
     // Draw the solution
     for (unsigned int i = 0; i < solution.size(); i++)
     {
-        Path path = solution.at(i);
+        ClipperLib::Path path = solution.at(i);
         cv::line(plot, cv::Point2f(path.at(path.size() - 1).X, path.at(path.size() - 1).Y), cv::Point2f(path.at(0).X, path.at(0).Y), cv::Scalar(255, 255, 0), 2);
         for (unsigned int j = 1; j < path.size(); j++)
         {
@@ -93,18 +91,18 @@ void printSolution(std::vector<IntPoint> startingPoints, Paths solution)
  * @return true If the two polygons intersect
  * @return false If the two polygons do not intersect
  */
-bool intersect (student::Point *subj, student::Point *clip){
-    Path firstPoly;
-    Paths firstFinalPoly;
+bool intersect (dubins::DubinsPoint *subj, dubins::DubinsPoint *clip){
+    ClipperLib::Path firstPoly;
+    ClipperLib::Paths firstFinalPoly;
     for (int i = 0; i < sizeof(subj); i++){
-        firstPoly << IntPoint(subj[i].x*1000, subj[i].y*1000);
+        firstPoly << ClipperLib::IntPoint(subj[i].x*1000, subj[i].y*1000);
     }
     firstFinalPoly.push_back(firstPoly);
 
-    Path secondPoly;
-    Paths secondFinalPoly;
+    ClipperLib::Path secondPoly;
+    ClipperLib::Paths secondFinalPoly;
     for (int j = 0; j < sizeof(clip); j++){
-        secondPoly << IntPoint(clip[j].x*1000, clip[j].y*1000);
+        secondPoly << ClipperLib::IntPoint(clip[j].x*1000, clip[j].y*1000);
     }
     secondFinalPoly.push_back(secondPoly);
 
@@ -127,7 +125,7 @@ bool intersect (student::Point *subj, student::Point *clip){
  * @return std::vector<std::vector<student::Point>> Array containing at position 0 the bigger obstacles and at position 1 the smaller ones
  */
 std::vector<std::vector<visgraph::Point>> enlargeObstaclesWithTwoOffsets(std::vector<visgraph::Point> polygon, double offset){
-    double variant = 3.0;
+    double variant = 2.5;
     std::vector<visgraph::Point> newPath;
 
     //Convert the polygon to the data structure for enlarge, we need a vector of visgraph points
@@ -167,30 +165,30 @@ std::vector<std::vector<std::vector<visgraph::Point>>> enlargeAndJoinObstacles(s
         results.clear();
     }
 
-    Paths subj(bigPolygons.size()), solution;
+    ClipperLib::Paths subj(bigPolygons.size()), solution;
 
     for (unsigned int i = 0; i < bigPolygons.size(); i++){
         for (unsigned int j = 0; j < bigPolygons[i].size(); j++) {
-            subj[i].push_back(IntPoint(bigPolygons[i][j].x*1000, bigPolygons[i][j].y*1000));
+            subj[i].push_back(ClipperLib::IntPoint(bigPolygons[i][j].x*1000, bigPolygons[i][j].y*1000));
         }
     }
-    Clipper c;
-    c.AddPaths(subj, ptSubject, true);
-    c.Execute(ctUnion, solution, pftNonZero);
+    ClipperLib::Clipper c;
+    c.AddPaths(subj, ClipperLib::ptSubject, true);
+    c.Execute(ClipperLib::ctUnion, solution, ClipperLib::pftNonZero);
 
     CleanPolygons(solution);
 
-    Paths subj1(smallPolygons.size()), solution1;
+    ClipperLib::Paths subj1(smallPolygons.size()), solution1;
 
     for (unsigned int i = 0; i < smallPolygons.size(); i++){
         for (unsigned int j = 0; j < smallPolygons[i].size(); j++) {
-            subj1[i].push_back(IntPoint(smallPolygons[i][j].x*1000, smallPolygons[i][j].y*1000));
+            subj1[i].push_back(ClipperLib::IntPoint(smallPolygons[i][j].x*1000, smallPolygons[i][j].y*1000));
         }
     }
 
-    Clipper c1;
-    c1.AddPaths(subj1, ptSubject, true);
-    c1.Execute(ctUnion, solution1, pftNonZero);
+    ClipperLib::Clipper c1;
+    c1.AddPaths(subj1, ClipperLib::ptSubject, true);
+    c1.Execute(ClipperLib::ctUnion, solution1, ClipperLib::pftNonZero);
 
     CleanPolygons(solution1);
 
@@ -199,11 +197,11 @@ std::vector<std::vector<std::vector<visgraph::Point>>> enlargeAndJoinObstacles(s
     std::vector<std::vector<visgraph::Point>> intermediateValues;
 
     for (unsigned int i = 0; i < solution.size(); i++){
-        Path path = solution.at(i);
+        ClipperLib::Path path = solution.at(i);
         std::vector<visgraph::Point> newPath;
         visgraph::VisGraph visg;
         if (Orientation(path)) {
-            for(IntPoint p : path){
+            for(ClipperLib::IntPoint p : path){
                 newPath.push_back(visgraph::Point(p.X/1000.0, p.Y/1000.0));
             }
         }
@@ -217,11 +215,11 @@ std::vector<std::vector<std::vector<visgraph::Point>>> enlargeAndJoinObstacles(s
     intermediateValues.clear();
 
     for (unsigned int i = 0; i < solution1.size(); i++){
-        Path path = solution1.at(i);
+        ClipperLib::Path path = solution1.at(i);
         std::vector<visgraph::Point> newPath;
         visgraph::VisGraph visg;
         if (Orientation(path)) {
-            for(IntPoint p : path){
+            for(ClipperLib::IntPoint p : path){
                 newPath.push_back(visgraph::Point(p.X/1000.0, p.Y/1000.0));
             }
         }

@@ -17,6 +17,14 @@ include_directories(
 ## CREATE EXECUTABLE LIBRARY
 add_library(student SHARED
    src/student_interface.cpp
+   src/dubins.cpp 
+   src/utils.cpp 
+   src/clipper.cpp 
+   src/clipper_addons.cpp 
+   src/graph.cpp 
+   src/open_edges.cpp 
+   src/visgraph.cpp 
+   src/graphPrint.cpp 
 )
 
 target_link_libraries(student

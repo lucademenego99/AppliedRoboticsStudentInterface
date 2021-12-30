@@ -1,15 +1,14 @@
-#pragma once
+#ifndef STUDENT_PLANNING
+#define STUDENT_PLANNING
 
-#include "utils.hpp"
+#include "student_planning_utils.hpp"
 #include <string>
 #include "graph.hpp"
 #include "dubins.hpp"
-#include "clipper_addons.hpp"
 #include "visgraph.hpp"
 #include "open_edges.hpp"
 #include "graphPrint.hpp"
 #include "utils.hpp"
-#include "clipper.hpp"
 
 namespace student
 {
@@ -42,4 +41,17 @@ namespace student
      */
    void unnamedFunction(std::vector<std::vector<visgraph::Point>> polygons, visgraph::VisGraph visg, visgraph::Graph g);
 
+  /**
+   * @brief fulfill the path for the robots
+   * 
+   * @param curves result of the multi-point shortest path
+   * @param path pointer to the structure which will be returned in the function planPath
+   * @param pathSize number of segments of the segmented path
+   * @param size integrate distance for seperated dubin path
+   * @param robotId ID for the robot to be controlled
+   */
+  void fillPath(dubins::DubinsCurve **curves, std::vector<Path>& path, int pathSize, double size, int robotId);
+
 }
+
+#endif
