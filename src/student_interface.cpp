@@ -29,6 +29,27 @@ namespace student
   }
 
   /**
+   * @brief Find out the number of robots based on the values of their position
+   * 
+   * @param x x positions of the robots
+   * @param y y positions of the robots
+   * @return int number of robots
+   */
+  int checkNumberOfRobots(std::vector<float> x, std::vector<float> y) {
+    int size = 0;
+    if (x[0] != 0 && y[0] != 0) {
+      size++;
+      if (x[1] != 0 && y[1] != 0) {
+        size++;
+        if (x[2] != 0 && y[2] != 0) {
+          size++;
+        }
+      }
+    }
+    return size;
+  }
+
+  /**
    * @brief Given the coordinates of the destination square, find a point that lies within the arena
    * 
    * @param borderPoints Points representing the arena, in order bottom-left, bottom-right, top-right, top-left
@@ -49,6 +70,121 @@ namespace student
       return visgraph::Point(minX, (minY+maxY)/2.0);
     
     return visgraph::Point(-1,-1);
+  }
+
+  /**
+   * @brief Find the 4 border points
+   * 
+   * @param borders Polygon representing the border
+   * @param borderMaxX Max x point - passed by ref.
+   * @param borderMinX Min x point - passed by ref.
+   * @param borderMaxY Max y point - passed by ref.
+   * @param borderMinY Min y point - passed by ref.
+   */
+  void findBorderPoints(const Polygon &borders, double &borderMaxX, double &borderMinX, double &borderMaxY, double &borderMinY) {
+    for(int i = 0; i < borders.size(); i++) {
+      if (borders[i].x > borderMaxX) {
+        borderMaxX = borders[i].x;
+      }
+      if (borders[i].x < borderMinX) {
+        borderMinX = borders[i].x;
+      }
+      if (borders[i].y > borderMaxY) {
+        borderMaxY = borders[i].y;
+      }
+      if (borders[i].y < borderMinY) {
+        borderMinY = borders[i].y;
+      }
+    }
+  }
+
+  /**
+   * @brief Find the 4 destination points given a destination polygon
+   * 
+   * @param gate Polygon representing our gate
+   * @param maxX Max x point - passed by ref.
+   * @param minX Min x point - passed by ref.
+   * @param maxY Max y point - passed by ref.
+   * @param minY Min y point - passed by ref.
+   */
+  void findDestinationPoints(const Polygon &gate, double &maxX, double &minX, double &maxY, double &minY) {
+    for(int i = 0; i < gate.size(); i++) {
+      if (gate[i].x > maxX) {
+        maxX = gate[i].x;
+      }
+      if (gate[i].x < minX) {
+        minX = gate[i].x;
+      }
+      if (gate[i].y > maxY) {
+        maxY = gate[i].y;
+      }
+      if (gate[i].y < minY) {
+        minY = gate[i].y;
+      }
+    }
+  }
+
+  /**
+   * @brief Convert the obstacles into a structure our algorithms comprehend
+   * 
+   * @param obstacle_list List of the obstacles as vector of polygons
+   * @return std::vector<std::vector<visgraph::Point>> List of obstacles represented as vectors of visgraph::Point
+   */
+  std::vector<std::vector<visgraph::Point>> getObstacles(const std::vector<Polygon>& obstacle_list) {
+    std::vector<visgraph::Point> pol;
+    std::vector<std::vector<visgraph::Point>> polygons;
+    for(int i = 0; i<obstacle_list.size(); i++) {
+      pol.clear();
+      for(int j = 0; j<obstacle_list[i].size(); j++) {
+        visgraph::Point trans_point = visgraph::Point(obstacle_list[i][j].x, obstacle_list[i][j].y, i);
+        pol.push_back(trans_point);
+      }
+      polygons.push_back(pol);
+    }
+    return polygons;
+  }
+
+  /**
+   * @brief Add borders increased in size by a certain factor to the polygons vector
+   * 
+   * @param borderMaxX Max x point
+   * @param borderMinX Min x point
+   * @param borderMaxY Max y point
+   * @param borderMinY Min y point
+   * @param offset Offset by which we want to increase the size of the borders
+   * @param variant Another value used to determine how much we want to increase the size of the borders
+   * @param borderPoints Vector keeping the 4 border points - passed by ref.
+   * @param polygons Add the borders to this vector, then they will be used for collision detection - passed by ref.
+   */
+  void addBorders(double borderMaxX, double borderMinX, double borderMaxY, double borderMinY, double offset, double variant, std::vector<visgraph::Point> &borderPoints, std::vector<std::vector<visgraph::Point>> &polygons) {
+    std::vector<visgraph::Point> pol;
+
+    // Bottom Edge
+    pol.push_back(visgraph::Point(borderMinX+(offset + (offset / variant)), borderMinY+(offset + (offset / variant))));
+    pol.push_back(visgraph::Point(borderMaxX-(offset + (offset / variant)), borderMinY+(offset + (offset / variant))));
+    borderPoints.push_back(visgraph::Point(borderMinX+(offset + (offset / variant)), borderMinY+(offset + (offset / variant))));
+    polygons.push_back(pol);
+
+    // Right Edge
+    pol.clear();
+    pol.push_back(visgraph::Point(borderMaxX-(offset + (offset / variant)), borderMinY+(offset + (offset / variant))));
+    pol.push_back(visgraph::Point(borderMaxX-(offset + (offset / variant)), borderMaxY-(offset + (offset / variant))));
+    borderPoints.push_back(visgraph::Point(borderMaxX-(offset + (offset / variant)), borderMinY+(offset + (offset / variant))));
+    polygons.push_back(pol);
+
+    // Top Edge
+    pol.clear();
+    pol.push_back(visgraph::Point(borderMaxX-(offset + (offset / variant)), borderMaxY-(offset + (offset / variant))));
+    pol.push_back(visgraph::Point(borderMinX+(offset + (offset / variant)), borderMaxY-(offset + (offset / variant))));
+    borderPoints.push_back(visgraph::Point(borderMaxX-(offset + (offset / variant)), borderMaxY-(offset + (offset / variant))));
+    polygons.push_back(pol);
+
+    // Left Edge
+    pol.clear();
+    pol.push_back(visgraph::Point(borderMinX+(offset + (offset / variant)), borderMaxY-(offset + (offset / variant))));
+    pol.push_back(visgraph::Point(borderMinX+(offset + (offset / variant)), borderMinY+(offset + (offset / variant))));
+    borderPoints.push_back(visgraph::Point(borderMinX+(offset + (offset / variant)), borderMaxY-(offset + (offset / variant))));
+    polygons.push_back(pol);
   }
 
   /**
@@ -114,6 +250,66 @@ namespace student
   }
 
   /**
+   * @brief Reach a certain destination points with a certain robot
+   * 
+   * @param robot Robot ID
+   * @param origin Origin point
+   * @param destination Destination Point
+   * @param theta Robot's starting angle
+   * @param polygons Obstacles for collision detection
+   * @param polygonsForVisgraph Obstacles for the roadmap generation
+   * @param path Path to fill - passed by ref.
+   * @param max_k Curvature of the robot
+   * @param size Discritizer size for the path generation
+   * @return true If a path has been found
+   * @return false If a path hasn't been found
+   */
+  bool reachDestinationForRobot(int robot, visgraph::Point origin, visgraph::Point destination, double theta, std::vector<std::vector<visgraph::Point>> polygons, std::vector<std::vector<visgraph::Point>> polygonsForVisgraph,std::vector<Path> &path, double max_k, double size) {
+    // ********** COMPUTE THE ROADMAP - SHORTEST PATH VERSION ********** //
+    visgraph::VisGraph visg;
+    // The original graph comprehend all the obstacles that will be used for collision detection
+    visgraph::Graph originalGraph = visgraph::Graph(polygons, false, true);
+    // The visibility graph will be used to find the shortest path between a source and a destination
+    visgraph::Graph g = visg.computeVisibilityGraph(polygonsForVisgraph, origin, destination);
+
+
+    // ********** COMPUTE SHORTEST PATH FROM ORIGIN TO DESTINATION ********** //
+    std::vector<visgraph::Point> shortestPath = g.shortestPath(origin, destination);
+
+    // DEBUG - print graphs using opencv
+    // printGraph(originalGraphFirst.graph, origin, destination, shortestPath);
+    // printGraph(originalGraph.graph, origin, destination, shortestPath);
+    // printGraph(g.graph, origin, destination, shortestPath);
+
+
+    // ********** COMPUTE MULTIPOINT DUBINS PATH ********** //
+    // Create an input valid for multipointShortestPath - we have a source,
+    // a list of intermediate points and a destination.
+    // The only point in which we specify an angle is the initial one.
+    dubins::Dubins dubins = dubins::Dubins(max_k, size);
+    dubins::DubinsPoint **points = new dubins::DubinsPoint *[shortestPath.size()];
+    points[0] = new dubins::DubinsPoint(shortestPath[0].x, shortestPath[0].y, theta);
+    for(int i = 1; i < shortestPath.size(); i++) {
+        points[i] = new dubins::DubinsPoint(shortestPath[i].x, shortestPath[i].y);
+    }
+    // Find the dubins shortest path given the set of intermediate points
+    dubins::DubinsCurve **curves = dubins.multipointShortestPath(points, shortestPath.size(), originalGraph);
+    if (curves == nullptr) {
+        std::cout << "UNABLE TO COMPUTE A PATH FOR GIVEN INPUT\n";
+        return false;
+    } else {
+        std::cout << "COMPLETED MULTIPOINT SHORTEST PATH SUCCESSFULLY\n";
+        // DEBUG - print the final complete path using opencv
+        // dubins.printCompletePath(curves, shortestPath.size()-1, polygons);
+
+
+        // ********** CREATE THE PATH FOR THE ROBOT ********** //
+        fillPath(curves, path, shortestPath.size()-1, size, robot);
+        return true;
+    }
+  }
+
+  /**
    * @brief Plan a safe and fast path in the arena
    * 
    * @param borders Border of the arena, expressed in meters
@@ -128,96 +324,100 @@ namespace student
    * @return false We don't have a valid path available
    */
   bool planPath(const Polygon& borders, const std::vector<Polygon>& obstacle_list, const std::vector<Polygon>& gate_list, const std::vector<float> x, const std::vector<float> y, const std::vector<float> theta, std::vector<Path>& path, const std::string& config_folder){
-    std::vector<visgraph::Point> pol;
-    std::vector<std::vector<visgraph::Point>> polygons, polygonsForVisgraph;
 
-    // TODO: find the correct bound k and the inter size of the dubins
-    double max_k = 30, size = 0.0001;
-    // TODO: find the correct offset based on the robot's size for polygon offsetting
-    double offset = 0.076, variant = 20.0;
+    std::cout << "----- STUDENT PLAN PATH -----\n";
 
-    // Find the border's points
+    // ********** DEFINE USEFUL VARIABLES ********** //
+    // Correct bound k and discritizer size
+    double max_k = 30;
+    // Correct discritizer size
+    double size = 0.0001;
+    // Offset based on the robot's size for polygon offsetting
+    double offset = 0.076;
+    // Variant value to increase the size of the outside borders
+    double variant = 20.0;
+
+
+    // ********** FIND THE BORDER'S POINTS ********** //
     double borderMaxX = -INFINITY, borderMinX = INFINITY;
     double borderMaxY = -INFINITY, borderMinY = INFINITY;
-    for(int i = 0; i < borders.size(); i++) {
-      if (borders[i].x > borderMaxX) {
-        borderMaxX = borders[i].x;
-      }
-      if (borders[i].x < borderMinX) {
-        borderMinX = borders[i].x;
-      }
-      if (borders[i].y > borderMaxY) {
-        borderMaxY = borders[i].y;
-      }
-      if (borders[i].y < borderMinY) {
-        borderMinY = borders[i].y;
-      }
-    }
+    findBorderPoints(borders, borderMaxX, borderMinX, borderMaxY, borderMinY);
 
-    // Add obstacles
-    for(int i = 0; i<obstacle_list.size(); i++) {
-      pol.clear();
-      for(int j = 0; j<obstacle_list[i].size(); j++) {
-        visgraph::Point trans_point = visgraph::Point(obstacle_list[i][j].x, obstacle_list[i][j].y, i);
-        pol.push_back(trans_point);
-      }
-      polygons.push_back(pol);
-    }
+
+    // ********** CONVERT OBSTACLES INTO OUR STRUCTURE ********** //
+    std::vector<std::vector<visgraph::Point>> polygons = getObstacles(obstacle_list);
 
     // DEBUG - create the original graph
-    visgraph::Graph originalGraphFirst = visgraph::Graph(polygons, false, true);
+    // visgraph::Graph originalGraphFirst = visgraph::Graph(polygons, false, true);
 
-    // POLYGON OFFSETTING AND JOIN
+
+    // ********** POLYGON OFFSETING AND JOIN ********** //
+    // We apply the polygon offsetting algorithm because we are treating our robot as a simple point
+    // So we need to increase the size of all the obstacles based on the actual robot's size, or better,
+    // in our case based on the radius of the circle circumscribed to the robot
+    // We perform the join operation because after the polygon offsetting some obstacles may intersect between each other
+    // in those cases, we create one bigger obstacle comprehending all the intersecting ones.
     std::vector<std::vector<std::vector<visgraph::Point>>> pols = enlargeAndJoinObstacles(polygons, offset);
-    polygonsForVisgraph = pols[0];
+  
+    // The polygons for the visibility graph are a little bit bigger, in order to be sure the robot
+    // will not bump into them and in order to make the collision detection part works well
+    std::vector<std::vector<visgraph::Point>> polygonsForVisgraph = pols[0];
+
+    // These are the polygons that will be used for the collision detection part. Their size is a little
+    // bit smaller than the ones used for the roadmap generation, but their size is still increased based on the robot's size
     polygons = pols[1];
 
-    // Add borders for collision detection
+
+    // ********** ADD BORDERS FOR COLLISION DETECTION ********** //
+    // Even the border must be adapted since we treat our robot as a point. We make them smaller by the same amount "offset",
+    // times a very small value to be sure our robot doesn't bump into them. We add them at the end of our obstacles
+    // so that they will be used for collision detection too
+
+    // I also keep a vector of the 4 border points, that will be useful later to find a valid destination point
     std::vector<visgraph::Point> borderPoints;
-    pol.clear();
-    pol.push_back(visgraph::Point(borderMinX+(offset + (offset / variant)), borderMinY+(offset + (offset / variant))));
-    pol.push_back(visgraph::Point(borderMaxX-(offset + (offset / variant)), borderMinY+(offset + (offset / variant))));
-    borderPoints.push_back(visgraph::Point(borderMinX+(offset + (offset / variant)), borderMinY+(offset + (offset / variant))));
-    polygons.push_back(pol);
-    pol.clear();
-    pol.push_back(visgraph::Point(borderMaxX-(offset + (offset / variant)), borderMinY+(offset + (offset / variant))));
-    pol.push_back(visgraph::Point(borderMaxX-(offset + (offset / variant)), borderMaxY-(offset + (offset / variant))));
-    borderPoints.push_back(visgraph::Point(borderMaxX-(offset + (offset / variant)), borderMinY+(offset + (offset / variant))));
-    polygons.push_back(pol);
-    pol.clear();
-    pol.push_back(visgraph::Point(borderMaxX-(offset + (offset / variant)), borderMaxY-(offset + (offset / variant))));
-    pol.push_back(visgraph::Point(borderMinX+(offset + (offset / variant)), borderMaxY-(offset + (offset / variant))));
-    borderPoints.push_back(visgraph::Point(borderMaxX-(offset + (offset / variant)), borderMaxY-(offset + (offset / variant))));
-    polygons.push_back(pol);
-    pol.clear();
-    pol.push_back(visgraph::Point(borderMinX+(offset + (offset / variant)), borderMaxY-(offset + (offset / variant))));
-    pol.push_back(visgraph::Point(borderMinX+(offset + (offset / variant)), borderMinY+(offset + (offset / variant))));
-    borderPoints.push_back(visgraph::Point(borderMinX+(offset + (offset / variant)), borderMaxY-(offset + (offset / variant))));
-    polygons.push_back(pol);
+    addBorders(borderMaxX, borderMinX, borderMaxY, borderMinY, offset, variant, borderPoints, polygons);
 
-    // Set origin
-    visgraph::Point origin = visgraph::Point(x[0], y[0]);
+    int numberOfRobots = checkNumberOfRobots(x,y);
+    if (numberOfRobots == 1) {
+      // ********** WE HAVE JUST ONE ROBOT ********** //
+      // *** Try to reach the destination *** //
+      std::cout << "THERE IS ONE ONLY ROBOT\nTry to reach the gate\n";
 
-    // Find the destination
-    double maxX = -INFINITY, minX = INFINITY;
-    double maxY = -INFINITY, minY = INFINITY;
-    for(int i = 0; i < gate_list[0].size(); i++) {
-      if (gate_list[0][i].x > maxX) {
-        maxX = gate_list[0][i].x;
+      // ********** SET THE ORIGIN ********** //
+      visgraph::Point origin = visgraph::Point(x[0], y[0]);
+
+      // TODO: if there are other destinations, check which is the closer one
+
+      // ********** FIND THE DESTINATION POINTS ********** //
+      double maxX = -INFINITY, minX = INFINITY;
+      double maxY = -INFINITY, minY = INFINITY;
+      findDestinationPoints(gate_list[0], maxX, minX, maxY, minY);
+
+
+      // ********** FIND A VALID DESTINATION ********** //
+      // Since we performed polygon offsetting, some points of the destination may not be available (inside an obstacle,
+      // or outside the border).
+      visgraph::Point destination = findValidDestinationPoint(borderPoints, minX, maxX, minY, maxY);
+      if (destination == visgraph::Point(-1, -1)) {
+        std::cout << "UNABLE TO DETERMINE A VALID DESTINATION POINT\n";
+        return false;
       }
-      if (gate_list[0][i].x < minX) {
-        minX = gate_list[0][i].x;
-      }
-      if (gate_list[0][i].y > maxY) {
-        maxY = gate_list[0][i].y;
-      }
-      if (gate_list[0][i].y < minY) {
-        minY = gate_list[0][i].y;
-      }
+
+      // ********** TRY TO REACH THE DESTINATION ********** //
+      reachDestinationForRobot(0, origin, destination, theta[0], polygons, polygonsForVisgraph, path, max_k, size);
+
+    } else if (numberOfRobots == 2) {
+      // ********** TWO ROBOTS - PROJECT NUMBER 1 - PURSUER EVADER GAME ********** //
+      std::cout << "THERE ARE TWO ROBOTS\nPursuer Evader game\n";
+      
+    } else if (numberOfRobots == 3) {
+      // ********** THREE ROBOTS - PROJECT NUMBER 2 - NOT DONE ********** //
+      std::cout << "THERE ARE THREE ROBOTS\nProject number 2 not done\n";
+
     }
 
 
-    // ************************ DEBUG - Test a simple shortest path ********************************
+    // ************************ DEBUG - Test a simple shortest path ******************************** //
     // visgraph::Point destination = visgraph::Point(borderMinX + 0.2, borderMaxY - 0.2);
     // dubins::Dubins dubins = dubins::Dubins(max_k, size);
     // dubins::DubinsCurve *curve = dubins.findShortestPath(origin.x, origin.y, theta[0], destination.x, destination.y, M_PI);
@@ -242,45 +442,6 @@ namespace student
     //   path[0].points.emplace_back(s, tmp->x, tmp->y, tmp->th, curve->a3->k);
     //   delete tmp;
     // }
-
-
-    // ************************ SOLUTION - acutal multipoint shortest path **************************
-    visgraph::Point destination = findValidDestinationPoint(borderPoints, minX, maxX, minY, maxY);
-    if (destination == visgraph::Point(-1, -1)) {
-      std::cout << "UNABLE TO DETERMINE A VALID DESTINATION POINT\n";
-      return false;
-    }
-
-    // COMPUTE VISIBILITY GRAPH
-    visgraph::VisGraph visg;
-    visgraph::Graph originalGraph = visgraph::Graph(polygons, false, true);
-    visgraph::Graph g = visg.computeVisibilityGraph(polygonsForVisgraph, origin, destination);
-
-    // COMPUTE SHORTEST PATH
-    std::vector<visgraph::Point> shortestPath = g.shortestPath(origin, destination);
-
-    // DEBUG
-    printGraph(originalGraphFirst.graph, origin, destination, shortestPath);
-    printGraph(originalGraph.graph, origin, destination, shortestPath);
-    printGraph(g.graph, origin, destination, shortestPath);
-
-    // COMPUTE MULTIPOINT DUBINS SHORTEST PATH
-    dubins::Dubins dubins = dubins::Dubins(max_k, size);
-    dubins::DubinsPoint **points = new dubins::DubinsPoint *[shortestPath.size()];
-    points[0] = new dubins::DubinsPoint(shortestPath[0].x, shortestPath[0].y, theta[0]);
-    for(int i = 1; i < shortestPath.size(); i++) {
-        points[i] = new dubins::DubinsPoint(shortestPath[i].x, shortestPath[i].y);
-    }
-    dubins::DubinsCurve **curves = dubins.multipointShortestPath(points, shortestPath.size(), originalGraph);
-    if (curves == nullptr) {
-        std::cout << "UNABLE TO COMPUTE A PATH FOR GIVEN INPUT\n";
-        // return false;
-    } else {
-        std::cout << "COMPLETED MULTIPOINT SHORTEST PATH SUCCESSFULLY\n";
-        // DEBUG
-        dubins.printCompletePath(curves, shortestPath.size()-1, polygons);
-        fillPath(curves, path, shortestPath.size()-1, size, 0);
-    }
     
     return true;
   }
