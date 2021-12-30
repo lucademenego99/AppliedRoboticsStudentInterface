@@ -33,6 +33,17 @@ namespace visgraph
         std::vector<Point> getVisibleVertices(Point from, Graph graph, Point origin = Point(-1, -1), Point destination = Point(-1, -1));
 
         /**
+         * @brief Computes the visible points given a starting point
+         * 
+         * @param point Point we want to consider
+         * @param graph Graph of the map
+         * @param origin Starting points
+         * @param destination Final points
+         * @return vector<Point> 
+         */
+        std::vector<Point> getVisibleVerticesMultipleOD(Point point, Graph graph, std::vector<Point> origins, std::vector<Point> destinations);
+
+        /**
         * @brief 
         * 
         * @param center 
@@ -155,9 +166,19 @@ namespace visgraph
         * @param points Polygons we encounter in the map
         * @param origin Starting point
         * @param destination Destination point
-        * @return Graph 
+        * @return Graph Visibility graph
         */
         Graph computeVisibilityGraph(std::vector<std::vector<Point>> points, Point origin, Point destination);
+
+        /**
+        * @brief Computes the visibility graph given a list of points, a list of origins and a list of destinations
+        * 
+        * @param points Polygons we encounter in the map
+        * @param origins Starting points
+        * @param destinations Destination points
+        * @return Graph Visibility graph
+        */
+        Graph computeVisibilityGraphMultipleOD(std::vector<std::vector<Point>> points, std::vector<Point> origin, std::vector<Point> destination);
     };
 
 }

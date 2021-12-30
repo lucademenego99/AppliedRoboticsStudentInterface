@@ -13,13 +13,58 @@ using namespace std;
 
 namespace visgraph
 {
+
+    /**
+     * @brief Computes the visibility graph given a list of points, a list of origins and a list of destinations
+     * 
+     * @param points Polygons we encounter in the map
+     * @param origins Starting points
+     * @param destinations Destination points
+     * @return Graph Visibility graph
+     */
+    Graph VisGraph::computeVisibilityGraphMultipleOD(vector<vector<Point>> points, std::vector<Point> origins, std::vector<Point> destinations) 
+    {
+        // Initial graph with all our shapes
+        Graph initial = Graph(points);
+
+        // Final visibility graph
+        Graph result = Graph(points, true);
+
+        // Get all the points we need to consider
+        vector<Point> allPoints = initial.getPoints();
+
+        // Rescale origin and destination, not to have too small numbers
+        for (int i = 0; i < origins.size(); i++) {
+            origins[i].scale();
+            allPoints.push_back(origins[i]);
+        }
+        for (int i = 0; i < destinations.size(); i++) {
+            destinations[i].scale();
+            allPoints.push_back(destinations[i]);
+        }
+
+        // Loop through all the points we have
+        for (int i = 0; i < allPoints.size(); i++)
+        {
+            // Get the visible vertices from the point we are considering
+            vector<Point> visibleVertices = getVisibleVerticesMultipleOD(allPoints[i], initial, origins, destinations);
+            // Add an edge (a,b) if b is visible from a
+            for (int j = 0; j < visibleVertices.size(); j++)
+            {
+                result.addEdge(Edge(allPoints[i], visibleVertices[j]));
+            }
+        }
+
+        return result;
+    }
+
     /**
      * @brief Computes the visibility graph given a list of points, the origin and the destination
      * 
      * @param points Polygons we encounter in the map
      * @param origin Starting point
      * @param destination Destination point
-     * @return Graph 
+     * @return Graph Visbility graph
      */
     Graph VisGraph::computeVisibilityGraph(vector<vector<Point>> points, Point origin, Point destination)
     {
@@ -53,6 +98,160 @@ namespace visgraph
         }
 
         return result;
+    }
+
+    /**
+     * @brief Computes the visible points given a starting point
+     * 
+     * @param point Point we want to consider
+     * @param graph Graph of the map
+     * @param origin Starting points
+     * @param destination Final points
+     * @return vector<Point> 
+     */
+    vector<Point> VisGraph::getVisibleVerticesMultipleOD(Point point, Graph graph, std::vector<Point> origins, std::vector<Point> destinations)
+    {
+        vector<Edge> edges = graph.getEdges();
+        vector<Point> points = graph.getPoints();
+        std::vector<dubins::DubinsPoint> results; //Just for the sake of passing correct parameters to the function
+        std::vector<double> t;
+        dubins::Dubins dubin;
+        
+        for (int i = 0; i < origins.size(); i++) {
+            points.push_back(origins[i]);
+        }
+        for (int i = 0; i < destinations.size(); i++) {
+            points.push_back(destinations[i]);
+        }
+
+        // Sort the points in counter-clockwise order. If the angle is the same, take the closer ones.
+        sort(points.begin(), points.end(), [&](const Point &lhs, const Point &rhs) -> bool
+             {
+                 double angleLhs = getAngle(point, lhs);
+                 double angleRhs = getAngle(point, rhs);
+                 if (angleLhs == angleRhs)
+                 {
+                     return edgeDistance(point, lhs) < edgeDistance(point, rhs);
+                 }
+                 return angleLhs < angleRhs;
+             });
+
+        OpenEdges openEdges = OpenEdges();
+        Point pointInf = Point(INF, point.y);
+        for (Edge edge : edges)
+        {
+            // If the point is not part of the edge we are considering
+            if (!(edge.contains(point)))
+            {
+                // And if the line that starts from point and goes to the right (positive x axis) intersect the edge
+                if (dubin.intersLineLine(dubins::DubinsPoint(point.x, point.y), dubins::DubinsPoint(pointInf.x, pointInf.y), dubins::DubinsPoint(edge.p1.x, edge.p1.y), dubins::DubinsPoint(edge.p2.x, edge.p2.y), results, t))
+                {
+                    // And if one of the points of the edge is on the line that starts from point and goes to the right
+                    if (!onSegment(point, edge.p1, pointInf) && !onSegment(point, edge.p2, pointInf))
+                    {
+                        // Add the edge inside the binary tree OpenEdges
+                        openEdges.insertEdge(point, pointInf, edge);
+                    }
+                }
+            }
+        }
+
+        vector<Point> visible;  // Final result: all the visible points from the point [point]
+        Point prev = Point(-1, -1, -1); // Keep the previous point to understand what is the line that moves counter-clockwise (the one that at first was [point - pointInf])
+        bool prevVisible = false;   // Remember if the previous point was visible or not
+
+        // Loop through all points (expcept the point we are considering)
+        for (Point p : points)
+        {
+            if (!(p == point))
+            {
+                // if (getAngle(point, p) > M_PI)
+                // {
+                //     break;
+                // }
+
+                // Update open edges - remove clock wise edges because we already considered them (remember we are moving counter-clockwise)
+                if (openEdges.openEdges.size() > 0)
+                {
+                    for (Edge e : graph.graph[p])
+                    {
+                        // So check the orientation: if it's clockwise delete the edge from openEdges
+                        if (getOrientation(point, p, e.getAdjacent(p)) == CW)
+                        {
+                            openEdges.deleteEdge(point, p, e);
+                        }
+                    }
+                }
+                
+                // Initialize the visibility of the point we are considering to false
+                bool isVisible = false;
+
+                // If it's the first iteration (prev is default point) or the orientation is not collinear or it's collinear and the previous point is between point and p
+                if (prev == Point(-1, -1, -1) || getOrientation(point, prev, p) != COLLINEAR || !onSegment(point, prev, p))
+                {
+                    if (openEdges.openEdges.size() == 0)
+                    {
+                        // If there is nothing inside openEdges, then the point is visible because there is no edge that hides it
+                        isVisible = true;
+                    }
+                    else if (!dubin.intersLineLine(dubins::DubinsPoint(point.x, point.y), dubins::DubinsPoint(p.x, p.y), dubins::DubinsPoint(openEdges.getSmallest().p1.x, openEdges.getSmallest().p1.y), dubins::DubinsPoint(openEdges.getSmallest().p2.x, openEdges.getSmallest().p2.y), results, t))
+                    {
+                        // If there is something inside openEdges, but the segment [point - p] does not intersect the closer openEdge, then no segment is hiding the point and the point is visible
+                        isVisible = true;
+                    }
+                }
+                else if (!prevVisible)
+                {
+                    // This is the case of collinear points. If the previous point was not visible, for sure even p is not because they are collinear
+                    isVisible = false;
+                }
+                else
+                {
+                    // This is the case of collinear points, If the previous point was visible, we need to check (as always)
+                    // that the edge from prev to p does not intersect any open edge
+                    isVisible = true;
+                    for (Edge e : openEdges.openEdges)
+                    {
+                        if (!(e.contains(prev)) && dubin.intersLineLine(dubins::DubinsPoint(prev.x, prev.y), dubins::DubinsPoint(p.x, p.y), dubins::DubinsPoint(e.p1.x, e.p1.y), dubins::DubinsPoint(e.p2.x, e.p2.y), results, t))
+                        {
+                            isVisible = false;
+                            // We break because if there is at least one intersecting openEdge, we are sure the point won't be visible
+                            break;
+                        }
+                    }
+                    if (isVisible && edgeInPolygon(prev, p, graph))
+                    {
+                        isVisible = false;
+                    }
+                }
+
+                // Check if the visible edge is interior to its polygon
+                vector<Point> adjPoints = graph.getAdjacentPoints(point);
+                if (isVisible && !(count(adjPoints.begin(), adjPoints.end(), p)))
+                {
+                    isVisible = !(edgeInPolygon(point, p, graph));
+                }
+
+                if (isVisible)
+                {
+                    visible.push_back(p);
+                }
+
+                // Update open edges - Add counter clock wise edges incident on p
+                for (Edge e : graph.graph[p])
+                {
+                    if (!(e.contains(point)) && getOrientation(point, p, e.getAdjacent(p)) == CCW)
+                    {
+                        openEdges.insertEdge(point, p, e);
+                    }
+                }
+
+                prev = p;
+                prevVisible = isVisible;
+            }
+        }
+
+        return visible;
     }
 
     /**

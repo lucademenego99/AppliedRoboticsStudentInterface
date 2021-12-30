@@ -256,28 +256,19 @@ namespace student
    * @param origin Origin point
    * @param destination Destination Point
    * @param theta Robot's starting angle
-   * @param polygons Obstacles for collision detection
-   * @param polygonsForVisgraph Obstacles for the roadmap generation
+   * @param originalGraph Obstacles for collision detection
+   * @param g Obstacles for the shortestPath
    * @param path Path to fill - passed by ref.
    * @param max_k Curvature of the robot
    * @param size Discritizer size for the path generation
    * @return true If a path has been found
    * @return false If a path hasn't been found
    */
-  bool reachDestinationForRobot(int robot, visgraph::Point origin, visgraph::Point destination, double theta, std::vector<std::vector<visgraph::Point>> polygons, std::vector<std::vector<visgraph::Point>> polygonsForVisgraph,std::vector<Path> &path, double max_k, double size) {
-    // ********** COMPUTE THE ROADMAP - SHORTEST PATH VERSION ********** //
-    visgraph::VisGraph visg;
-    // The original graph comprehend all the obstacles that will be used for collision detection
-    visgraph::Graph originalGraph = visgraph::Graph(polygons, false, true);
-    // The visibility graph will be used to find the shortest path between a source and a destination
-    visgraph::Graph g = visg.computeVisibilityGraph(polygonsForVisgraph, origin, destination);
-
-
+  bool reachDestinationForRobot(int robot, visgraph::Point origin, std::vector<visgraph::Point> destinations, double theta, visgraph::Graph originalGraph, visgraph::Graph g, std::vector<Path> &path, double max_k, double size) {
     // ********** COMPUTE SHORTEST PATH FROM ORIGIN TO DESTINATION ********** //
-    std::vector<visgraph::Point> shortestPath = g.shortestPath(origin, destination);
+    std::vector<visgraph::Point> shortestPath = g.shortestPathMultipleD(origin, destinations);
 
     // DEBUG - print graphs using opencv
-    // printGraph(originalGraphFirst.graph, origin, destination, shortestPath);
     // printGraph(originalGraph.graph, origin, destination, shortestPath);
     // printGraph(g.graph, origin, destination, shortestPath);
 
@@ -376,22 +367,20 @@ namespace student
     // I also keep a vector of the 4 border points, that will be useful later to find a valid destination point
     std::vector<visgraph::Point> borderPoints;
     addBorders(borderMaxX, borderMinX, borderMaxY, borderMinY, offset, variant, borderPoints, polygons);
+    
 
+    // ********** GET ALL ORIGINS AND DESTINATIONS ********** //
     int numberOfRobots = checkNumberOfRobots(x,y);
-    if (numberOfRobots == 1) {
-      // ********** WE HAVE JUST ONE ROBOT ********** //
-      // *** Try to reach the destination *** //
-      std::cout << "THERE IS ONE ONLY ROBOT\nTry to reach the gate\n";
-
-      // ********** SET THE ORIGIN ********** //
-      visgraph::Point origin = visgraph::Point(x[0], y[0]);
-
-      // TODO: if there are other destinations, check which is the closer one
-
+    int numberOfDestinations = gate_list.size();
+    std::vector<visgraph::Point> origins, destinations;
+    for(int i = 0; i < numberOfRobots; i++) {
+      origins.push_back(visgraph::Point(x[i], y[i]));
+    }
+    for(int i = 0; i < numberOfDestinations; i++) {
       // ********** FIND THE DESTINATION POINTS ********** //
       double maxX = -INFINITY, minX = INFINITY;
       double maxY = -INFINITY, minY = INFINITY;
-      findDestinationPoints(gate_list[0], maxX, minX, maxY, minY);
+      findDestinationPoints(gate_list[i], maxX, minX, maxY, minY);
 
 
       // ********** FIND A VALID DESTINATION ********** //
@@ -399,12 +388,40 @@ namespace student
       // or outside the border).
       visgraph::Point destination = findValidDestinationPoint(borderPoints, minX, maxX, minY, maxY);
       if (destination == visgraph::Point(-1, -1)) {
-        std::cout << "UNABLE TO DETERMINE A VALID DESTINATION POINT\n";
-        return false;
+        std::cout << "UNABLE TO DETERMINE A VALID DESTINATION POINT FOR DESTINATION NUMBER" << i << "\n";
+      } else {
+        destinations.push_back(destination);
       }
+    }
+
+    // DEBUG - if you want to test using other destinations, just add them here with destinations.push_back(your destination)
+    
+
+    // ********** COMPUTE THE ROADMAP - SHORTEST PATH VERSION ********** //
+    visgraph::VisGraph visg;
+    // The original graph comprehend all the obstacles that will be used for collision detection
+    visgraph::Graph originalGraph = visgraph::Graph(polygons, false, true);
+    // The visibility graph will be used to find the shortest path between a source and a destination
+    visgraph::Graph g = visg.computeVisibilityGraphMultipleOD(polygonsForVisgraph, origins, destinations);
+
+    // DEBUG - show graphs using opencv
+    // std::vector<visgraph::Point> empty;
+    // printGraph(originalGraph.graph, visgraph::Point(0,0), visgraph::Point(0,0), empty);
+    // printGraph(g.graph, visgraph::Point(0,0), visgraph::Point(0,0), empty);
+
+    if (numberOfRobots == 1) {
+      // ********** WE HAVE JUST ONE ROBOT ********** //
+      // *** Try to reach the destination *** //
+      std::cout << "THERE IS ONE ONLY ROBOT\nTry to reach the gate\n";
+
+
+      // ********** SET THE ORIGIN ********** //
+      visgraph::Point origin = visgraph::Point(x[0], y[0]);
+
 
       // ********** TRY TO REACH THE DESTINATION ********** //
-      reachDestinationForRobot(0, origin, destination, theta[0], polygons, polygonsForVisgraph, path, max_k, size);
+      reachDestinationForRobot(0, origin, destinations, theta[0], originalGraph, g, path, max_k, size);
+
 
     } else if (numberOfRobots == 2) {
       // ********** TWO ROBOTS - PROJECT NUMBER 1 - PURSUER EVADER GAME ********** //

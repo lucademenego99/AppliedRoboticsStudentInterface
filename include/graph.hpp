@@ -145,6 +145,18 @@ namespace visgraph
         std::vector<Point> shortestPath(Point origin, Point destination);
 
         /**
+         * @brief Dijkstra Shortest path, multiple destinations.
+         * Reference: https://www.geeksforgeeks.org/dijkstras-shortest-path-algorithm-using-set-in-stl/
+         * Complexity: O(E logV)
+         * 
+         * @param graph A map <Point, vector of adjacent edges>
+         * @param origin The origin point in which we want to start
+         * @param destinations All possible destinations
+         * @return std::vector<Point> The complete shortest path from origin to destination
+         */
+        std::vector<Point> shortestPathMultipleD(Point origin, std::vector<Point> destinations);
+
+        /**
         * @brief returns the adjacent edges to a certain point
         * 
         * @param point the point we want to consider
