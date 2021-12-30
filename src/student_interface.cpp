@@ -395,7 +395,8 @@ namespace student
     }
 
     // DEBUG - if you want to test using other destinations, just add them here with destinations.push_back(your destination)
-    
+    // destinations.push_back(visgraph::Point(1.2, 0.2));
+
 
     // ********** COMPUTE THE ROADMAP - SHORTEST PATH VERSION ********** //
     visgraph::VisGraph visg;
@@ -420,16 +421,34 @@ namespace student
 
 
       // ********** TRY TO REACH THE DESTINATION ********** //
-      reachDestinationForRobot(0, origin, destinations, theta[0], originalGraph, g, path, max_k, size);
+      bool foundPath = reachDestinationForRobot(0, origin, destinations, theta[0], originalGraph, g, path, max_k, size);
+      if (!foundPath) {
+        std::cout << "NO PATH FOUND!\n";
+      }
 
 
     } else if (numberOfRobots == 2) {
       // ********** TWO ROBOTS - PROJECT NUMBER 1 - PURSUER EVADER GAME ********** //
       std::cout << "THERE ARE TWO ROBOTS\nPursuer Evader game\n";
+
+      // DEBUG - try to reach a destination with both robots
+      bool foundPathFirst = reachDestinationForRobot(0, visgraph::Point(x[0], y[0]), destinations, theta[0], originalGraph, g, path, max_k, size);
+      if (!foundPathFirst) {
+        std::cout << "NO PATH FOUND FOR FIRST ROBOT!\n";
+      }
+      bool foundPathSecond = reachDestinationForRobot(1, visgraph::Point(x[1], y[1]), destinations, theta[1], originalGraph, g, path, max_k, size);
+      if (!foundPathSecond) {
+        std::cout << "NO PATH FOUND FOR SECOND ROBOT!\n";
+      }
       
     } else if (numberOfRobots == 3) {
       // ********** THREE ROBOTS - PROJECT NUMBER 2 - NOT DONE ********** //
       std::cout << "THERE ARE THREE ROBOTS\nProject number 2 not done\n";
+
+      // DEBUG - try to reach a destination with all robots
+      reachDestinationForRobot(0, visgraph::Point(x[0], y[0]), destinations, theta[0], originalGraph, g, path, max_k, size);
+      reachDestinationForRobot(1, visgraph::Point(x[1], y[1]), destinations, theta[1], originalGraph, g, path, max_k, size);
+      reachDestinationForRobot(2, visgraph::Point(x[2], y[2]), destinations, theta[2], originalGraph, g, path, max_k, size);
 
     }
 
