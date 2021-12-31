@@ -259,12 +259,14 @@ namespace student
    * @param originalGraph Obstacles for collision detection
    * @param g Obstacles for the shortestPath
    * @param path Path to fill - passed by ref.
+   * @param shortestPath Calculated shortest path
+   * @param pathLengths Lengths of the dubins path from source to all intermediate points
    * @param max_k Curvature of the robot
    * @param size Discritizer size for the path generation
    * @return true If a path has been found
    * @return false If a path hasn't been found
    */
-  bool reachDestinationForRobot(int robot, visgraph::Point origin, std::vector<visgraph::Point> destinations, double theta, visgraph::Graph originalGraph, visgraph::Graph g, std::vector<visgraph::Point> &shortestPath, std::vector<Path> &path, double max_k, double size) {
+  bool reachDestinationForRobot(int robot, visgraph::Point origin, std::vector<visgraph::Point> destinations, double theta, visgraph::Graph originalGraph, visgraph::Graph g, std::vector<visgraph::Point> &shortestPath, std::vector<double> &pathLengths, std::vector<Path> &path, double max_k, double size) {
     // ********** COMPUTE SHORTEST PATH FROM ORIGIN TO DESTINATION ********** //
     shortestPath = g.shortestPathMultipleD(origin, destinations);
 
@@ -293,6 +295,13 @@ namespace student
         // DEBUG - print the final complete path using opencv
         // dubins.printCompletePath(curves, shortestPath.size()-1, polygons);
 
+        // ********** GET THE PATH COMPLETE LENGTH ********** //
+        double pathLength = 0;
+        pathLengths.clear();
+        for (int i = 0; i < shortestPath.size() - 1; i++) {
+          pathLengths.push_back(pathLength);
+          pathLength += curves[i]->L;
+        }
 
         // ********** CREATE THE PATH FOR THE ROBOT ********** //
         fillPath(curves, path, shortestPath.size()-1, size, robot);
@@ -322,7 +331,7 @@ namespace student
     // Correct bound k and discritizer size
     double max_k = 30;
     // Correct discritizer size
-    double size = 0.0001;
+    double size = 0.001;
     // Offset based on the robot's size for polygon offsetting
     double offset = 0.076;
     // Variant value to increase the size of the outside borders
@@ -416,15 +425,18 @@ namespace student
       std::cout << "THERE IS ONE ONLY ROBOT\nTry to reach the gate\n";
 
       std::vector<visgraph::Point> shortestPath;
+      std::vector<double> pathLengths;
 
       // ********** SET THE ORIGIN ********** //
       visgraph::Point origin = visgraph::Point(x[0], y[0]);
 
 
       // ********** TRY TO REACH THE DESTINATION ********** //
-      bool foundPath = reachDestinationForRobot(0, origin, destinations, theta[0], originalGraph, g, shortestPath, path, max_k, size);
+      bool foundPath = reachDestinationForRobot(0, origin, destinations, theta[0], originalGraph, g, shortestPath, pathLengths, path, max_k, size);
       if (!foundPath) {
         std::cout << "NO PATH FOUND!\n";
+      } else {
+        std::cout << "FOUND PATH WITH LENGTH: " << pathLengths[pathLengths.size() - 1] << "\n";
       }
 
 
@@ -434,11 +446,14 @@ namespace student
       std::cout << "THERE ARE TWO ROBOTS\nPursuer Evader game\n";
 
       std::vector<visgraph::Point> shortestPathEvader, shortestPathPursuer;
+      std::vector<double> pathLengthsEvader, pathLengthsPursuer;
       
       // ********** EVADER - Try to reach the closer destination ********** //
-      bool foundPathFirst = reachDestinationForRobot(0, visgraph::Point(x[0], y[0]), destinations, theta[0], originalGraph, g, shortestPathEvader, path, max_k, size);
+      bool foundPathFirst = reachDestinationForRobot(0, visgraph::Point(x[0], y[0]), destinations, theta[0], originalGraph, g, shortestPathEvader, pathLengthsEvader, path, max_k, size);
       if (!foundPathFirst) {
         std::cout << "NO PATH FOUND FOR THE EVADER!\n";
+      } else {
+        std::cout << "PATH FOUND FOR EVADER WITH LENGTH: " << pathLengthsEvader[pathLengthsEvader.size()-1] << "\n";
       }
       
       // DEBUG - Try to reach the closer destination with the pursuer
@@ -459,9 +474,19 @@ namespace student
         if (distancesPursuer[shortestPathEvader[i]] < distancesEvader[shortestPathEvader[i]]) {
           std::vector<visgraph::Point> finalDestinations;
           finalDestinations.push_back(visgraph::Point(shortestPathEvader[i].x, shortestPathEvader[i].y));
-          bool foundPathPursuer = reachDestinationForRobot(1, visgraph::Point(x[1], y[1]), finalDestinations, theta[1], originalGraph, g, shortestPathPursuer, path, max_k, size);
+          bool foundPathPursuer = reachDestinationForRobot(1, visgraph::Point(x[1], y[1]), finalDestinations, theta[1], originalGraph, g, shortestPathPursuer, pathLengthsPursuer, path, max_k, size);
           if (foundPathPursuer) {
-            break;
+            // Check if the length of the multipoint path is really less than the one of the evader
+            double completePathLengthPursuer = pathLengthsPursuer[pathLengthsPursuer.size()-1], completePathLengthEvader = pathLengthsEvader[i];
+            std::cout << "PATH FOUND FOR PURSUER WITH LENGTH: " << completePathLengthPursuer << " WHERE EVADER'S ONE IS " << completePathLengthEvader << "\n";
+            if (completePathLengthPursuer < completePathLengthEvader) {
+              std::cout << "WITH THIS PATH THE PURSUER WILL BE ABLE TO REACH THE EVADER\n";
+              break;
+            } else {
+              // Cancel the constructed path and retry
+              path[1].points.clear();
+              std::cout << "WITH THIS PATH THE PURSUER WON'T BE ABLE TO REACH THE EVADER\n";
+            }
           }
         }
       }
@@ -474,11 +499,12 @@ namespace student
       std::cout << "THERE ARE THREE ROBOTS\nProject number 2 not done\n";
 
       std::vector<visgraph::Point> shortestPathTmp;
+      std::vector<double> pathLengths;
 
       // DEBUG - try to reach a destination with all robots
-      reachDestinationForRobot(0, visgraph::Point(x[0], y[0]), destinations, theta[0], originalGraph, g, shortestPathTmp, path, max_k, size);
-      reachDestinationForRobot(1, visgraph::Point(x[1], y[1]), destinations, theta[1], originalGraph, g, shortestPathTmp, path, max_k, size);
-      reachDestinationForRobot(2, visgraph::Point(x[2], y[2]), destinations, theta[2], originalGraph, g, shortestPathTmp, path, max_k, size);
+      reachDestinationForRobot(0, visgraph::Point(x[0], y[0]), destinations, theta[0], originalGraph, g, shortestPathTmp, pathLengths, path, max_k, size);
+      reachDestinationForRobot(1, visgraph::Point(x[1], y[1]), destinations, theta[1], originalGraph, g, shortestPathTmp, pathLengths, path, max_k, size);
+      reachDestinationForRobot(2, visgraph::Point(x[2], y[2]), destinations, theta[2], originalGraph, g, shortestPathTmp, pathLengths, path, max_k, size);
 
     }
 
