@@ -271,8 +271,8 @@ namespace student
     shortestPath = g.shortestPathMultipleD(origin, destinations);
 
     // DEBUG - print graphs using opencv
-    // printGraph(originalGraph.graph, origin, destination, shortestPath);
-    // printGraph(g.graph, origin, destination, shortestPath);
+    // printGraph(originalGraph.graph, origin, destinations[0], shortestPath);
+    // printGraph(g.graph, origin, destinations[0], shortestPath);
 
 
     // ********** COMPUTE MULTIPOINT DUBINS PATH ********** //
@@ -299,8 +299,8 @@ namespace student
         double pathLength = 0;
         pathLengths.clear();
         for (int i = 0; i < shortestPath.size() - 1; i++) {
-          pathLengths.push_back(pathLength);
           pathLength += curves[i]->L;
+          pathLengths.push_back(pathLength);
         }
 
         // ********** CREATE THE PATH FOR THE ROBOT ********** //
@@ -477,7 +477,7 @@ namespace student
           bool foundPathPursuer = reachDestinationForRobot(1, visgraph::Point(x[1], y[1]), finalDestinations, theta[1], originalGraph, g, shortestPathPursuer, pathLengthsPursuer, path, max_k, size);
           if (foundPathPursuer) {
             // Check if the length of the multipoint path is really less than the one of the evader
-            double completePathLengthPursuer = pathLengthsPursuer[pathLengthsPursuer.size()-1], completePathLengthEvader = pathLengthsEvader[i];
+            double completePathLengthPursuer = pathLengthsPursuer[pathLengthsPursuer.size()-1], completePathLengthEvader = pathLengthsEvader[i-1];
             std::cout << "PATH FOUND FOR PURSUER WITH LENGTH: " << completePathLengthPursuer << " WHERE EVADER'S ONE IS " << completePathLengthEvader << "\n";
             if (completePathLengthPursuer < completePathLengthEvader) {
               std::cout << "WITH THIS PATH THE PURSUER WILL BE ABLE TO REACH THE EVADER\n";
