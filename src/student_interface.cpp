@@ -10,6 +10,7 @@
 #include <stdexcept>
 #include <sstream>
 #include <iostream>
+#include <random>
 
 namespace student
 {
@@ -207,14 +208,12 @@ namespace student
         s = result->a1->L/npts * i;
         tmp = new dubins::DubinsLine(s, result->a1->x0, result->a1->y0, result->a1->th0, result->a1->k);
         path[robotId].points.emplace_back(s, tmp->x, tmp->y, tmp->th, result->a1->k);
-        delete tmp;
       }
 
       if(result->a1->L - result->a1->L/npts*npts > 0.0) {
         s = result->a1->L/npts * npts;
         tmp = new dubins::DubinsLine(s, result->a1->x0, result->a1->y0, result->a1->th0, result->a1->k);
         path[robotId].points.emplace_back(s, tmp->x, tmp->y, tmp->th, result->a1->k);
-        delete tmp;
       }
 
       npts = result->a2->L/size;
@@ -222,14 +221,12 @@ namespace student
         s = result->a2->L/npts * i;
         tmp = new dubins::DubinsLine(s, result->a2->x0, result->a2->y0, result->a2->th0, result->a2->k);
         path[robotId].points.emplace_back(s, tmp->x, tmp->y, tmp->th, result->a2->k);
-        delete tmp;
       }
 
       if(result->a2->L - result->a2->L/npts*npts > 0.0) {
         s = result->a2->L/npts * npts;
         tmp = new dubins::DubinsLine(s, result->a2->x0, result->a2->y0, result->a2->th0, result->a2->k);
         path[robotId].points.emplace_back(s, tmp->x, tmp->y, tmp->th, result->a2->k);
-        delete tmp;
       }
 
       npts = result->a3->L/size;
@@ -237,14 +234,12 @@ namespace student
         s = result->a3->L/npts * i;
         tmp = new dubins::DubinsLine(s, result->a3->x0, result->a3->y0, result->a3->th0, result->a3->k);
         path[robotId].points.emplace_back(s, tmp->x, tmp->y, tmp->th, result->a3->k);
-        delete tmp;
       }
 
       if(result->a3->L - result->a3->L/npts*npts > 0.0) {
         s = result->a3->L/npts * npts;
         tmp = new dubins::DubinsLine(s, result->a3->x0, result->a3->y0, result->a3->th0, result->a3->k);
         path[robotId].points.emplace_back(s, tmp->x, tmp->y, tmp->th, result->a3->k);
-        delete tmp;
       }
     }
   }
@@ -308,6 +303,8 @@ namespace student
         return true;
     }
   }
+
+
 
   /**
    * @brief Plan a safe and fast path in the arena
@@ -441,73 +438,127 @@ namespace student
 
 
     } else if (numberOfRobots == 2) {
+      if(numberOfDestinations == 1) {
+        // ********** TWO ROBOTS - PROJECT NUMBER 1 - PURSUER EVADER GAME ********** //
+        std::cout << "THERE ARE TWO ROBOTS\nPursuer Evader game\n";
 
-      // ********** TWO ROBOTS - PROJECT NUMBER 1 - PURSUER EVADER GAME ********** //
-      std::cout << "THERE ARE TWO ROBOTS\nPursuer Evader game\n";
-
-      std::vector<visgraph::Point> shortestPathEvader, shortestPathPursuer;
-      std::vector<double> pathLengthsEvader, pathLengthsPursuer;
-      
-      // ********** EVADER - Try to reach the closer destination ********** //
-      bool foundPathFirst = reachDestinationForRobot(0, visgraph::Point(x[0], y[0]), destinations, theta[0], originalGraph, g, shortestPathEvader, pathLengthsEvader, path, max_k, size);
-      if (!foundPathFirst) {
-        std::cout << "NO PATH FOUND FOR THE EVADER!\n";
-      } else {
-        std::cout << "PATH FOUND FOR EVADER WITH LENGTH: " << pathLengthsEvader[pathLengthsEvader.size()-1] << "\n";
-      }
-      
-      // DEBUG - Try to reach the closer destination with the pursuer
-      // bool foundPathSecond = reachDestinationForRobot(1, visgraph::Point(x[1], y[1]), destinations, theta[1], originalGraph, g, path, max_k, size);
-      // if (!foundPathSecond) {
-      //   std::cout << "NO PATH FOUND FOR SECOND ROBOT!\n";
-      // }
+        std::vector<visgraph::Point> shortestPathEvader, shortestPathPursuer;
+        std::vector<double> pathLengthsEvader, pathLengthsPursuer;
+        
+        // ********** EVADER - Try to reach the closer destination ********** //
+        bool foundPathFirst = reachDestinationForRobot(0, visgraph::Point(x[0], y[0]), destinations, theta[0], originalGraph, g, shortestPathEvader, pathLengthsEvader, path, max_k, size);
+        if (!foundPathFirst) {
+          std::cout << "NO PATH FOUND FOR THE EVADER!\n";
+        } else {
+          std::cout << "PATH FOUND FOR EVADER WITH LENGTH: " << pathLengthsEvader[pathLengthsEvader.size()-1] << "\n";
+        }
+        
+        // DEBUG - Try to reach the closer destination with the pursuer
+        // bool foundPathSecond = reachDestinationForRobot(1, visgraph::Point(x[1], y[1]), destinations, theta[1], originalGraph, g, path, max_k, size);
+        // if (!foundPathSecond) {
+        //   std::cout << "NO PATH FOUND FOR SECOND ROBOT!\n";
+        // }
 
 
-      // ********** PURSUER - Find the path to intercept the evader ********** //
-      //Calculate the shortestPathDict both for the first robot position and the second
-      std::map<visgraph::Point, double> distancesEvader = g.shortestPathMultipleDDict(visgraph::Point(x[0], y[0]), destinations);
-      std::map<visgraph::Point, double> distancesPursuer = g.shortestPathMultipleDDict(visgraph::Point(x[1], y[1]), destinations);
-      // Algorithm for the pursuer evader game
-      // We assume the evader is in position 0
-      int i;
-      for(i = 1; i < shortestPathEvader.size(); i++){
-        if (distancesPursuer[shortestPathEvader[i]] < distancesEvader[shortestPathEvader[i]]) {
-          std::vector<visgraph::Point> finalDestinations;
-          finalDestinations.push_back(visgraph::Point(shortestPathEvader[i].x, shortestPathEvader[i].y));
-          bool foundPathPursuer = reachDestinationForRobot(1, visgraph::Point(x[1], y[1]), finalDestinations, theta[1], originalGraph, g, shortestPathPursuer, pathLengthsPursuer, path, max_k, size);
-          if (foundPathPursuer) {
-            // Check if the length of the multipoint path is really less than the one of the evader
-            double completePathLengthPursuer = pathLengthsPursuer[pathLengthsPursuer.size()-1], completePathLengthEvader = pathLengthsEvader[i-1];
-            std::cout << "PATH FOUND FOR PURSUER WITH LENGTH: " << completePathLengthPursuer << " WHERE EVADER'S ONE IS " << completePathLengthEvader << "\n";
-            if (completePathLengthPursuer < completePathLengthEvader) {
-              std::cout << "WITH THIS PATH THE PURSUER WILL BE ABLE TO REACH THE EVADER\n";
-              break;
-            } else {
-              // Cancel the constructed path and retry
-              path[1].points.clear();
-              std::cout << "WITH THIS PATH THE PURSUER WON'T BE ABLE TO REACH THE EVADER\n";
+        // ********** PURSUER - Find the path to intercept the evader ********** //
+        //Calculate the shortestPathDict both for the first robot position and the second
+        std::map<visgraph::Point, double> distancesEvader = g.shortestPathMultipleDDict(visgraph::Point(x[0], y[0]), destinations);
+        std::map<visgraph::Point, double> distancesPursuer = g.shortestPathMultipleDDict(visgraph::Point(x[1], y[1]), destinations);
+        // Algorithm for the pursuer evader game
+        // We assume the evader is in position 0
+        int i;
+        for(i = 1; i < shortestPathEvader.size(); i++){
+          if (distancesPursuer[shortestPathEvader[i]] < distancesEvader[shortestPathEvader[i]]) {
+            std::vector<visgraph::Point> finalDestinations;
+            finalDestinations.push_back(visgraph::Point(shortestPathEvader[i].x, shortestPathEvader[i].y));
+            bool foundPathPursuer = reachDestinationForRobot(1, visgraph::Point(x[1], y[1]), finalDestinations, theta[1], originalGraph, g, shortestPathPursuer, pathLengthsPursuer, path, max_k, size);
+            if (foundPathPursuer) {
+              // Check if the length of the multipoint path is really less than the one of the evader
+              double completePathLengthPursuer = pathLengthsPursuer[pathLengthsPursuer.size()-1], completePathLengthEvader = pathLengthsEvader[i-1];
+              std::cout << "PATH FOUND FOR PURSUER WITH LENGTH: " << completePathLengthPursuer << " WHERE EVADER'S ONE IS " << completePathLengthEvader << "\n";
+              if (completePathLengthPursuer < completePathLengthEvader) {
+                std::cout << "WITH THIS PATH THE PURSUER WILL BE ABLE TO REACH THE EVADER\n";
+                break;
+              } else {
+                // Cancel the constructed path and retry
+                path[1].points.clear();
+                std::cout << "WITH THIS PATH THE PURSUER WON'T BE ABLE TO REACH THE EVADER\n";
+              }
             }
           }
         }
-      }
-      if (i == shortestPathEvader.size()) {
-        std::cout << "THE PURSUER WASN'T ABLE TO FIND A PATH TO REACH THE EVADER\n";
-      }
+        if (i == shortestPathEvader.size()) {
+          std::cout << "THE PURSUER WASN'T ABLE TO FIND A PATH TO REACH THE EVADER\n";
+        }
+      }else if(numberOfDestinations == 2) {
       
-    } else if (numberOfRobots == 3) {
-      // ********** THREE ROBOTS - PROJECT NUMBER 2 - NOT DONE ********** //
-      std::cout << "THERE ARE THREE ROBOTS\nProject number 2 not done\n";
+        // ********** TWO DESTINATIONS - PROJECT NUMBER 2 - ********** //
+        std::cout << "THERE ARE TWO DESTINATIONS ROBOTS\nProject number 2 in implement\n";
 
-      std::vector<visgraph::Point> shortestPathTmp;
-      std::vector<double> pathLengths;
+        std::vector<visgraph::Point> shortestPathTmp;
+        std::vector<double> pathLengths;
+        std::vector<visgraph::Point> shortestPath;
+        std::vector<visgraph::Point> finalDestination;
 
-      // DEBUG - try to reach a destination with all robots
-      reachDestinationForRobot(0, visgraph::Point(x[0], y[0]), destinations, theta[0], originalGraph, g, shortestPathTmp, pathLengths, path, max_k, size);
-      reachDestinationForRobot(1, visgraph::Point(x[1], y[1]), destinations, theta[1], originalGraph, g, shortestPathTmp, pathLengths, path, max_k, size);
-      reachDestinationForRobot(2, visgraph::Point(x[2], y[2]), destinations, theta[2], originalGraph, g, shortestPathTmp, pathLengths, path, max_k, size);
+        // using random to decide the finalDestination
+        std::random_device rd;
+        std::default_random_engine eng(rd());
+        std::uniform_int_distribution<int> disti(0, 1);
+        std::uniform_real_distribution<double> distr(0.0, 1.0);
 
+        // chose a random destination
+        finalDestination.push_back(destinations[disti(eng)]);
+ 
+        // ********** COMPUTE THE FIRST SHORTEST PATH FROM ORIGIN TO DESTINATION ********** //
+        shortestPath = g.shortestPathMultipleD(visgraph::Point(x[0], y[0]), finalDestination);
+
+        // fill initial point with a shortest path calculated by using random chosen destination
+        // a list of intermediate points and a destination.
+        // The only point in which we specify an angle is the initial one.
+        dubins::Dubins dubins = dubins::Dubins(max_k, size);
+        dubins::DubinsPoint **points = new dubins::DubinsPoint *[shortestPath.size()];
+        points[0] = new dubins::DubinsPoint(shortestPath[0].x, shortestPath[0].y, theta[0]);
+        int pointCnt = 1;
+        dubins::DubinsCurve **curves;
+
+        std::cout<< "CURRENT DESTINATION: " << std::endl;
+        finalDestination[0].print();
+
+        do{
+          // chose the exit point randomly
+          for(pointCnt = 1; pointCnt < shortestPath.size(); pointCnt++) {
+              if(distr(eng) < 0.5) break;
+              points[pointCnt] = new dubins::DubinsPoint(shortestPath[pointCnt].x, shortestPath[pointCnt].y);
+          }
+
+          //Find the dubins shortest path given the set of intermediate points only if there be points added in the list
+          if(pointCnt > 1) {
+            curves = dubins.multipointShortestPath(points, pointCnt, originalGraph);
+            // redecide the destination if no available path
+            if (curves == nullptr) {
+              std::cout << "UNVALIABLE DESTINATION, CHANGE MIND!\n";
+              // set cnt to 0 to avoid the project stop here
+              pointCnt = 1;
+            } else {
+              std::cout << "COMPLETED MULTIPOINT SHORTEST PATH SUCCESSFULLY\n";
+              // ********** CREATE THE PATH FOR CURRENT PATH ********** //
+              // using the robot0 as the evader  
+              fillPath(curves, path, pointCnt-1, size, 0);
+            }
+          }
+          // already in destination
+          if((points[pointCnt-1]->x==finalDestination[0].x) && (points[pointCnt-1]->y==finalDestination[0].y)) break;
+          // randomly chose the new destination and replan the path
+          finalDestination.pop_back();
+          finalDestination.push_back(destinations[disti(eng)]);
+          std::cout<< "CURRENT DESTINATION: " << std::endl;
+          finalDestination[0].print();
+          // calculate the new path from current point to new destination
+          shortestPath = g.shortestPathMultipleD(visgraph::Point(points[pointCnt-1]->x, points[pointCnt-1]->y), finalDestination);
+          points[0] = new dubins::DubinsPoint(shortestPath[0].x, shortestPath[0].y, theta[0]);
+        } while(true);
+      }
     }
-
 
     // ************************ DEBUG - Test a simple shortest path ******************************** //
     // visgraph::Point destination = visgraph::Point(borderMinX + 0.2, borderMaxY - 0.2);
