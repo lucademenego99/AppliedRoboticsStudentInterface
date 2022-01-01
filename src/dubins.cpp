@@ -401,8 +401,10 @@ namespace dubins
                 if (!areThereCollisions) {
                     best_L = current_L;
                     pidx = i;
-                    if (best_curve_segments != nullptr)
+                    if (best_curve_segments != nullptr) {
                         delete best_curve_segments;
+                        best_curve_segments = nullptr;
+                    }
                     best_curve_segments = new CurveSegmentsResult(true, curve_segments->s1, curve_segments->s2, curve_segments->s3);
                 }
             }
@@ -450,7 +452,6 @@ namespace dubins
      */
     double *Dubins::multipointShortestPathAngles(DubinsPoint **points, unsigned int numberOfPoints, visgraph::Graph &graph)
     {
-        // std::vector<visgraph::Edge> edges = graph.getEdges();
         std::cout << "INPUT WITH " << numberOfPoints << " POINTS: \n";
         std::cout << "X\tY\tTHETA\n";
         for (int i = 0; i < numberOfPoints; i++)
@@ -653,6 +654,7 @@ namespace dubins
         // Get the optimal angles for each point (dynamic programming iterative procedure)
         double *angles = multipointShortestPathAngles(newPoints, numberOfPoints, graph);
         if (angles == nullptr) {
+            delete[] newPoints;
             return nullptr;
         }
 
@@ -662,9 +664,11 @@ namespace dubins
             int index = numberOfPoints-i-1;
             curves[i] = findShortestPathCollisionDetection(newPoints[index]->x, newPoints[index]->y, mod2pi(angles[index] + M_PI), newPoints[index-1]->x, newPoints[index-1]->y, mod2pi(angles[index-1] + M_PI), graph);
             if (curves[i] == nullptr) {
+                delete[] newPoints;
                 return nullptr;
             }
         }
+        delete[] newPoints;
         return curves;
     }
 

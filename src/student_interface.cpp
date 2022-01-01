@@ -327,7 +327,7 @@ namespace student
    */
   bool planPath(const Polygon& borders, const std::vector<Polygon>& obstacle_list, const std::vector<Polygon>& gate_list, const std::vector<float> x, const std::vector<float> y, const std::vector<float> theta, std::vector<Path>& path, const std::string& config_folder){
 
-    std::cout << "----- STUDENT PLAN PATH -----\n";
+    std::cout << "----- STUDENT PLAN PATH -----\n;
 
     // ********** DEFINE USEFUL VARIABLES ********** //
     // Correct bound k and discritizer size
@@ -404,6 +404,7 @@ namespace student
         destinations.push_back(destination);
       }
     }
+    numberOfDestinations = destinations.size();
 
     // DEBUG - if you want to test using other destinations, just add them here with destinations.push_back(your destination)
     // destinations.push_back(visgraph::Point(1.2, 0.2));
@@ -495,10 +496,10 @@ namespace student
         if (i == shortestPathEvader.size()) {
           std::cout << "THE PURSUER WASN'T ABLE TO FIND A PATH TO REACH THE EVADER\n";
         }
-      }else if(numberOfDestinations == 2) {
+      } else if(numberOfDestinations > 1) {
       
-        // ********** TWO DESTINATIONS - PROJECT NUMBER 2 - ********** //
-        std::cout << "THERE ARE TWO DESTINATIONS ROBOTS\nProject number 2 in implement\n";
+        // ********** MULTIPLE DESTINATIONS - PROJECT NUMBER 1 - ********** //
+        std::cout << "THERE ARE TWO ROBOTS AND MULTIPLE DESTINATIONS\nPursuer Evader Game with " << numberOfDestinations << " destinations!\n";
 
         std::vector<visgraph::Point> shortestPathTmp;
         std::vector<double> pathLengths;
@@ -508,14 +509,14 @@ namespace student
         // using random to decide the finalDestination
         std::random_device rd;
         std::default_random_engine eng(rd());
-        std::uniform_int_distribution<int> disti(0, 1);
+        std::uniform_int_distribution<int> disti(0, numberOfDestinations-1);
         std::uniform_real_distribution<double> distr(0.0, 1.0);
 
-        // chose a random destination
+        // Choose a random destination
         finalDestination.push_back(destinations[disti(eng)]);
  
         // ********** COMPUTE THE FIRST SHORTEST PATH FROM ORIGIN TO DESTINATION ********** //
-        shortestPath = g.shortestPathMultipleD(visgraph::Point(x[0], y[0]), finalDestination);
+        shortestPath = g.shortestPath(visgraph::Point(x[0], y[0]), finalDestination[0]);
 
         // fill initial point with a shortest path calculated by using random chosen destination
         // a list of intermediate points and a destination.
@@ -526,44 +527,63 @@ namespace student
         int pointCnt = 1;
         dubins::DubinsCurve **curves;
 
-        std::cout<< "CURRENT DESTINATION: " << std::endl;
+        std::cout<< "CURRENT DESTINATION: ";
         finalDestination[0].print();
 
+        double lastTheta = theta[0];
+        int counter = 0;
+
         do{
+          counter++;
+
           // chose the exit point randomly
-          for(pointCnt = 1; pointCnt < shortestPath.size(); ) {
+          for(pointCnt = 1; pointCnt < shortestPath.size(); pointCnt++) {
               if(distr(eng) < 0.5) break;
               points[pointCnt] = new dubins::DubinsPoint(shortestPath[pointCnt].x, shortestPath[pointCnt].y);
-              ++ pointCnt;
           }
 
-          //Find the dubins shortest path given the set of intermediate points only if there be points added in the list
+          //Find the dubins shortest path given the set of intermediate points only if there are points added in the list
           if(pointCnt > 1) {
             curves = dubins.multipointShortestPath(points, pointCnt, originalGraph);
-            // redecide the destination if no available path
+            // If there is no path available with the decided destination, restart from the beginning of the process excluding this destination
             if (curves == nullptr) {
               std::cout << "UNVALIABLE DESTINATION, CHANGE MIND!\n";
-              // set cnt to 0 to avoid the project stop here
+              for (int t = pointCnt-1; t >= 1; t--) {
+                delete points[t];
+              }
               pointCnt = 1;
             } else {
               std::cout << "COMPLETED MULTIPOINT SHORTEST PATH SUCCESSFULLY\n";
+
               // ********** CREATE THE PATH FOR CURRENT PATH ********** //
-              // using the robot0 as the evader  
+              // Fill the path for the evader (assume it's the robot in the 0th position)
               fillPath(curves, path, pointCnt-1, size, 0);
+
+              lastTheta = curves[pointCnt-2]->a3->dubins_line->th;
             }
           }
-          // already in destination
-          if((points[pointCnt-1]->x==finalDestination[0].x) && (points[pointCnt-1]->y==finalDestination[0].y)) break;
-          // randomly chose the new destination and replan the path
+
+          // Did we arrive at our destination? If so, break the loop and return
+          if((points[pointCnt-1]->x==finalDestination[0].x) && (points[pointCnt-1]->y==finalDestination[0].y)) 
+            break;
+
+          // Randomly choose the new destination and replan the path
           finalDestination.pop_back();
           finalDestination.push_back(destinations[disti(eng)]);
-          std::cout<< "CURRENT DESTINATION: " << std::endl;
+          std::cout<< "NEW DESTINATION CHOSEN: ";
           finalDestination[0].print();
-          // calculate the new path from current point to new destination
-          shortestPath = g.shortestPathMultipleD(visgraph::Point(points[pointCnt-1]->x, points[pointCnt-1]->y), finalDestination);
-          points[0] = new dubins::DubinsPoint(shortestPath[0].x, shortestPath[0].y, theta[0]);
-        } while(true);
+
+          // Calculate the new path from the current point to the new destination
+          shortestPath = g.shortestPath(visgraph::Point(points[pointCnt-1]->x, points[pointCnt-1]->y), finalDestination[0]);
+
+          // Set the new origin
+          delete points[0];
+          points[0] = new dubins::DubinsPoint(shortestPath[0].x, shortestPath[0].y, lastTheta);
+
+        } while(counter < 50);
       }
+    } else if (numberOfRobots == 3) {
+      std::cout << "THERE ARE THREE ROBOTS - Project Number 2 Not Done\n";
     }
 
     // ************************ DEBUG - Test a simple shortest path ******************************** //
