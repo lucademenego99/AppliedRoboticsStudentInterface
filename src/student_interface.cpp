@@ -250,6 +250,64 @@ namespace student
   }
 
   /**
+   * @brief Plan to reach a certain destination points with a certain robot
+   * 
+   * @param robot Robot ID
+   * @param origin Origin point
+   * @param destination Destination Point
+   * @param theta Robot's starting angle
+   * @param originalGraph Obstacles for collision detection
+   * @param g Obstacles for the shortestPath
+   * @param path Path to fill - passed by ref.
+   * @param shortestPath Calculated shortest path
+   * @param pathLengths Lengths of the dubins path from source to all intermediate points
+   * @param max_k Curvature of the robot
+   * @param size Discritizer size for the path generation
+   * @return true If a path has been found
+   * @return false If a path hasn't been found
+   */
+  bool planDestinationForRobot(int robot, visgraph::Point origin, std::vector<visgraph::Point> destinations, double theta, visgraph::Graph originalGraph, visgraph::Graph g, std::vector<visgraph::Point> &shortestPath, std::vector<double> &pathLengths, std::vector<Path> &path, double max_k, double size) {
+    // ********** COMPUTE SHORTEST PATH FROM ORIGIN TO DESTINATION ********** //
+    shortestPath = g.shortestPathMultipleD(origin, destinations);
+
+    // DEBUG - print graphs using opencv
+    // printGraph(originalGraph.graph, origin, destinations[0], shortestPath);
+    // printGraph(g.graph, origin, destinations[0], shortestPath);
+
+
+    // ********** COMPUTE MULTIPOINT DUBINS PATH ********** //
+    // Create an input valid for multipointShortestPath - we have a source,
+    // a list of intermediate points and a destination.
+    // The only point in which we specify an angle is the initial one.
+    dubins::Dubins dubins = dubins::Dubins(max_k, size);
+    dubins::DubinsPoint **points = new dubins::DubinsPoint *[shortestPath.size()];
+    points[0] = new dubins::DubinsPoint(shortestPath[0].x, shortestPath[0].y, theta);
+    for(int i = 1; i < shortestPath.size(); i++) {
+        points[i] = new dubins::DubinsPoint(shortestPath[i].x, shortestPath[i].y);
+    }
+    // Find the dubins shortest path given the set of intermediate points
+    dubins::DubinsCurve **curves = dubins.multipointShortestPath(points, shortestPath.size(), originalGraph);
+    if (curves == nullptr) {
+        std::cout << "UNABLE TO COMPUTE A PATH FOR GIVEN INPUT\n";
+        return false;
+    } else {
+        std::cout << "COMPLETED MULTIPOINT SHORTEST PATH SUCCESSFULLY\n";
+        // DEBUG - print the final complete path using opencv
+        // dubins.printCompletePath(curves, shortestPath.size()-1, polygons);
+
+        // ********** GET THE PATH COMPLETE LENGTH ********** //
+        double pathLength = 0;
+        pathLengths.clear();
+        for (int i = 0; i < shortestPath.size() - 1; i++) {
+          pathLength += curves[i]->L;
+          pathLengths.push_back(pathLength);
+        }
+
+        return true;
+    }
+  }
+
+  /**
    * @brief Reach a certain destination points with a certain robot
    * 
    * @param robot Robot ID
@@ -533,6 +591,9 @@ namespace student
         visgraph::Point origin = visgraph::Point(x[0], y[0]); // Keep track of the origin point
         std::vector<std::vector<visgraph::Point>> shortestPathsEvader;  // All shortest paths of the evader
         std::vector<std::vector<double>> pathLengthsEvader; // All lengths of all the evader's paths
+        std::vector<visgraph::Point> destinationPointsEvader; // All the destination points considered by the evader in order
+        std::vector<double> evaderThetas; // All the destination theta angles of the evader in order
+        evaderThetas.push_back(theta[0]);
 
         do {
           counter++;
@@ -554,13 +615,16 @@ namespace student
             bool r = reachDestinationForRobot(0, origin, destTmp, lastTheta, originalGraph, g, shortestPathsEvader[shortestPathsEvader.size()-1], pathLengthsEvader[pathLengthsEvader.size()-1], path, max_k, size);
             // If there is no path available with the decided destination, restart from the beginning of the process excluding this destination
             if (!r) {
+              shortestPathsEvader.pop_back();
+              pathLengthsEvader.pop_back();
               std::cout << "UNVALIABLE DESTINATION, CHANGE MIND!\n";
               pointCnt = 1;
             } else {
-              std::cout << "COMPLETED MULTIPOINT SHORTEST PATH SUCCESSFULLY\n";
+              destinationPointsEvader.push_back(finalDestination[0]);
 
-              // Get the last angle (at destination)
+              // Get the last angle at destination
               lastTheta = path[0].points[path[0].points.size()-1].theta;
+              evaderThetas.push_back(lastTheta);
             }
           }
 
@@ -579,6 +643,89 @@ namespace student
           shortestPath = g.shortestPath(origin, finalDestination[0]);
 
         } while(counter < 50); 
+
+        // Now we define the pursuer's path
+        // In order to simulate the fact that the pursuer should not be able to predict the future,
+        // i.e. the evader's decisions to change destination, we allow the pursuer to change its path
+        // accordingly to the evader's new decisions only after:
+        // - it actually happens at runtime (we do this by comparing the length of the dubins paths)
+        // - it reaches the next node (because of the asynchronous assumption of the problem)
+
+        // Keep track of the pursuer's starting position and last angle theta
+        visgraph::Point originPursuer = visgraph::Point(x[1], y[1]);
+        double lastThetaPursuer = theta[1];
+
+        // Loop through all the evader's decisions of changing path
+        for (int z = 0; z < destinationPointsEvader.size(); z++) {
+          // Origin of the evader
+          visgraph::Point originEvader = shortestPathsEvader[z][0];
+
+          // Destination that the evader wanted to reach during this iteration
+          std::vector<visgraph::Point> destTmp {destinationPointsEvader[z]};
+
+          // Calculate the distances using Dijkstra for the evader and the pursuer
+          std::map<visgraph::Point, double> distancesEvader = g.shortestPathMultipleDDict(originEvader, destTmp);
+          std::map<visgraph::Point, double> distancesPursuer = g.shortestPathMultipleDDict(originPursuer, destTmp);
+
+          // Calculate the shortest path and the path lengths of the evader when going to the decided destination
+          std::vector<visgraph::Point> shortestPathEvaderTmp;
+          std::vector<double> pathLengthsEvaderTmp;
+          planDestinationForRobot(0, originEvader, destTmp, evaderThetas[z], originalGraph, g, shortestPathEvaderTmp, pathLengthsEvaderTmp, path, max_k, size);
+
+          // Keep track of the shortest path and the path lengths of the pursuer, see the algorithm below (for loop)
+          std::vector<visgraph::Point> shortestPathPursuer;
+          std::vector<double> pathLengthsPursuer;
+
+          // Algorithm for the pursuer evader game
+          // We assume the evader is in position 0
+          int i;
+          for(i = 1; i < shortestPathEvaderTmp.size(); i++) {
+            if (distancesPursuer[shortestPathEvaderTmp[i]] < distancesEvader[shortestPathEvaderTmp[i]]) {
+              // If the distance from this node of the pursuer is less than the evader's one, then the pursuer may be able to reach the evader setting this node as destination
+              std::vector<visgraph::Point> finalDestinations;
+              finalDestinations.push_back(shortestPathEvaderTmp[i]);
+
+              // Plan the path
+              bool foundPathPursuer = planDestinationForRobot(1, originPursuer, finalDestinations, lastThetaPursuer, originalGraph, g, shortestPathPursuer, pathLengthsPursuer, path, max_k, size);
+              if (foundPathPursuer) {
+                // Check if the length of the multipoint path is really less than the one of the evader
+                double completePathLengthPursuer = pathLengthsPursuer[pathLengthsPursuer.size()-1], completePathLengthEvader = pathLengthsEvaderTmp[i-1];
+                std::cout << "PATH FOUND FOR PURSUER WITH LENGTH: " << completePathLengthPursuer << " WHERE EVADER'S ONE IS " << completePathLengthEvader << "\n";
+                if (completePathLengthPursuer < completePathLengthEvader) {
+                  // Even the dubins path is smaller than the one of the evader! We can reach it, if it doesn't change its mind (we'll see during the next iteration of this for loop)
+                  std::cout << "WITH THIS PATH THE PURSUER WILL BE ABLE TO REACH THE EVADER\n";
+
+                  int j = pathLengthsPursuer.size();
+                  // In case the evader changes its mind later, we don't go through all the calculated path.
+                  // As soon as the pursuer will notice the evader changed path and will reach a node of the graph,
+                  // it will change its own path accordingly
+                  if (z < shortestPathsEvader.size()-1) {
+                    for (j = 0; j < pathLengthsPursuer.size(); j++) {
+                      if (pathLengthsPursuer[j] > pathLengthsEvader[z][pathLengthsEvader[0].size()-1]) {
+                        break;
+                      }
+                    }
+                  }
+
+                  // Make the pursuer reach the destination
+                  std::vector<visgraph::Point> dest {shortestPathPursuer[j]};
+                  reachDestinationForRobot(1, originPursuer, dest, lastThetaPursuer, originalGraph, g, shortestPathPursuer, pathLengthsPursuer, path, max_k, size);
+
+                  // Update last angle theta of the pursuer and origin point
+                  lastThetaPursuer = path[1].points[path[1].points.size()-1].theta;
+                  originPursuer = shortestPathPursuer[j];
+                  break;
+                } else {
+                  std::cout << "WITH THIS PATH THE PURSUER WON'T BE ABLE TO REACH THE EVADER\n";
+                }
+              }
+            }
+          }
+          if (i == shortestPathEvaderTmp.size()) {
+            std::cout << "THE PURSUER WASN'T ABLE TO FIND A PATH TO REACH THE EVADER AT ITERATION " << z << "\n";
+          }
+        }
+
       }
     } else if (numberOfRobots == 3) {
       std::cout << "THERE ARE THREE ROBOTS - Project Number 2 Not Done\n";

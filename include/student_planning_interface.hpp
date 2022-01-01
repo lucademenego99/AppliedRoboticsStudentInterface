@@ -134,6 +134,25 @@ namespace student
   visgraph::Point findValidDestinationPoint(std::vector<visgraph::Point> borderPoints, double minX, double maxX, double minY, double maxY);
 
   /**
+   * @brief Plan to reach a certain destination points with a certain robot
+   * 
+   * @param robot Robot ID
+   * @param origin Origin point
+   * @param destination Destination Point
+   * @param theta Robot's starting angle
+   * @param originalGraph Obstacles for collision detection
+   * @param g Obstacles for the shortestPath
+   * @param path Path to fill - passed by ref.
+   * @param shortestPath Calculated shortest path
+   * @param pathLengths Lengths of the dubins path from source to all intermediate points
+   * @param max_k Curvature of the robot
+   * @param size Discritizer size for the path generation
+   * @return true If a path has been found
+   * @return false If a path hasn't been found
+   */
+  bool planDestinationForRobot(int robot, visgraph::Point origin, std::vector<visgraph::Point> destinations, double theta, visgraph::Graph originalGraph, visgraph::Graph g, std::vector<visgraph::Point> &shortestPath, std::vector<double> &pathLengths, std::vector<Path> &path, double max_k, double size);
+
+  /**
    * @brief Reach a certain destination points with a certain robot
    * 
    * @param robot Robot ID

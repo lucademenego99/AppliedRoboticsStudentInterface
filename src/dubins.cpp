@@ -646,30 +646,33 @@ namespace dubins
      */
     DubinsCurve **Dubins::multipointShortestPath(DubinsPoint **points, unsigned int numberOfPoints, visgraph::Graph &graph)
     {
-        DubinsPoint **newPoints = new DubinsPoint*[numberOfPoints];
-        for (int i = 0; i < numberOfPoints; i++) {
-            newPoints[i] = points[numberOfPoints - i - 1];
-        }
-        newPoints[numberOfPoints-1]->th = mod2pi(points[0]->th + M_PI);
-        // Get the optimal angles for each point (dynamic programming iterative procedure)
-        double *angles = multipointShortestPathAngles(newPoints, numberOfPoints, graph);
-        if (angles == nullptr) {
-            delete[] newPoints;
-            return nullptr;
-        }
-
-        // Now that we have everything we need, calculate the optimal multipoint shortest path
-        DubinsCurve **curves = new DubinsCurve*[numberOfPoints-1];
-        for (int i = 0; i < numberOfPoints-1; i++) {
-            int index = numberOfPoints-i-1;
-            curves[i] = findShortestPathCollisionDetection(newPoints[index]->x, newPoints[index]->y, mod2pi(angles[index] + M_PI), newPoints[index-1]->x, newPoints[index-1]->y, mod2pi(angles[index-1] + M_PI), graph);
-            if (curves[i] == nullptr) {
+        if (numberOfPoints > 1) {
+            DubinsPoint **newPoints = new DubinsPoint*[numberOfPoints];
+            for (int i = 0; i < numberOfPoints; i++) {
+                newPoints[i] = points[numberOfPoints - i - 1];
+            }
+            newPoints[numberOfPoints-1]->th = mod2pi(points[0]->th + M_PI);
+            // Get the optimal angles for each point (dynamic programming iterative procedure)
+            double *angles = multipointShortestPathAngles(newPoints, numberOfPoints, graph);
+            if (angles == nullptr) {
                 delete[] newPoints;
                 return nullptr;
             }
+
+            // Now that we have everything we need, calculate the optimal multipoint shortest path
+            DubinsCurve **curves = new DubinsCurve*[numberOfPoints-1];
+            for (int i = 0; i < numberOfPoints-1; i++) {
+                int index = numberOfPoints-i-1;
+                curves[i] = findShortestPathCollisionDetection(newPoints[index]->x, newPoints[index]->y, mod2pi(angles[index] + M_PI), newPoints[index-1]->x, newPoints[index-1]->y, mod2pi(angles[index-1] + M_PI), graph);
+                if (curves[i] == nullptr) {
+                    delete[] newPoints;
+                    return nullptr;
+                }
+            }
+            delete[] newPoints;
+            return curves;
         }
-        delete[] newPoints;
-        return curves;
+        return nullptr;
     }
 
     /**
