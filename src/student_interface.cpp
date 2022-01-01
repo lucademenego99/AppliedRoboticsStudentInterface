@@ -327,7 +327,7 @@ namespace student
    */
   bool planPath(const Polygon& borders, const std::vector<Polygon>& obstacle_list, const std::vector<Polygon>& gate_list, const std::vector<float> x, const std::vector<float> y, const std::vector<float> theta, std::vector<Path>& path, const std::string& config_folder){
 
-    std::cout << "----- STUDENT PLAN PATH -----\n;
+    std::cout << "----- STUDENT PLAN PATH -----\n";
 
     // ********** DEFINE USEFUL VARIABLES ********** //
     // Correct bound k and discritizer size
@@ -522,49 +522,50 @@ namespace student
         // a list of intermediate points and a destination.
         // The only point in which we specify an angle is the initial one.
         dubins::Dubins dubins = dubins::Dubins(max_k, size);
-        dubins::DubinsPoint **points = new dubins::DubinsPoint *[shortestPath.size()];
-        points[0] = new dubins::DubinsPoint(shortestPath[0].x, shortestPath[0].y, theta[0]);
         int pointCnt = 1;
-        dubins::DubinsCurve **curves;
 
         std::cout<< "CURRENT DESTINATION: ";
         finalDestination[0].print();
 
-        double lastTheta = theta[0];
-        int counter = 0;
+        double lastTheta = theta[0];  // Keep the last angle of the robot
+        int counter = 0;  // Keep a counter to limit the number of iterations of the do while
 
-        do{
+        visgraph::Point origin = visgraph::Point(x[0], y[0]); // Keep track of the origin point
+        std::vector<std::vector<visgraph::Point>> shortestPathsEvader;  // All shortest paths of the evader
+        std::vector<std::vector<double>> pathLengthsEvader; // All lengths of all the evader's paths
+
+        do {
           counter++;
 
-          // chose the exit point randomly
+          // Choose the exit point randomly
           for(pointCnt = 1; pointCnt < shortestPath.size(); pointCnt++) {
               if(distr(eng) < 0.5) break;
-              points[pointCnt] = new dubins::DubinsPoint(shortestPath[pointCnt].x, shortestPath[pointCnt].y);
           }
 
           //Find the dubins shortest path given the set of intermediate points only if there are points added in the list
           if(pointCnt > 1) {
-            curves = dubins.multipointShortestPath(points, pointCnt, originalGraph);
+            std::vector<visgraph::Point> v;
+            std::vector<double> d;
+            std::vector<visgraph::Point> destTmp {shortestPath[pointCnt-1]};
+            shortestPathsEvader.push_back(v);
+            pathLengthsEvader.push_back(d);
+
+            // Reach destination with the evader
+            bool r = reachDestinationForRobot(0, origin, destTmp, lastTheta, originalGraph, g, shortestPathsEvader[shortestPathsEvader.size()-1], pathLengthsEvader[pathLengthsEvader.size()-1], path, max_k, size);
             // If there is no path available with the decided destination, restart from the beginning of the process excluding this destination
-            if (curves == nullptr) {
+            if (!r) {
               std::cout << "UNVALIABLE DESTINATION, CHANGE MIND!\n";
-              for (int t = pointCnt-1; t >= 1; t--) {
-                delete points[t];
-              }
               pointCnt = 1;
             } else {
               std::cout << "COMPLETED MULTIPOINT SHORTEST PATH SUCCESSFULLY\n";
 
-              // ********** CREATE THE PATH FOR CURRENT PATH ********** //
-              // Fill the path for the evader (assume it's the robot in the 0th position)
-              fillPath(curves, path, pointCnt-1, size, 0);
-
-              lastTheta = curves[pointCnt-2]->a3->dubins_line->th;
+              // Get the last angle (at destination)
+              lastTheta = path[0].points[path[0].points.size()-1].theta;
             }
           }
 
           // Did we arrive at our destination? If so, break the loop and return
-          if((points[pointCnt-1]->x==finalDestination[0].x) && (points[pointCnt-1]->y==finalDestination[0].y)) 
+          if(shortestPath[pointCnt-1] == finalDestination[0])
             break;
 
           // Randomly choose the new destination and replan the path
@@ -574,13 +575,10 @@ namespace student
           finalDestination[0].print();
 
           // Calculate the new path from the current point to the new destination
-          shortestPath = g.shortestPath(visgraph::Point(points[pointCnt-1]->x, points[pointCnt-1]->y), finalDestination[0]);
+          origin = shortestPath[pointCnt-1];
+          shortestPath = g.shortestPath(origin, finalDestination[0]);
 
-          // Set the new origin
-          delete points[0];
-          points[0] = new dubins::DubinsPoint(shortestPath[0].x, shortestPath[0].y, lastTheta);
-
-        } while(counter < 50);
+        } while(counter < 50); 
       }
     } else if (numberOfRobots == 3) {
       std::cout << "THERE ARE THREE ROBOTS - Project Number 2 Not Done\n";
