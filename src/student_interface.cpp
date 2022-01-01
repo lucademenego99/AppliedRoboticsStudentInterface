@@ -202,44 +202,49 @@ namespace student
       dubins::DubinsCurve *result = curves[n];
       int npts = result->a1->L/size;
       double s = 0;
-      dubins::DubinsLine *tmp;
 
       for (int i = 0; i < npts; i++) {
         s = result->a1->L/npts * i;
-        tmp = new dubins::DubinsLine(s, result->a1->x0, result->a1->y0, result->a1->th0, result->a1->k);
+        dubins::DubinsLine *tmp = new dubins::DubinsLine(s, result->a1->x0, result->a1->y0, result->a1->th0, result->a1->k);
         path[robotId].points.emplace_back(s, tmp->x, tmp->y, tmp->th, result->a1->k);
+        delete tmp;
       }
 
       if(result->a1->L - result->a1->L/npts*npts > 0.0) {
         s = result->a1->L/npts * npts;
-        tmp = new dubins::DubinsLine(s, result->a1->x0, result->a1->y0, result->a1->th0, result->a1->k);
+        dubins::DubinsLine *tmp = new dubins::DubinsLine(s, result->a1->x0, result->a1->y0, result->a1->th0, result->a1->k);
         path[robotId].points.emplace_back(s, tmp->x, tmp->y, tmp->th, result->a1->k);
+        delete tmp;
       }
 
       npts = result->a2->L/size;
       for (int i = 0; i < npts; i++) {
         s = result->a2->L/npts * i;
-        tmp = new dubins::DubinsLine(s, result->a2->x0, result->a2->y0, result->a2->th0, result->a2->k);
+        dubins::DubinsLine *tmp = new dubins::DubinsLine(s, result->a2->x0, result->a2->y0, result->a2->th0, result->a2->k);
         path[robotId].points.emplace_back(s, tmp->x, tmp->y, tmp->th, result->a2->k);
+        delete tmp;
       }
 
       if(result->a2->L - result->a2->L/npts*npts > 0.0) {
         s = result->a2->L/npts * npts;
-        tmp = new dubins::DubinsLine(s, result->a2->x0, result->a2->y0, result->a2->th0, result->a2->k);
+        dubins::DubinsLine *tmp = new dubins::DubinsLine(s, result->a2->x0, result->a2->y0, result->a2->th0, result->a2->k);
         path[robotId].points.emplace_back(s, tmp->x, tmp->y, tmp->th, result->a2->k);
+        delete tmp;
       }
 
       npts = result->a3->L/size;
       for (int i = 0; i < npts; i++) {
         s = result->a3->L/npts * i;
-        tmp = new dubins::DubinsLine(s, result->a3->x0, result->a3->y0, result->a3->th0, result->a3->k);
+        dubins::DubinsLine *tmp = new dubins::DubinsLine(s, result->a3->x0, result->a3->y0, result->a3->th0, result->a3->k);
         path[robotId].points.emplace_back(s, tmp->x, tmp->y, tmp->th, result->a3->k);
+        delete tmp;
       }
 
       if(result->a3->L - result->a3->L/npts*npts > 0.0) {
         s = result->a3->L/npts * npts;
-        tmp = new dubins::DubinsLine(s, result->a3->x0, result->a3->y0, result->a3->th0, result->a3->k);
+        dubins::DubinsLine *tmp = new dubins::DubinsLine(s, result->a3->x0, result->a3->y0, result->a3->th0, result->a3->k);
         path[robotId].points.emplace_back(s, tmp->x, tmp->y, tmp->th, result->a3->k);
+        delete tmp;
       }
     }
   }
@@ -526,9 +531,10 @@ namespace student
 
         do{
           // chose the exit point randomly
-          for(pointCnt = 1; pointCnt < shortestPath.size(); pointCnt++) {
+          for(pointCnt = 1; pointCnt < shortestPath.size(); ) {
               if(distr(eng) < 0.5) break;
               points[pointCnt] = new dubins::DubinsPoint(shortestPath[pointCnt].x, shortestPath[pointCnt].y);
+              ++ pointCnt;
           }
 
           //Find the dubins shortest path given the set of intermediate points only if there be points added in the list

@@ -437,6 +437,7 @@ namespace dubins
         }
         delete scaled_parameters;
         delete best_curve_segments;
+        std::vector<visgraph::Edge>().swap(edges);
         return curve;
     };
 
@@ -449,7 +450,7 @@ namespace dubins
      */
     double *Dubins::multipointShortestPathAngles(DubinsPoint **points, unsigned int numberOfPoints, visgraph::Graph &graph)
     {
-        std::vector<visgraph::Edge> edges = graph.getEdges();
+        // std::vector<visgraph::Edge> edges = graph.getEdges();
         std::cout << "INPUT WITH " << numberOfPoints << " POINTS: \n";
         std::cout << "X\tY\tTHETA\n";
         for (int i = 0; i < numberOfPoints; i++)
