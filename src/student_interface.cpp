@@ -406,6 +406,8 @@ namespace student
     double size = 0.005;
     // Offset based on the robot's size for polygon offsetting
     double offset = 0.076;
+    // Alternative offset
+    double altOffset = 0.065;
     // Variant value to increase the size of the outside borders
     double variant = 20.0;
 
@@ -528,6 +530,19 @@ namespace student
         bool foundPathFirst = reachDestinationForRobot(0, visgraph::Point(x[0], y[0]), destinations, theta[0], borderPoints, originalGraph, g, shortestPathEvader, pathLengthsEvader, path, max_k, size);
         if (!foundPathFirst) {
           std::cout << "NO PATH FOUND FOR THE EVADER!\n";
+          // We compute again all the graps with a smaller offset, higher risk but shorter paths
+          pols = enlargeAndJoinObstacles(polygons, altOffset);
+          polygonsForVisgraph = pols[0];
+          polygons = pols[1];
+          addBorders(borderMaxX, borderMinX, borderMaxY, borderMinY, altOffset, variant, borderPoints, polygons);
+          originalGraph = visgraph::Graph(polygons, false, true);
+          g = visg.computeVisibilityGraphMultipleOD(polygonsForVisgraph, origins, destinations);
+          bool foundPathFirst = reachDestinationForRobot(0, visgraph::Point(x[0], y[0]), destinations, theta[0], borderPoints, originalGraph, g, shortestPathEvader, pathLengthsEvader, path, max_k, size);
+          if (!foundPathFirst) {
+            std::cout << "NO PATH FOUND EVEN WITH A SMALLER OFFSET FOR THE EVADER!\n";
+          }else{
+            std::cout << "PATH FOUND WITH A SMALLER OFFSET FOR THE EVADER WITH LENGTH: " << pathLengthsEvader[pathLengthsEvader.size()-1] << "\n";
+          }  
         } else {
           std::cout << "PATH FOUND FOR EVADER WITH LENGTH: " << pathLengthsEvader[pathLengthsEvader.size()-1] << "\n";
         }
