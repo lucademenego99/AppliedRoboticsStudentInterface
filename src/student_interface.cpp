@@ -654,13 +654,10 @@ namespace student
         // Keep track of the pursuer's starting position and last angle theta
         visgraph::Point originPursuer = visgraph::Point(x[1], y[1]);
         double lastThetaPursuer = theta[1];
-        bool find = false;
+        bool reachedEvader = false;
 
         // Loop through all the evader's decisions of changing path
-        for (int z = 0; z < destinationPointsEvader.size(); z++) {
-
-          // if already found a path, break!
-          if(find) break;
+        for (int z = 0; z < destinationPointsEvader.size() && !reachedEvader; z++) {
 
           // if the evater didn't change destination, do nothing
           if(z > 0 && destinationPointsEvader[z] == destinationPointsEvader[z-1]) continue;
@@ -700,7 +697,6 @@ namespace student
                 double completePathLengthPursuer = pathLengthsPursuer[pathLengthsPursuer.size()-1], completePathLengthEvader = pathLengthsEvaderTmp[i-1];
                 std::cout << "PATH FOUND FOR PURSUER WITH LENGTH: " << completePathLengthPursuer << " WHERE EVADER'S ONE IS " << completePathLengthEvader << "\n";
                 if (completePathLengthPursuer < completePathLengthEvader) {
-                  find = true;
                   // Even the dubins path is smaller than the one of the evader! We can reach it, if it doesn't change its mind (we'll see during the next iteration of this for loop)
                   std::cout << "WITH THIS PATH THE PURSUER WILL BE ABLE TO REACH THE EVADER\n";
 
@@ -723,6 +719,13 @@ namespace student
                   // Update last angle theta of the pursuer and origin point
                   lastThetaPursuer = path[1].points[path[1].points.size()-1].theta;
                   originPursuer = shortestPathPursuer[j];
+
+                  // If the pursuer has reached the evader, just stop, even if the evader has planned to do other things after
+                  for (int s = 0; s < shortestPathsEvader[z].size(); s++) {
+                    if (shortestPathsEvader[z][s] == shortestPathPursuer[j])
+                      reachedEvader = true;
+                  }
+                  
                   break;
                 } else {
                   std::cout << "WITH THIS PATH THE PURSUER WON'T BE ABLE TO REACH THE EVADER\n";
