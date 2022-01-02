@@ -140,9 +140,10 @@ namespace visgraph
         * @param graph A map <Point, vector of adjacent edges>
         * @param origin The origin point in which we want to start
         * @param destination Our destination
+        * @param borderPoints points of the borders of the arena
         * @return std::vector<Point> The complete shortest path from origin to destination
         */
-        std::vector<Point> shortestPath(Point origin, Point destination);
+        std::vector<Point> shortestPath(Point origin, Point destination, std::vector<Point> borderPoints);
 
         /**
         * @brief Dijkstra Shortest path.
@@ -152,9 +153,10 @@ namespace visgraph
         * @param graph A map <Point, vector of adjacent edges>
         * @param origin The origin point in which we want to start
         * @param destination Our destination
+        * @param borderPoints points of the borders of the arena
         * @return std::map<Point, double> The complete shortest path from origin to destination
         */
-        std::map<Point, double> shortestPathDict(Point origin, Point destination);
+        std::map<Point, double> shortestPathDict(Point origin, Point destination, std::vector<Point> borderPoints);
 
         /**
         * @brief Dijkstra Shortest path, multiple destinations.
@@ -166,19 +168,20 @@ namespace visgraph
         * @param destinations All possible destinations
         * @return std::map<Point, double> The complete shortest path from origin to destination
         */
-        std::map<Point, double> shortestPathMultipleDDict(Point origin, std::vector<Point> destinations);
+        std::map<Point, double> shortestPathMultipleDDict(Point origin, std::vector<Point> destinations, std::vector<Point> borderPoints);
 
         /**
-         * @brief Dijkstra Shortest path, multiple destinations.
+         * @brief Dijkstra Shortest path, multiple destinations. Consider also the border of the arena
          * Reference: https://www.geeksforgeeks.org/dijkstras-shortest-path-algorithm-using-set-in-stl/
          * Complexity: O(E logV)
          * 
          * @param graph A map <Point, vector of adjacent edges>
          * @param origin The origin point in which we want to start
          * @param destinations All possible destinations
+         * @param borderPoints points of the borders of the arena
          * @return std::vector<Point> The complete shortest path from origin to destination
          */
-        std::vector<Point> shortestPathMultipleD(Point origin, std::vector<Point> destinations);
+        std::vector<Point> shortestPathMultipleD(Point origin, std::vector<Point> destinations, std::vector<Point> borderPoints);
 
         /**
         * @brief returns the adjacent edges to a certain point

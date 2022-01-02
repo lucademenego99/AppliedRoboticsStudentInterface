@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
 
     // shortestPathDubinsTest(dubins);
 
-    multipointDubinsAndVisgraphTest(dubins);
+    // multipointDubinsAndVisgraphTest(dubins);
 
     // intersectionsTest(dubins);
 
@@ -30,6 +30,7 @@ int main(int argc, char *argv[])
     return 0;
 }
 
+/*
 void openEdgesTest() {
     visgraph::OpenEdges openEdges = visgraph::OpenEdges();
     visgraph::Edge edgeNull = openEdges.getEdge(3);
@@ -255,3 +256,5 @@ void intersectionsTest(Dubins dubins)
     //     }
     // }
 }
+
+*/

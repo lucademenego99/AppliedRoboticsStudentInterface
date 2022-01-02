@@ -141,6 +141,7 @@ namespace student
    * @param origin Origin point
    * @param destination Destination Point
    * @param theta Robot's starting angle
+   * @param borderPoints points of the borders of the arena
    * @param originalGraph Obstacles for collision detection
    * @param g Obstacles for the shortestPath
    * @param path Path to fill - passed by ref.
@@ -151,7 +152,7 @@ namespace student
    * @return true If a path has been found
    * @return false If a path hasn't been found
    */
-  bool planDestinationForRobot(int robot, visgraph::Point origin, std::vector<visgraph::Point> destinations, double theta, visgraph::Graph originalGraph, visgraph::Graph g, std::vector<visgraph::Point> &shortestPath, std::vector<double> &pathLengths, std::vector<Path> &path, double max_k, double size);
+  bool planDestinationForRobot(int robot, visgraph::Point origin, std::vector<visgraph::Point> destinations, double theta, std::vector<visgraph::Point> borderPoints, visgraph::Graph originalGraph, visgraph::Graph g, std::vector<visgraph::Point> &shortestPath, std::vector<double> &pathLengths, std::vector<Path> &path, double max_k, double size);
 
   /**
    * @brief Reach a certain destination points with a certain robot
@@ -160,6 +161,7 @@ namespace student
    * @param origin Origin point
    * @param destination Destination Point
    * @param theta Robot's starting angle
+   * @param borderPoints points of the borders of the arena
    * @param originalGraph Obstacles for collision detection
    * @param g Obstacles for the shortestPath
    * @param path Path to fill - passed by ref.
@@ -170,7 +172,7 @@ namespace student
    * @return true If a path has been found
    * @return false If a path hasn't been found
    */
-  bool reachDestinationForRobot(int robot, visgraph::Point origin, std::vector<visgraph::Point> destinations, double theta, visgraph::Graph originalGraph, visgraph::Graph g, std::vector<visgraph::Point> &shortestPath, std::vector<double> &pathLengths, std::vector<Path> &path, double max_k, double size);
+  bool reachDestinationForRobot(int robot, visgraph::Point origin, std::vector<visgraph::Point> destinations, double theta, std::vector<visgraph::Point> borderPoints, visgraph::Graph originalGraph, visgraph::Graph g, std::vector<visgraph::Point> &shortestPath, std::vector<double> &pathLengths, std::vector<Path> &path, double max_k, double size);
 
 }
 

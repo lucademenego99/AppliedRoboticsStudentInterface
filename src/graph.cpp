@@ -238,16 +238,31 @@ Edge Graph::containsE (Edge e) {
 }
 
 /**
- * @brief Dijkstra Shortest path, multiple destinations.
+ * @brief Check if a certain points (x,y) is inside the arena
+ * Points are in the order bottom-left, bottom-right, top-right, top-left
+ * 
+ * @param borderPoints Points representing the arena, in order bottom-left, bottom-right, top-right, top-left
+ * @param xPoint X of the point we are considering
+ * @param yPoint Y of the point we are considering
+ * @return true If the point lies inside the arena
+ * @return false If the point does not lie inside the arena
+ */
+bool isInsideArena(std::vector<visgraph::Point> borderPoints, double xPoint, double yPoint) {
+return (xPoint >= borderPoints[0].x && xPoint <= borderPoints[1].x && yPoint >= borderPoints[0].y && yPoint <= borderPoints[2].y);
+}
+
+/**
+ * @brief Dijkstra Shortest path, multiple destinations. Consider also the border of the arena
  * Reference: https://www.geeksforgeeks.org/dijkstras-shortest-path-algorithm-using-set-in-stl/
  * Complexity: O(E logV)
  * 
  * @param graph A map <Point, vector of adjacent edges>
  * @param origin The origin point in which we want to start
  * @param destinations All possible destinations
+ * @param borderPoints points of the borders of the arena
  * @return std::vector<Point> The complete shortest path from origin to destination
  */
-std::vector<Point> Graph::shortestPathMultipleD(Point origin, std::vector<Point> destinations) 
+std::vector<Point> Graph::shortestPathMultipleD(Point origin, std::vector<Point> destinations, std::vector<Point> borderPoints) 
 {
     // Check the input
     if(graph.find(origin) == graph.end()) {
@@ -280,6 +295,11 @@ std::vector<Point> Graph::shortestPathMultipleD(Point origin, std::vector<Point>
             Point v = e.getAdjacent(u);
             // The weight is simply the distance between the points
             double weight = e.weight();
+
+            // If the point is not inside the arena, put weight INFINITY so Dijkstra won't use it
+            if (!isInsideArena(borderPoints, v.x, v.y)) {
+                weight = INFINITY;
+            }
 
             // If there is a shortest path from v through u (or it's the first one we find)
             if (!dist.count(v) || dist[v] > dist[u]+weight) {
@@ -327,9 +347,10 @@ std::vector<Point> Graph::shortestPathMultipleD(Point origin, std::vector<Point>
  * @param graph A map <Point, vector of adjacent edges>
  * @param origin The origin point in which we want to start
  * @param destination Our destination
+ * @param borderPoints points of the borders of the arena
  * @return std::vector<Point> The complete shortest path from origin to destination
  */
-std::vector<Point> Graph::shortestPath(Point origin, Point destination) {
+std::vector<Point> Graph::shortestPath(Point origin, Point destination, std::vector<Point> borderPoints) {
     // Check the input
     if(graph.find(origin) == graph.end() || graph.find(destination) == graph.end()) {
         std::cout << "ERROR: origin point or destination point not available in graph!" << std::endl;
@@ -366,6 +387,11 @@ std::vector<Point> Graph::shortestPath(Point origin, Point destination) {
             Point v = e.getAdjacent(u);
             // The weight is simply the distance between the points
             double weight = e.weight();
+
+            // If the point is not inside the arena, put weight INFINITY so Dijkstra won't use it
+            if (!isInsideArena(borderPoints, v.x, v.y)) {
+                weight = INFINITY;
+            }
 
             // If there is a shortest path from v through u (or it's the first one we find)
             if (!dist.count(v) || dist[v] > dist[u]+weight) {
@@ -404,9 +430,10 @@ std::vector<Point> Graph::shortestPath(Point origin, Point destination) {
  * @param graph A map <Point, vector of adjacent edges>
  * @param origin The origin point in which we want to start
  * @param destination Our destination
+ * @param borderPoints Points of the borders of the arena
  * @return std::map<Point, double> The complete shortest path from origin to destination
  */
-std::map<Point, double> Graph::shortestPathDict(Point origin, Point destination) {
+std::map<Point, double> Graph::shortestPathDict(Point origin, Point destination, std::vector<Point> borderPoints) {
     // Check the input
     if(graph.find(origin) == graph.end() || graph.find(destination) == graph.end()) {
         std::cout << "ERROR: origin point or destination point not available in graph!" << std::endl;
@@ -443,6 +470,11 @@ std::map<Point, double> Graph::shortestPathDict(Point origin, Point destination)
             Point v = e.getAdjacent(u);
             // The weight is simply the distance between the points
             double weight = e.weight();
+
+            // If the point is not inside the arena, put weight INFINITY so Dijkstra won't use it
+            if (!isInsideArena(borderPoints, v.x, v.y)) {
+                weight = INFINITY;
+            }
 
             // If there is a shortest path from v through u (or it's the first one we find)
             if (!dist.count(v) || dist[v] > dist[u]+weight) {
@@ -481,9 +513,10 @@ std::map<Point, double> Graph::shortestPathDict(Point origin, Point destination)
  * @param graph A map <Point, vector of adjacent edges>
  * @param origin The origin point in which we want to start
  * @param destinations All possible destinations
+ * @param borderPoints Points of the borders of the arena
  * @return std::map<Point, double> The complete shortest path from origin to destination
  */
-std::map<Point, double> Graph::shortestPathMultipleDDict(Point origin, std::vector<Point> destinations) 
+std::map<Point, double> Graph::shortestPathMultipleDDict(Point origin, std::vector<Point> destinations, std::vector<Point> borderPoints) 
 {
     // Check the input
     if(graph.find(origin) == graph.end()) {
@@ -515,6 +548,11 @@ std::map<Point, double> Graph::shortestPathMultipleDDict(Point origin, std::vect
             Point v = e.getAdjacent(u);
             // The weight is simply the distance between the points
             double weight = e.weight();
+
+            // If the point is not inside the arena, put weight INFINITY so Dijkstra won't use it
+            if (!isInsideArena(borderPoints, v.x, v.y)) {
+                weight = INFINITY;
+            }
 
             // If there is a shortest path from v through u (or it's the first one we find)
             if (!dist.count(v) || dist[v] > dist[u]+weight) {
