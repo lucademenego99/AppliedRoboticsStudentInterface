@@ -591,8 +591,9 @@ namespace student
 
         std::vector<visgraph::Point> shortestPathTmp;
         std::vector<double> pathLengths;
-        std::vector<visgraph::Point> shortestPath;
-        std::vector<visgraph::Point> finalDestination;
+        std::vector<visgraph::Point> shortestPath, initialShortestPath;
+        std::vector<visgraph::Point> finalDestination, initalDestination;
+        bool pathValid = false;
 
         // using random to decide the finalDestination
         std::random_device rd;
@@ -602,6 +603,7 @@ namespace student
 
         // Choose a random destination
         finalDestination.push_back(destinations[disti(eng)]);
+        initalDestination.push_back(finalDestination[0]);
  
         // ********** COMPUTE THE FIRST SHORTEST PATH FROM ORIGIN TO DESTINATION ********** //
         shortestPath = g.shortestPath(visgraph::Point(x[0], y[0]), finalDestination[0], borderPoints);
@@ -649,12 +651,14 @@ namespace student
               pathLengthsEvader.pop_back();
               std::cout << "UNVALIABLE DESTINATION, CHANGE MIND!\n";
               pointCnt = 1;
+              pathValid = false;
             } else {
               destinationPointsEvader.push_back(finalDestination[0]);
 
               // Get the last angle at destination
               lastTheta = path[0].points[path[0].points.size()-1].theta;
               evaderThetas.push_back(lastTheta);
+              pathValid = true;
             }
           }
 
@@ -673,6 +677,31 @@ namespace student
           shortestPath = g.shortestPath(origin, finalDestination[0], borderPoints);
 
         } while(counter < 50); 
+
+        if(1){//!pathValid) {
+          std::cout<< "RANDOM PATH NOT AVAILABLE, USE THE INITIAL DESTINATION" << std::endl;
+          while(!path[0].points.empty()) {
+            path[0].points.pop_back();
+          }
+          bool foundInitialPath = reachDestinationForRobot(0, visgraph::Point(x[0], y[0]), initalDestination, theta[0], borderPoints, originalGraph, g, initialShortestPath, pathLengths, path, max_k, size);
+          if (!foundInitialPath) {
+            std::cout << "NO PATH FOUND FOR THE EVADER!\n";
+          } else {
+            std::cout << "FOUND PATH WITH LENGTH: " << pathLengths[pathLengths.size() - 1] << "\n";
+            while(!destinationPointsEvader.empty()) {
+              destinationPointsEvader.pop_back();
+            }
+            destinationPointsEvader.push_back(initalDestination[0]);
+            while(!shortestPathsEvader.empty()) {
+              shortestPathsEvader.pop_back();
+            }
+            shortestPathsEvader.push_back(initialShortestPath);
+            while(!evaderThetas.empty()) {
+              evaderThetas.pop_back();;
+            }
+            evaderThetas.push_back(theta[0]);
+          }
+        }
 
         // Now we define the pursuer's path
         // In order to simulate the fact that the pursuer should not be able to predict the future,
