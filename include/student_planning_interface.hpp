@@ -69,13 +69,14 @@ namespace student
    * @brief Given the coordinates of the destination square, find a point that lies within the arena
    * 
    * @param borderPoints Points representing the arena, in order bottom-left, bottom-right, top-right, top-left
+   * @param obstaclesGraph graph containing the enlarged obstacles, to find out which part of the destination gate is available
    * @param minX Minimum x of the destination square
    * @param maxX Maximum x of the destination square
    * @param minY Minimum y of the destination square
    * @param maxY Maximum y of the destination square
    * @return visgraph::Point A point that lies within the arena and that is on an edge of the destination square
    */
-  visgraph::Point findValidDestinationPoint(std::vector<visgraph::Point> borderPoints, double minX, double maxX, double minY, double maxY);
+  visgraph::Point findValidDestinationPoint(std::vector<visgraph::Point> borderPoints, visgraph::Graph obstaclesGraph, double minX, double maxX, double minY, double maxY);
 
   /**
    * @brief Find the 4 border points

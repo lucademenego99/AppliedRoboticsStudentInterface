@@ -64,15 +64,6 @@ namespace visgraph
         bool edgeInPolygon(Point p1, Point p2, Graph graph);
 
         /**
-        * @brief Verifies if a point is within a polygon
-        * 
-        * @param p The point we consider
-        * @param graph The graph of the map
-        * @return vector<Edge> 
-        */
-        std::vector<Edge> pointInPolygon(Point p, Graph graph);
-
-        /**
         * @brief Computes the distance of two points
         * 
         * @param p1 First input point
@@ -159,6 +150,15 @@ namespace visgraph
         * @return double 
         */
         double getAngle2(Point a, Point b, Point c);
+
+        /**
+        * @brief Verifies if a point is within a polygon
+        * 
+        * @param p The point we consider
+        * @param graph The graph of the map
+        * @return vector<Edge> 
+        */
+        std::vector<Edge> pointInPolygon(Point p, Graph graph);
 
         /**
         * @brief Computes the visibility graph given a list of points, the origin and the destination

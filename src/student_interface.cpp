@@ -54,21 +54,31 @@ namespace student
    * @brief Given the coordinates of the destination square, find a point that lies within the arena
    * 
    * @param borderPoints Points representing the arena, in order bottom-left, bottom-right, top-right, top-left
+   * @param obstaclesGraph graph containing the enlarged obstacles, to find out which part of the destination gate is available
    * @param minX Minimum x of the destination square
    * @param maxX Maximum x of the destination square
    * @param minY Minimum y of the destination square
    * @param maxY Maximum y of the destination square
    * @return visgraph::Point A point that lies within the arena and that is on an edge of the destination square
    */
-  visgraph::Point findValidDestinationPoint(std::vector<visgraph::Point> borderPoints, double minX, double maxX, double minY, double maxY) {
-    if (isInsideArena(borderPoints, (minX+maxX)/2.0, minY))
+  visgraph::Point findValidDestinationPoint(std::vector<visgraph::Point> borderPoints, visgraph::Graph obstaclesGraph, double minX, double maxX, double minY, double maxY) {
+    visgraph::VisGraph vg;
+    if (isInsideArena(borderPoints, (minX+maxX)/2.0, minY) && vg.pointInPolygon(visgraph::Point((minX+maxX)/2.0, minY), obstaclesGraph).empty())
       return visgraph::Point((minX+maxX)/2.0, minY);
-    if (isInsideArena(borderPoints, (minX+maxX)/2.0, maxY))
+    if (isInsideArena(borderPoints, (minX+maxX)/2.0, maxY) && vg.pointInPolygon(visgraph::Point((minX+maxX)/2.0, maxY), obstaclesGraph).empty())
       return visgraph::Point((minX+maxX)/2.0, maxY);
-    if (isInsideArena(borderPoints, maxX, (minY+maxY)/2.0))
+    if (isInsideArena(borderPoints, maxX, (minY+maxY)/2.0) && vg.pointInPolygon(visgraph::Point(maxX, (minY+maxY)/2.0), obstaclesGraph).empty())
       return visgraph::Point(maxX, (minY+maxY)/2.0);
-    if (isInsideArena(borderPoints, minX, (minY+maxY)/2.0))
+    if (isInsideArena(borderPoints, minX, (minY+maxY)/2.0) && vg.pointInPolygon(visgraph::Point(minX, (minY+maxY)/2.0), obstaclesGraph).empty())
       return visgraph::Point(minX, (minY+maxY)/2.0);
+    if (isInsideArena(borderPoints, minX, minY) && vg.pointInPolygon(visgraph::Point(minX, minY), obstaclesGraph).empty())
+      return visgraph::Point(minX, minY);
+    if (isInsideArena(borderPoints, minX, maxY) && vg.pointInPolygon(visgraph::Point(minX, maxY), obstaclesGraph).empty())
+      return visgraph::Point(minX, maxY);
+    if (isInsideArena(borderPoints, maxX, minY) && vg.pointInPolygon(visgraph::Point(maxX, minY), obstaclesGraph).empty())
+      return visgraph::Point(maxX, minY);
+    if (isInsideArena(borderPoints, maxX, maxY) && vg.pointInPolygon(visgraph::Point(maxX, maxY), obstaclesGraph).empty())
+      return visgraph::Point(maxX, maxY);
     
     return visgraph::Point(-1,-1);
   }
@@ -455,7 +465,8 @@ namespace student
       // ********** FIND A VALID DESTINATION ********** //
       // Since we performed polygon offsetting, some points of the destination may not be available (inside an obstacle,
       // or outside the border).
-      visgraph::Point destination = findValidDestinationPoint(borderPoints, minX, maxX, minY, maxY);
+      visgraph::Graph tmpGraph = visgraph::Graph(polygonsForVisgraph, false, true);
+      visgraph::Point destination = findValidDestinationPoint(borderPoints, tmpGraph, minX, maxX, minY, maxY);
       if (destination == visgraph::Point(-1, -1)) {
         std::cout << "UNABLE TO DETERMINE A VALID DESTINATION POINT FOR DESTINATION NUMBER" << i << "\n";
       } else {
@@ -725,7 +736,7 @@ namespace student
                     if (shortestPathsEvader[z][s] == shortestPathPursuer[j])
                       reachedEvader = true;
                   }
-                  
+
                   break;
                 } else {
                   std::cout << "WITH THIS PATH THE PURSUER WON'T BE ABLE TO REACH THE EVADER\n";
