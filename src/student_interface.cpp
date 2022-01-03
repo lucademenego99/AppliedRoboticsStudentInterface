@@ -1052,7 +1052,6 @@ namespace student
               }
             }
             if (i == shortestPathEvaderTmp.size()) {
-              std::cout << "destinationPointsEvader.size() = " << destinationPointsEvader.size()<< std::endl;
               std::cout << "THE PURSUER WASN'T ABLE TO FIND A PATH TO REACH THE EVADER AT ITERATION " << z << "\n";
             }
           }
