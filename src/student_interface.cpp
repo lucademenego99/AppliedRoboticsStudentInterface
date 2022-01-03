@@ -299,6 +299,10 @@ namespace student
     dubins::DubinsCurve **curves = dubins.multipointShortestPath(points, shortestPath.size(), originalGraph);
     if (curves == nullptr) {
         std::cout << "UNABLE TO COMPUTE A PATH FOR GIVEN INPUT\n";
+        for(int i = 0; i < shortestPath.size(); i++) {
+            delete points[i];
+        }
+        delete[] points;
         return nullptr;
     } else {
         std::cout << "COMPLETED MULTIPOINT SHORTEST PATH SUCCESSFULLY\n";
@@ -312,6 +316,11 @@ namespace student
           pathLength += curves[i]->L;
           pathLengths.push_back(pathLength);
         }
+
+        for(int i = 0; i < shortestPath.size(); i++) {
+            delete points[i];
+        }
+        delete[] points;
 
         return curves;
     }
@@ -358,6 +367,10 @@ namespace student
     dubins::DubinsCurve **curves = dubins.multipointShortestPath(points, shortestPath.size(), originalGraph);
     if (curves == nullptr) {
         std::cout << "UNABLE TO COMPUTE A PATH FOR GIVEN INPUT\n";
+        for(int i = 0; i < shortestPath.size(); i++) {
+            delete points[i];
+        }
+        delete[] points;
         return false;
     } else {
         std::cout << "COMPLETED MULTIPOINT SHORTEST PATH SUCCESSFULLY\n";
@@ -374,6 +387,16 @@ namespace student
 
         // ********** CREATE THE PATH FOR THE ROBOT ********** //
         fillPath(curves, path, shortestPath.size()-1, size, robot);
+
+        for(int i = 0; i < shortestPath.size(); i++) {
+            delete points[i];
+            if (i < shortestPath.size()-1) {
+              delete curves[i];
+            }
+        }
+        delete[] points;
+        delete[] curves;
+
         return true;
     }
   }
@@ -665,7 +688,7 @@ namespace student
 
           // Choose the exit point randomly
           for(pointCnt = 1; pointCnt < shortestPath.size(); pointCnt++) {
-              if(distr(eng) < 0.5) break;
+              if(distr(eng) < 0.2) break;
           }
 
           //Find the dubins shortest path given the set of intermediate points only if there are points added in the list
@@ -700,6 +723,11 @@ namespace student
               // Get the last angle of the robot
               lastTheta = curvesEvader[pointCnt-2]->a3->dubins_line->th;
               evaderThetas.push_back(lastTheta);
+
+              for(int i = 0; i < shortestPathsEvader.size()-1; i++) {
+                delete curvesEvader[i];
+              }
+              delete[] curvesEvader;
             }
           }
 
@@ -767,6 +795,10 @@ namespace student
                 fillPath(curves, path, index, size, 1);
                 originPursuer = sp[1];
                 lastThetaPursuer = path[1].points[path[1].points.size()-1].theta;
+                for(int i = 0; i < sp.size()-1; i++) {
+                  delete curves[i];
+                }
+                delete[] curves;
               }
               else {
                 std::vector<visgraph::Point> dest {destinations[0]};
@@ -782,6 +814,10 @@ namespace student
                   fillPath(curves, path, index, size, 1);
                   originPursuer = sp[1];
                   lastThetaPursuer = path[1].points[path[1].points.size()-1].theta;
+                  for(int i = 0; i < sp.size()-1; i++) {
+                    delete curves[i];
+                  }
+                  delete[] curves;
                 } else {
                   std::vector<visgraph::Point> dest {visgraph::Point(x[0], y[0])};
                   dubins::DubinsCurve **curves = planDestinationForRobot(1, visgraph::Point(x[1], y[1]), dest, theta[1], borderPoints, originalGraph, g, sp, pl, path, max_k, size);
@@ -796,6 +832,10 @@ namespace student
                     fillPath(curves, path, index, size, 1);
                     originPursuer = sp[1];
                     lastThetaPursuer = path[1].points[path[1].points.size()-1].theta;
+                    for(int i = 0; i < sp.size()-1; i++) {
+                      delete curves[i];
+                    }
+                    delete[] curves;
                   } else {
                     firstPathNotFound = true;
                     std::cout << "NO PATH FOUND FOR PURSUER\n";
@@ -816,6 +856,10 @@ namespace student
                 fillPath(curves, path, index, size, 1);
                 originPursuer = sp[1];
                 lastThetaPursuer = path[1].points[path[1].points.size()-1].theta;
+                for(int i = 0; i < sp.size()-1; i++) {
+                  delete curves[i];
+                }
+                delete[] curves;
               }
               else {
                 std::vector<visgraph::Point> dest {destinations[1]};
@@ -831,6 +875,10 @@ namespace student
                   fillPath(curves, path, index, size, 1);
                   originPursuer = sp[1];
                   lastThetaPursuer = path[1].points[path[1].points.size()-1].theta;
+                  for(int i = 0; i < sp.size()-1; i++) {
+                    delete curves[i];
+                  }
+                  delete[] curves;
                 } else {
                   std::vector<visgraph::Point> dest {visgraph::Point(x[0], y[0])};
                   dubins::DubinsCurve **curves = planDestinationForRobot(1, visgraph::Point(x[1], y[1]), dest, theta[1], borderPoints, originalGraph, g, sp, pl, path, max_k, size);
@@ -845,6 +893,10 @@ namespace student
                     fillPath(curves, path, index, size, 1);
                     originPursuer = sp[1];
                     lastThetaPursuer = path[1].points[path[1].points.size()-1].theta;
+                    for(int i = 0; i < sp.size()-1; i++) {
+                      delete curves[i];
+                    }
+                    delete[] curves;
                   } else {
                     firstPathNotFound = true;
                     std::cout << "NO PATH FOUND FOR PURSUER\n";
@@ -921,6 +973,19 @@ namespace student
               }
             }
 
+            if (tmp1 != nullptr) {
+              for(int i = 0; i < shortestPathEvaderTmp1.size()-1; i++) {
+                delete tmp1[i];
+              }
+              delete[] tmp1;
+            }
+            if (tmp2 != nullptr) {
+              for(int i = 0; i < shortestPathEvaderTmp2.size()-1; i++) {
+                delete tmp2[i];
+              }
+              delete[] tmp2;
+            }
+
             // Keep track of the shortest path and the path lengths of the pursuer, see the algorithm below (for loop)
             std::vector<visgraph::Point> shortestPathPursuer;
             std::vector<double> pathLengthsPursuer;
@@ -969,6 +1034,11 @@ namespace student
                     // Update last angle theta of the pursuer and origin point
                     lastThetaPursuer = path[1].points[path[1].points.size()-1].theta;
                     originPursuer = shortestPathPursuer[index];
+
+                    for(int k = 0; k < shortestPathPursuer.size()-1; k++) {
+                      delete curvesPursuer[k];
+                    }
+                    delete[] curvesPursuer;
 
                     break;
                   } else {
