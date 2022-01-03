@@ -870,10 +870,22 @@ namespace student
             std::map<visgraph::Point, double> distancesPursuer = g.shortestPathMultipleDDict(originPursuer, destTmp1, borderPoints);
 
             // Calculate the shortest path and the path lengths of the evader when going to each of the destinations
-            std::vector<visgraph::Point> shortestPathEvaderTmp, shortestPathEvaderTmp1, shortestPathEvaderTmp2;
-            std::vector<double> pathLengthsEvaderTmp, pathLengthsEvaderTmp1, pathLengthsEvaderTmp2;
-            dubins::DubinsCurve **tmp1 = planDestinationForRobot(0, originEvader, destTmp1, evaderThetas[z], borderPoints, originalGraph, g, shortestPathEvaderTmp1, pathLengthsEvaderTmp1, path, max_k, size);
-            dubins::DubinsCurve **tmp2 = planDestinationForRobot(0, originEvader, destTmp2, evaderThetas[z], borderPoints, originalGraph, g, shortestPathEvaderTmp2, pathLengthsEvaderTmp2, path, max_k, size);
+            std::vector<visgraph::Point> shortestPathEvaderTmp;
+            std::vector<double> pathLengthsEvaderTmp;
+            //dubins::DubinsCurve **tmp1 = planDestinationForRobot(0, originEvader, destTmp1, evaderThetas[z], borderPoints, originalGraph, g, shortestPathEvaderTmp1, pathLengthsEvaderTmp1, path, max_k, size);
+            //dubins::DubinsCurve **tmp2 = planDestinationForRobot(0, originEvader, destTmp2, evaderThetas[z], borderPoints, originalGraph, g, shortestPathEvaderTmp2, pathLengthsEvaderTmp2, path, max_k, size);
+
+            std::vector<visgraph::Point> shortestPathEvaderTmp1 = g.shortestPath(originEvader, destTmp1[0], borderPoints);
+            std::vector<double> pathLengthsEvaderTmp1;
+            for(int i = 0; i < shortestPathEvaderTmp1.size()-1; i++){
+              double tmp = sqrt(pow(shortestPathEvaderTmp1[i+1].x - shortestPathEvaderTmp1[i].x, 2.0) + pow(shortestPathEvaderTmp1[i+1].y - shortestPathEvaderTmp1[i].y, 2.0));
+            }
+
+            std::vector<visgraph::Point> shortestPathEvaderTmp2 = g.shortestPath(originEvader, destTmp2[0], borderPoints);
+            std::vector<double> pathLengthsEvaderTmp2;
+            for(int i = 0; i < shortestPathEvaderTmp2.size()-1; i++){
+              double tmp = sqrt(pow(shortestPathEvaderTmp2[i+1].x - shortestPathEvaderTmp2[i].x, 2.0) + pow(shortestPathEvaderTmp2[i+1].y - shortestPathEvaderTmp2[i].y, 2.0));
+            }
 
             // Try to understand which destination is the actual one of the evader
             int numberOfSamePointsDest1 = 0, numberOfSamePointsDest2 = 0;
@@ -886,10 +898,10 @@ namespace student
               }
             }
 
-            if (numberOfSamePointsDest1 > numberOfSamePointsDest2 && tmp1 != nullptr) {
+            if (numberOfSamePointsDest1 > numberOfSamePointsDest2 && !shortestPathEvaderTmp1.empty()) {
               shortestPathEvaderTmp = shortestPathEvaderTmp1;
               pathLengthsEvaderTmp = pathLengthsEvaderTmp1;
-            } else if (numberOfSamePointsDest1 < numberOfSamePointsDest2 && tmp2 != nullptr) {
+            } else if (numberOfSamePointsDest1 < numberOfSamePointsDest2 && !shortestPathEvaderTmp2.empty()) {
               shortestPathEvaderTmp = shortestPathEvaderTmp2;
               pathLengthsEvaderTmp = pathLengthsEvaderTmp2;
             } else {
@@ -897,10 +909,10 @@ namespace student
               // Check the closest destination to the evader
               double d1 = (pow(destinations[0].x, 2) - pow(destinationPointsEvader[z].x, 2)) + (pow(destinations[0].y, 2) - pow(destinationPointsEvader[z].y, 2));
               double d2 = (pow(destinations[1].x, 2) - pow(destinationPointsEvader[z].x, 2)) + (pow(destinations[1].y, 2) - pow(destinationPointsEvader[z].y, 2));
-              if (d1 > d2 && tmp2 != nullptr) {
+              if (d1 > d2 && !shortestPathEvaderTmp2.empty()) {
                 shortestPathEvaderTmp = shortestPathEvaderTmp2;
                 pathLengthsEvaderTmp = pathLengthsEvaderTmp2;
-              } else if (tmp1 != nullptr ){
+              } else if (!shortestPathEvaderTmp1.empty()){
                 shortestPathEvaderTmp = shortestPathEvaderTmp1;
                 pathLengthsEvaderTmp = pathLengthsEvaderTmp1;
               } else {
