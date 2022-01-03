@@ -599,11 +599,45 @@ namespace student
         std::uniform_int_distribution<int> disti(0, numberOfDestinations-1);
         std::uniform_real_distribution<double> distr(0.0, 1.0);
 
-        // Choose a random destination
-        finalDestination.push_back(destinations[disti(eng)]);
- 
-        // ********** COMPUTE THE FIRST SHORTEST PATH FROM ORIGIN TO DESTINATION ********** //
-        shortestPath = g.shortestPath(visgraph::Point(x[0], y[0]), finalDestination[0], borderPoints);
+        int counter = 0;  // Keep a counter to limit the number of iterations of the do while
+        // chose a valid destination
+        for(counter == 0; counter < 50; counter++){
+          // Choose a random destination
+          if(counter > 0) {
+            finalDestination.pop_back();
+          }
+          finalDestination.push_back(destinations[disti(eng)]);
+          // ********** COMPUTE THE FIRST SHORTEST PATH FROM ORIGIN TO DESTINATION ********** //
+          shortestPath = g.shortestPath(visgraph::Point(x[0], y[0]), finalDestination[0], borderPoints);
+          dubins::DubinsCurve **curvesValid = planDestinationForRobot(0, visgraph::Point(x[0], y[0]), finalDestination, theta[0], borderPoints, originalGraph, g, shortestPath, pathLengths, path, max_k, size);
+          if(curvesValid!=nullptr) break;
+        } 
+        // if no valid destination, reduce the enlarge offset and try again
+        if(counter == 50) {
+          std::cout << "NO PATH FOUND FOR THE EVADER!\n";
+          // We compute again all the graps with a smaller offset, higher risk but shorter paths
+          pols = enlargeAndJoinObstacles(polygons, altOffset);
+          polygonsForVisgraph = pols[0];
+          polygons = pols[1];
+          addBorders(borderMaxX, borderMinX, borderMaxY, borderMinY, altOffset, variant, borderPoints, polygons);
+          originalGraph = visgraph::Graph(polygons, false, true);
+          g = visg.computeVisibilityGraphMultipleOD(polygonsForVisgraph, origins, destinations);
+          counter = 0;
+          for(counter == 0; counter < 50; counter++){
+            // Choose a random destination
+            finalDestination.pop_back();
+            finalDestination.push_back(destinations[disti(eng)]);
+            // ********** COMPUTE THE FIRST SHORTEST PATH FROM ORIGIN TO DESTINATION ********** //
+            shortestPath = g.shortestPath(visgraph::Point(x[0], y[0]), finalDestination[0], borderPoints);
+            dubins::DubinsCurve **curvesValid = planDestinationForRobot(0, visgraph::Point(x[0], y[0]), finalDestination, theta[0], borderPoints, originalGraph, g, shortestPath, pathLengths, path, max_k, size);
+            if(curvesValid!=nullptr) break;
+          }
+          if (counter == 50) {
+            std::cout << "NO PATH FOUND EVEN WITH A SMALLER OFFSET FOR THE EVADER!\n";
+          }else{
+            std::cout << "PATH FOUND WITH A SMALLER OFFSET FOR THE EVADER WITH LENGTH: " << pathLengths[pathLengths.size()-1] << "\n";
+          }
+        }
 
         // fill initial point with a shortest path calculated by using random chosen destination
         // a list of intermediate points and a destination.
@@ -615,7 +649,7 @@ namespace student
         finalDestination[0].print();
 
         double lastTheta = theta[0];  // Keep the last angle of the robot
-        int counter = 0;  // Keep a counter to limit the number of iterations of the do while
+        counter = 0;  // Keep a counter to limit the number of iterations of the do while
 
         visgraph::Point origin = visgraph::Point(x[0], y[0]); // Keep track of the origin point
         std::vector<std::vector<visgraph::Point>> shortestPathsEvader;  // All shortest paths of the evader
