@@ -922,23 +922,34 @@ namespace student
             std::map<visgraph::Point, double> distancesPursuer = g.shortestPathMultipleDDict(originPursuer, destTmp1, borderPoints);
 
             // Calculate the shortest path and the path lengths of the evader when going to each of the destinations
-            std::vector<visgraph::Point> shortestPathEvaderTmp;
-            std::vector<double> pathLengthsEvaderTmp;
-            //dubins::DubinsCurve **tmp1 = planDestinationForRobot(0, originEvader, destTmp1, evaderThetas[z], borderPoints, originalGraph, g, shortestPathEvaderTmp1, pathLengthsEvaderTmp1, path, max_k, size);
-            //dubins::DubinsCurve **tmp2 = planDestinationForRobot(0, originEvader, destTmp2, evaderThetas[z], borderPoints, originalGraph, g, shortestPathEvaderTmp2, pathLengthsEvaderTmp2, path, max_k, size);
+            std::vector<visgraph::Point> shortestPathEvaderTmp, variable1, variable2;
+            std::vector<double> pathLengthsEvaderTmp, variable11, variable22;
+            dubins::DubinsCurve **tmp1 = planDestinationForRobot(0, originEvader, destTmp1, evaderThetas[z], borderPoints, originalGraph, g, variable1, variable11, path, max_k, size);
+            dubins::DubinsCurve **tmp2 = planDestinationForRobot(0, originEvader, destTmp2, evaderThetas[z], borderPoints, originalGraph, g, variable2, variable22, path, max_k, size);
 
             std::vector<visgraph::Point> shortestPathEvaderTmp1 = g.shortestPath(originEvader, destTmp1[0], borderPoints);
             std::vector<double> pathLengthsEvaderTmp1;
             for(int i = 0; i < shortestPathEvaderTmp1.size()-1; i++){
               double tmp = sqrt(pow(shortestPathEvaderTmp1[i+1].x - shortestPathEvaderTmp1[i].x, 2.0) + pow(shortestPathEvaderTmp1[i+1].y - shortestPathEvaderTmp1[i].y, 2.0));
+              std::cout << "\nTemp value: " << tmp << "\n";
+              pathLengthsEvaderTmp1.push_back(tmp);
             }
+            std::cout << "\nshortestPathEvaderTmp1 size " << pathLengthsEvaderTmp1.size();
+            std::cout << "\nPlanDest dimension1 " << variable1.size();
 
             std::vector<visgraph::Point> shortestPathEvaderTmp2 = g.shortestPath(originEvader, destTmp2[0], borderPoints);
             std::vector<double> pathLengthsEvaderTmp2;
             for(int i = 0; i < shortestPathEvaderTmp2.size()-1; i++){
               double tmp = sqrt(pow(shortestPathEvaderTmp2[i+1].x - shortestPathEvaderTmp2[i].x, 2.0) + pow(shortestPathEvaderTmp2[i+1].y - shortestPathEvaderTmp2[i].y, 2.0));
+              std::cout << "\nTemp value: " << tmp << "\n";
+              pathLengthsEvaderTmp2.push_back(tmp);
             }
 
+            std::cout << "\nshortestPathEvaderTmp2 size " << pathLengthsEvaderTmp2.size();
+            std::cout << "\nPlanDest dimension2 " << variable2.size();
+
+            std::cout << "Is SPET1 true? " << !shortestPathEvaderTmp1.empty() << "\n";
+            std::cout << "Is SPET2 true? " << !shortestPathEvaderTmp2.empty() << "\n";
             // Try to understand which destination is the actual one of the evader
             int numberOfSamePointsDest1 = 0, numberOfSamePointsDest2 = 0;
             for (int m = 0; m < z; m++) {
@@ -961,6 +972,7 @@ namespace student
               // Check the closest destination to the evader
               double d1 = (pow(destinations[0].x, 2) - pow(destinationPointsEvader[z].x, 2)) + (pow(destinations[0].y, 2) - pow(destinationPointsEvader[z].y, 2));
               double d2 = (pow(destinations[1].x, 2) - pow(destinationPointsEvader[z].x, 2)) + (pow(destinations[1].y, 2) - pow(destinationPointsEvader[z].y, 2));
+              
               if (d1 > d2 && !shortestPathEvaderTmp2.empty()) {
                 shortestPathEvaderTmp = shortestPathEvaderTmp2;
                 pathLengthsEvaderTmp = pathLengthsEvaderTmp2;
@@ -972,20 +984,14 @@ namespace student
                 break;
               }
             }
-
-            if (tmp1 != nullptr) {
-              for(int i = 0; i < shortestPathEvaderTmp1.size()-1; i++) {
-                delete tmp1[i];
-              }
-              delete[] tmp1;
+            
+            if (!shortestPathEvaderTmp1.empty()) {
+              shortestPathEvaderTmp1.clear();
             }
-            if (tmp2 != nullptr) {
-              for(int i = 0; i < shortestPathEvaderTmp2.size()-1; i++) {
-                delete tmp2[i];
-              }
-              delete[] tmp2;
+            if (!shortestPathEvaderTmp2.empty()) {
+              shortestPathEvaderTmp2.clear();
             }
-
+            
             // Keep track of the shortest path and the path lengths of the pursuer, see the algorithm below (for loop)
             std::vector<visgraph::Point> shortestPathPursuer;
             std::vector<double> pathLengthsPursuer;
