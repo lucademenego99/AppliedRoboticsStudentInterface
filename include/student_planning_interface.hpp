@@ -149,10 +149,9 @@ namespace student
    * @param pathLengths Lengths of the dubins path from source to all intermediate points
    * @param max_k Curvature of the robot
    * @param size Discritizer size for the path generation
-   * @return true If a path has been found
-   * @return false If a path hasn't been found
+   * @return dubins::DubinsCurve** Curves planned
    */
-  bool planDestinationForRobot(int robot, visgraph::Point origin, std::vector<visgraph::Point> destinations, double theta, std::vector<visgraph::Point> borderPoints, visgraph::Graph originalGraph, visgraph::Graph g, std::vector<visgraph::Point> &shortestPath, std::vector<double> &pathLengths, std::vector<Path> &path, double max_k, double size);
+  dubins::DubinsCurve **planDestinationForRobot(int robot, visgraph::Point origin, std::vector<visgraph::Point> destinations, double theta, std::vector<visgraph::Point> borderPoints, visgraph::Graph originalGraph, visgraph::Graph g, std::vector<visgraph::Point> &shortestPath, std::vector<double> &pathLengths, std::vector<Path> &path, double max_k, double size);
 
   /**
    * @brief Reach a certain destination points with a certain robot

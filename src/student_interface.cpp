@@ -274,10 +274,9 @@ namespace student
    * @param pathLengths Lengths of the dubins path from source to all intermediate points
    * @param max_k Curvature of the robot
    * @param size Discritizer size for the path generation
-   * @return true If a path has been found
-   * @return false If a path hasn't been found
+   * @return dubins::DubinsCurve** Curves planned
    */
-  bool planDestinationForRobot(int robot, visgraph::Point origin, std::vector<visgraph::Point> destinations, double theta, std::vector<visgraph::Point> borderPoints, visgraph::Graph originalGraph, visgraph::Graph g, std::vector<visgraph::Point> &shortestPath, std::vector<double> &pathLengths, std::vector<Path> &path, double max_k, double size) {
+  dubins::DubinsCurve **planDestinationForRobot(int robot, visgraph::Point origin, std::vector<visgraph::Point> destinations, double theta, std::vector<visgraph::Point> borderPoints, visgraph::Graph originalGraph, visgraph::Graph g, std::vector<visgraph::Point> &shortestPath, std::vector<double> &pathLengths, std::vector<Path> &path, double max_k, double size) {
     // ********** COMPUTE SHORTEST PATH FROM ORIGIN TO DESTINATION ********** //
     shortestPath = g.shortestPathMultipleD(origin, destinations, borderPoints);
 
@@ -300,7 +299,7 @@ namespace student
     dubins::DubinsCurve **curves = dubins.multipointShortestPath(points, shortestPath.size(), originalGraph);
     if (curves == nullptr) {
         std::cout << "UNABLE TO COMPUTE A PATH FOR GIVEN INPUT\n";
-        return false;
+        return nullptr;
     } else {
         std::cout << "COMPLETED MULTIPOINT SHORTEST PATH SUCCESSFULLY\n";
         // DEBUG - print the final complete path using opencv
@@ -314,7 +313,7 @@ namespace student
           pathLengths.push_back(pathLength);
         }
 
-        return true;
+        return curves;
     }
   }
 
@@ -591,9 +590,8 @@ namespace student
 
         std::vector<visgraph::Point> shortestPathTmp;
         std::vector<double> pathLengths;
-        std::vector<visgraph::Point> shortestPath, initialShortestPath;
-        std::vector<visgraph::Point> finalDestination, initalDestination;
-        bool pathValid = false;
+        std::vector<visgraph::Point> shortestPath;
+        std::vector<visgraph::Point> finalDestination;
 
         // using random to decide the finalDestination
         std::random_device rd;
@@ -603,7 +601,6 @@ namespace student
 
         // Choose a random destination
         finalDestination.push_back(destinations[disti(eng)]);
-        initalDestination.push_back(finalDestination[0]);
  
         // ********** COMPUTE THE FIRST SHORTEST PATH FROM ORIGIN TO DESTINATION ********** //
         shortestPath = g.shortestPath(visgraph::Point(x[0], y[0]), finalDestination[0], borderPoints);
@@ -614,7 +611,7 @@ namespace student
         dubins::Dubins dubins = dubins::Dubins(max_k, size);
         int pointCnt = 1;
 
-        std::cout<< "CURRENT DESTINATION: ";
+        std::cout<< "FIRST DESTINATION: ";
         finalDestination[0].print();
 
         double lastTheta = theta[0];  // Keep the last angle of the robot
@@ -643,22 +640,22 @@ namespace student
             shortestPathsEvader.push_back(v);
             pathLengthsEvader.push_back(d);
 
-            // Reach destination with the evader
-            bool r = reachDestinationForRobot(0, origin, destTmp, lastTheta, borderPoints, originalGraph, g, shortestPathsEvader[shortestPathsEvader.size()-1], pathLengthsEvader[pathLengthsEvader.size()-1], path, max_k, size);
-            // If there is no path available with the decided destination, restart from the beginning of the process excluding this destination
-            if (!r) {
+            // Plan a path with the evader
+            dubins::DubinsCurve **curvesEvader = planDestinationForRobot(0, origin, finalDestination, lastTheta, borderPoints, originalGraph, g, shortestPathsEvader[shortestPathsEvader.size()-1], pathLengthsEvader[pathLengthsEvader.size()-1], path, max_k, size);
+            // If there is no path available with the decided destination, restart from the beginning of the process
+            if (curvesEvader == nullptr) {
               shortestPathsEvader.pop_back();
               pathLengthsEvader.pop_back();
-              std::cout << "UNVALIABLE DESTINATION, CHANGE MIND!\n";
               pointCnt = 1;
-              pathValid = false;
             } else {
               destinationPointsEvader.push_back(finalDestination[0]);
 
-              // Get the last angle at destination
-              lastTheta = path[0].points[path[0].points.size()-1].theta;
+              // Truncate the path based on the value of pointCnt
+              fillPath(curvesEvader, path, pointCnt-1, size, 0);
+
+              // Get the last angle of the robot
+              lastTheta = curvesEvader[pointCnt-2]->a3->dubins_line->th;
               evaderThetas.push_back(lastTheta);
-              pathValid = true;
             }
           }
 
@@ -676,32 +673,7 @@ namespace student
           origin = shortestPath[pointCnt-1];
           shortestPath = g.shortestPath(origin, finalDestination[0], borderPoints);
 
-        } while(counter < 50); 
-
-        if(!pathValid) {
-          std::cout<< "RANDOM PATH NOT AVAILABLE, USE THE INITIAL DESTINATION" << std::endl;
-          while(!path[0].points.empty()) {
-            path[0].points.pop_back();
-          }
-          bool foundInitialPath = reachDestinationForRobot(0, visgraph::Point(x[0], y[0]), initalDestination, theta[0], borderPoints, originalGraph, g, initialShortestPath, pathLengths, path, max_k, size);
-          if (!foundInitialPath) {
-            std::cout << "NO PATH FOUND FOR THE EVADER!\n";
-          } else {
-            std::cout << "FOUND PATH WITH LENGTH: " << pathLengths[pathLengths.size() - 1] << "\n";
-            while(!destinationPointsEvader.empty()) {
-              destinationPointsEvader.pop_back();
-            }
-            destinationPointsEvader.push_back(initalDestination[0]);
-            while(!shortestPathsEvader.empty()) {
-              shortestPathsEvader.pop_back();
-            }
-            shortestPathsEvader.push_back(initialShortestPath);
-            while(!evaderThetas.empty()) {
-              evaderThetas.pop_back();;
-            }
-            evaderThetas.push_back(theta[0]);
-          }
-        }
+        } while(counter < 100);
 
         // Now we define the pursuer's path
         // In order to simulate the fact that the pursuer should not be able to predict the future,
@@ -750,8 +722,8 @@ namespace student
               finalDestinations.push_back(shortestPathEvaderTmp[i]);
 
               // Plan the path
-              bool foundPathPursuer = planDestinationForRobot(1, originPursuer, finalDestinations, lastThetaPursuer, borderPoints, originalGraph, g, shortestPathPursuer, pathLengthsPursuer, path, max_k, size);
-              if (foundPathPursuer) {
+              dubins::DubinsCurve **curvesPursuer = planDestinationForRobot(1, originPursuer, finalDestinations, lastThetaPursuer, borderPoints, originalGraph, g, shortestPathPursuer, pathLengthsPursuer, path, max_k, size);
+              if (curvesPursuer != nullptr) {
                 // Check if the length of the multipoint path is really less than the one of the evader
                 double completePathLengthPursuer = pathLengthsPursuer[pathLengthsPursuer.size()-1], completePathLengthEvader = pathLengthsEvaderTmp[i-1];
                 std::cout << "PATH FOUND FOR PURSUER WITH LENGTH: " << completePathLengthPursuer << " WHERE EVADER'S ONE IS " << completePathLengthEvader << "\n";
@@ -773,9 +745,8 @@ namespace student
                   if (j < pathLengthsPursuer.size())
                     j++;
 
-                  // Make the pursuer reach the destination
-                  std::vector<visgraph::Point> dest {shortestPathPursuer[j]};
-                  reachDestinationForRobot(1, originPursuer, dest, lastThetaPursuer, borderPoints, originalGraph, g, shortestPathPursuer, pathLengthsPursuer, path, max_k, size);
+                  // Make the pursuer reach the destination up to node j-1
+                  fillPath(curvesPursuer, path, j, size, 1);
 
                   // Update last angle theta of the pursuer and origin point
                   lastThetaPursuer = path[1].points[path[1].points.size()-1].theta;
