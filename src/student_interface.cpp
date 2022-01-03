@@ -678,7 +678,7 @@ namespace student
 
         } while(counter < 50); 
 
-        if(1){//!pathValid) {
+        if(!pathValid) {
           std::cout<< "RANDOM PATH NOT AVAILABLE, USE THE INITIAL DESTINATION" << std::endl;
           while(!path[0].points.empty()) {
             path[0].points.pop_back();
