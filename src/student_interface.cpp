@@ -585,8 +585,8 @@ namespace student
         }
       } else if(numberOfDestinations > 1) {
       
-        // ********** MULTIPLE DESTINATIONS - PROJECT NUMBER 1 - ********** //
-        std::cout << "THERE ARE TWO ROBOTS AND MULTIPLE DESTINATIONS\nPursuer Evader Game with " << numberOfDestinations << " destinations!\n";
+        // ********** TWO DESTINATIONS - PROJECT NUMBER 1 - ********** //
+        std::cout << "THERE ARE TWO ROBOTS AND TWO DESTINATIONS\nPursuer Evader Game\n";
 
         std::vector<visgraph::Point> shortestPathTmp;
         std::vector<double> pathLengths;
@@ -658,6 +658,8 @@ namespace student
         std::vector<double> evaderThetas; // All the destination theta angles of the evader in order
         evaderThetas.push_back(theta[0]);
 
+        std::vector<dubins::DubinsCurve *> evaderCurvesList;
+
         do {
           counter++;
 
@@ -682,10 +684,18 @@ namespace student
               pathLengthsEvader.pop_back();
               pointCnt = 1;
             } else {
-              destinationPointsEvader.push_back(finalDestination[0]);
+              for (visgraph::Point p : shortestPathsEvader[shortestPathsEvader.size()-1]) {
+                destinationPointsEvader.push_back(p);
+              }
+              // Remove the destination, it will be added later
+              destinationPointsEvader.pop_back();
 
               // Truncate the path based on the value of pointCnt
               fillPath(curvesEvader, path, pointCnt-1, size, 0);
+
+              for (int i = 0; i < pointCnt-1; i++) {
+                evaderCurvesList.push_back(curvesEvader[i]);
+              }
 
               // Get the last angle of the robot
               lastTheta = curvesEvader[pointCnt-2]->a3->dubins_line->th;
@@ -694,8 +704,10 @@ namespace student
           }
 
           // Did we arrive at our destination? If so, break the loop and return
-          if(shortestPath[pointCnt-1] == finalDestination[0])
+          if(shortestPath[pointCnt-1] == finalDestination[0]) {
+            destinationPointsEvader.push_back(finalDestination[0]);
             break;
+          }
 
           // Randomly choose the new destination and replan the path
           finalDestination.pop_back();
@@ -714,93 +726,244 @@ namespace student
         // i.e. the evader's decisions to change destination, we allow the pursuer to change its path
         // accordingly to the evader's new decisions only after:
         // - it actually happens at runtime (we do this by comparing the length of the dubins paths)
-        // - it reaches the next node (because of the asynchronous assumption of the problem)
+        // - it reaches the next node
 
         // Keep track of the pursuer's starting position and last angle theta
         visgraph::Point originPursuer = visgraph::Point(x[1], y[1]);
         double lastThetaPursuer = theta[1];
         bool reachedEvader = false;
+        bool firstPathNotFound = false;
 
-        // Loop through all the evader's decisions of changing path
+        // Loop through all the evader's nodes. The pursuer will know only the ones that already happened
         for (int z = 0; z < destinationPointsEvader.size() && !reachedEvader; z++) {
 
-          // if the evater didn't change destination, do nothing
-          if(z > 0 && destinationPointsEvader[z] == destinationPointsEvader[z-1]) continue;
+          // Just move closer to a point in which it would be easier to reach the evader.
+          // We do this because at the first iteration we don't know where the evader wants to go.
+          if (z == 0) {
+            std::vector<visgraph::Point> sp;
+            std::vector<double> pl;
 
-          // Origin of the evader
-          visgraph::Point originEvader = shortestPathsEvader[z][0];
+            // Check the closest destination to the evader
+            double d1 = (pow(destinations[0].x, 2) - pow(x[0], 2)) + (pow(destinations[0].y, 2) - pow(y[0], 2));
+            double d2 = (pow(destinations[1].x, 2) - pow(x[0], 2)) + (pow(destinations[1].y, 2) - pow(y[0], 2));
 
-          // Destination that the evader wanted to reach during this iteration
-          std::vector<visgraph::Point> destTmp {destinationPointsEvader[z]};
+            // Use the length of the first evader's curve to be sure the pursuer is not "predicting the future" decisions of the evader
+            double lengthOfFirstEvaderPath = evaderCurvesList[0]->L;
 
-          // Calculate the distances using Dijkstra for the evader and the pursuer
-          std::map<visgraph::Point, double> distancesEvader = g.shortestPathMultipleDDict(originEvader, destTmp, borderPoints);
-          std::map<visgraph::Point, double> distancesPursuer = g.shortestPathMultipleDDict(originPursuer, destTmp, borderPoints);
-
-          // Calculate the shortest path and the path lengths of the evader when going to the decided destination
-          std::vector<visgraph::Point> shortestPathEvaderTmp;
-          std::vector<double> pathLengthsEvaderTmp;
-          planDestinationForRobot(0, originEvader, destTmp, evaderThetas[z], borderPoints, originalGraph, g, shortestPathEvaderTmp, pathLengthsEvaderTmp, path, max_k, size);
-
-          // Keep track of the shortest path and the path lengths of the pursuer, see the algorithm below (for loop)
-          std::vector<visgraph::Point> shortestPathPursuer;
-          std::vector<double> pathLengthsPursuer;
-
-          // Algorithm for the pursuer evader game
-          // We assume the evader is in position 0
-          int i;
-          for(i = 1; i < shortestPathEvaderTmp.size(); i++) {
-            if (distancesPursuer[shortestPathEvaderTmp[i]] < distancesEvader[shortestPathEvaderTmp[i]]) {
-              // If the distance from this node of the pursuer is less than the evader's one, then the pursuer may be able to reach the evader setting this node as destination
-              std::vector<visgraph::Point> finalDestinations;
-              finalDestinations.push_back(shortestPathEvaderTmp[i]);
-
-              // Plan the path
-              dubins::DubinsCurve **curvesPursuer = planDestinationForRobot(1, originPursuer, finalDestinations, lastThetaPursuer, borderPoints, originalGraph, g, shortestPathPursuer, pathLengthsPursuer, path, max_k, size);
-              if (curvesPursuer != nullptr) {
-                // Check if the length of the multipoint path is really less than the one of the evader
-                double completePathLengthPursuer = pathLengthsPursuer[pathLengthsPursuer.size()-1], completePathLengthEvader = pathLengthsEvaderTmp[i-1];
-                std::cout << "PATH FOUND FOR PURSUER WITH LENGTH: " << completePathLengthPursuer << " WHERE EVADER'S ONE IS " << completePathLengthEvader << "\n";
-                if (completePathLengthPursuer < completePathLengthEvader) {
-                  // Even the dubins path is smaller than the one of the evader! We can reach it, if it doesn't change its mind (we'll see during the next iteration of this for loop)
-                  std::cout << "WITH THIS PATH THE PURSUER WILL BE ABLE TO REACH THE EVADER\n";
-
-                  int j = pathLengthsPursuer.size();
-                  // In case the evader changes its mind later, we don't go through all the calculated path.
-                  // As soon as the pursuer will notice the evader changed path and will reach a node of the graph,
-                  // it will change its own path accordingly
-                  if (z < shortestPathsEvader.size()-1) {
-                    for (j = 0; j < pathLengthsPursuer.size(); j++) {
-                      if (pathLengthsPursuer[j] > pathLengthsEvader[z][pathLengthsEvader[z].size()-1]) {
+            // Move towards the closest destination to the evader, if found
+            // If not found, move to the other one.
+            // If not found, move closer to the current position of the evader
+            if (d1 > d2) {
+              std::vector<visgraph::Point> dest {destinations[1]};
+              dubins::DubinsCurve **curves = planDestinationForRobot(1, visgraph::Point(x[1], y[1]), dest, theta[1], borderPoints, originalGraph, g, sp, pl, path, max_k, size);
+              if (curves != nullptr) {
+                int index = pl.size();
+                for (int b = 0; b < pl.size(); b++) {
+                  if (pl[b] >= lengthOfFirstEvaderPath) {
+                    index = b+1;
+                    break;
+                  }
+                }
+                fillPath(curves, path, index, size, 1);
+                originPursuer = sp[1];
+                lastThetaPursuer = path[1].points[path[1].points.size()-1].theta;
+              }
+              else {
+                std::vector<visgraph::Point> dest {destinations[0]};
+                dubins::DubinsCurve **curves = planDestinationForRobot(1, visgraph::Point(x[1], y[1]), dest, theta[1], borderPoints, originalGraph, g, sp, pl, path, max_k, size);
+                if (curves != nullptr) {
+                  int index = pl.size();
+                  for (int b = 0; b < pl.size(); b++) {
+                    if (pl[b] >= lengthOfFirstEvaderPath) {
+                      index = b+1;
+                      break;
+                    }
+                  }
+                  fillPath(curves, path, index, size, 1);
+                  originPursuer = sp[1];
+                  lastThetaPursuer = path[1].points[path[1].points.size()-1].theta;
+                } else {
+                  std::vector<visgraph::Point> dest {visgraph::Point(x[0], y[0])};
+                  dubins::DubinsCurve **curves = planDestinationForRobot(1, visgraph::Point(x[1], y[1]), dest, theta[1], borderPoints, originalGraph, g, sp, pl, path, max_k, size);
+                  if (curves != nullptr) {
+                    int index = pl.size();
+                    for (int b = 0; b < pl.size(); b++) {
+                      if (pl[b] >= lengthOfFirstEvaderPath) {
+                        index = b+1;
                         break;
                       }
                     }
+                    fillPath(curves, path, index, size, 1);
+                    originPursuer = sp[1];
+                    lastThetaPursuer = path[1].points[path[1].points.size()-1].theta;
+                  } else {
+                    firstPathNotFound = true;
+                    std::cout << "NO PATH FOUND FOR PURSUER\n";
                   }
-                  if (j < pathLengthsPursuer.size())
-                    j++;
-
-                  // Make the pursuer reach the destination up to node j-1
-                  fillPath(curvesPursuer, path, j, size, 1);
-
-                  // Update last angle theta of the pursuer and origin point
+                }
+              }
+            } else {
+              std::vector<visgraph::Point> dest {destinations[0]};
+              dubins::DubinsCurve **curves = planDestinationForRobot(1, visgraph::Point(x[1], y[1]), dest, theta[1], borderPoints, originalGraph, g, sp, pl, path, max_k, size);
+              if (curves != nullptr) {
+                int index = pl.size();
+                for (int b = 0; b < pl.size(); b++) {
+                  if (pl[b] >= lengthOfFirstEvaderPath) {
+                    index = b+1;
+                    break;
+                  }
+                }
+                fillPath(curves, path, index, size, 1);
+                originPursuer = sp[1];
+                lastThetaPursuer = path[1].points[path[1].points.size()-1].theta;
+              }
+              else {
+                std::vector<visgraph::Point> dest {destinations[1]};
+                dubins::DubinsCurve **curves = planDestinationForRobot(1, visgraph::Point(x[1], y[1]), dest, theta[1], borderPoints, originalGraph, g, sp, pl, path, max_k, size);
+                if (curves != nullptr) {
+                  int index = pl.size();
+                  for (int b = 0; b < pl.size(); b++) {
+                    if (pl[b] >= lengthOfFirstEvaderPath) {
+                      index = b+1;
+                      break;
+                    }
+                  }
+                  fillPath(curves, path, index, size, 1);
+                  originPursuer = sp[1];
                   lastThetaPursuer = path[1].points[path[1].points.size()-1].theta;
-                  originPursuer = shortestPathPursuer[j];
-
-                  // If the pursuer has reached the evader, just stop, even if the evader has planned to do other things after
-                  for (int s = 0; s < shortestPathsEvader[z].size(); s++) {
-                    if (shortestPathsEvader[z][s] == shortestPathPursuer[j])
-                      reachedEvader = true;
-                  }
-
-                  break;
                 } else {
-                  std::cout << "WITH THIS PATH THE PURSUER WON'T BE ABLE TO REACH THE EVADER\n";
+                  std::vector<visgraph::Point> dest {visgraph::Point(x[0], y[0])};
+                  dubins::DubinsCurve **curves = planDestinationForRobot(1, visgraph::Point(x[1], y[1]), dest, theta[1], borderPoints, originalGraph, g, sp, pl, path, max_k, size);
+                  if (curves != nullptr) {
+                    int index = pl.size();
+                    for (int b = 0; b < pl.size(); b++) {
+                      if (pl[b] >= lengthOfFirstEvaderPath) {
+                        index = b+1;
+                        break;
+                      }
+                    }
+                    fillPath(curves, path, index, size, 1);
+                    originPursuer = sp[1];
+                    lastThetaPursuer = path[1].points[path[1].points.size()-1].theta;
+                  } else {
+                    firstPathNotFound = true;
+                    std::cout << "NO PATH FOUND FOR PURSUER\n";
+                  }
                 }
               }
             }
-          }
-          if (i == shortestPathEvaderTmp.size()) {
-            std::cout << "THE PURSUER WASN'T ABLE TO FIND A PATH TO REACH THE EVADER AT ITERATION " << z << "\n";
+
+          } else {
+
+            if (firstPathNotFound) {
+              break;
+            }
+            // Origin of the evader
+            visgraph::Point originEvader = destinationPointsEvader[z];
+
+            // Destination that the evader wanted to reach during this iteration
+            std::vector<visgraph::Point> destTmp1 {destinations[0]};
+            std::vector<visgraph::Point> destTmp2 {destinations[1]};
+
+            // Calculate the distances using Dijkstra for the evader and the pursuer
+            std::map<visgraph::Point, double> distancesEvader = g.shortestPathMultipleDDict(originEvader, destTmp1, borderPoints);
+            std::map<visgraph::Point, double> distancesPursuer = g.shortestPathMultipleDDict(originPursuer, destTmp1, borderPoints);
+
+            // Calculate the shortest path and the path lengths of the evader when going to each of the destinations
+            std::vector<visgraph::Point> shortestPathEvaderTmp, shortestPathEvaderTmp1, shortestPathEvaderTmp2;
+            std::vector<double> pathLengthsEvaderTmp, pathLengthsEvaderTmp1, pathLengthsEvaderTmp2;
+            planDestinationForRobot(0, originEvader, destTmp1, evaderThetas[z], borderPoints, originalGraph, g, shortestPathEvaderTmp1, pathLengthsEvaderTmp1, path, max_k, size);
+            planDestinationForRobot(0, originEvader, destTmp2, evaderThetas[z], borderPoints, originalGraph, g, shortestPathEvaderTmp2, pathLengthsEvaderTmp2, path, max_k, size);
+
+            // Try to understand which destination is the actual one of the evader
+            int numberOfSamePointsDest1 = 0, numberOfSamePointsDest2 = 0;
+            for (int m = 0; m < z; m++) {
+              if (destinationPointsEvader[m] == shortestPathEvaderTmp1[m]) {
+                numberOfSamePointsDest1++;
+              }
+              if (destinationPointsEvader[m] == shortestPathEvaderTmp2[m]) {
+                numberOfSamePointsDest2++;
+              }
+            }
+
+            if (numberOfSamePointsDest1 > numberOfSamePointsDest2) {
+              std::cout << "DEST 1 IS BETTER\n";
+              shortestPathEvaderTmp = shortestPathEvaderTmp1;
+              pathLengthsEvaderTmp = pathLengthsEvaderTmp1;
+            } else if (numberOfSamePointsDest1 < numberOfSamePointsDest2) {
+              std::cout << "DEST 2 IS BETTER\n";
+              shortestPathEvaderTmp = shortestPathEvaderTmp2;
+              pathLengthsEvaderTmp = pathLengthsEvaderTmp2;
+            } else {
+              // Just move closer to a random one - TODO: MAKE IT CLEVER PLEASE
+              std::cout << "MOVE CLOSER TO A RANDOM DEST\n";
+              shortestPathEvaderTmp = shortestPathEvaderTmp2;
+              pathLengthsEvaderTmp = pathLengthsEvaderTmp2;
+            }
+
+            // Keep track of the shortest path and the path lengths of the pursuer, see the algorithm below (for loop)
+            std::vector<visgraph::Point> shortestPathPursuer;
+            std::vector<double> pathLengthsPursuer;
+
+            // Algorithm for the pursuer evader game
+            // We assume the evader is in position 0
+            int i;
+            for(i = 1; i < shortestPathEvaderTmp.size(); i++) {
+              if (distancesPursuer[shortestPathEvaderTmp[i]] < distancesEvader[shortestPathEvaderTmp[i]] || i == shortestPathEvaderTmp.size()-1) {
+                // If the distance from this node of the pursuer is less than the evader's one, then the pursuer may be able to reach the evader setting this node as destination
+                std::vector<visgraph::Point> finalDestinations;
+                finalDestinations.push_back(shortestPathEvaderTmp[i]);
+
+                // Plan the path
+                dubins::DubinsCurve **curvesPursuer = planDestinationForRobot(1, originPursuer, finalDestinations, lastThetaPursuer, borderPoints, originalGraph, g, shortestPathPursuer, pathLengthsPursuer, path, max_k, size);
+                if (curvesPursuer != nullptr) {
+                  // Check if the length of the multipoint path is really less than the one of the evader
+                  double completePathLengthPursuer = pathLengthsPursuer[pathLengthsPursuer.size()-1], completePathLengthEvader = pathLengthsEvaderTmp[i-1];
+                  std::cout << "PATH FOUND FOR PURSUER WITH LENGTH: " << completePathLengthPursuer << " WHERE EVADER'S ONE IS " << completePathLengthEvader << "\n";
+                  if (completePathLengthPursuer < completePathLengthEvader || i == shortestPathEvaderTmp.size()-1) {
+                    // Even the dubins path is smaller than the one of the evader! We can reach it, if it doesn't change its mind (we'll see during the next iteration of this for loop)
+                    std::cout << "WITH THIS PATH THE PURSUER WILL BE ABLE TO REACH THE EVADER\n";
+
+                    int index = pathLengthsPursuer.size();
+                    // In case the evader changes its mind later, we don't go through all the calculated path.
+                    // As soon as the pursuer will notice the evader changed path and will reach a node of the graph,
+                    // it will change its own path accordingly
+                    double lengthOfEvaderPath = 0;
+                    for (int m = 0; m < z; m++) {
+                      lengthOfEvaderPath += evaderCurvesList[m]->L;
+                    }
+                    for (int j = 0; j < pathLengthsPursuer.size(); j++) {
+                      if (pathLengthsPursuer[j] > lengthOfEvaderPath) {
+                        index = j+1;
+                        break;
+                      }
+                    }
+
+                    // Make the pursuer reach the destination up to the decided node
+                    fillPath(curvesPursuer, path, index, size, 1);
+
+                    // TODO: if the path of the pursuer is smaller than the one of the evader, add a small sub-path to synchronize them
+                    // were should we go? maybe towards the evader
+                    // if (index == pathLengthsPursuer.size()) {
+                    //   double lengthRemaining = lengthOfEvaderPath - pathLengthsPursuer[pathLengthsPursuer.size()-1];
+
+                    //   dubins::DubinsCurve **curvesPursuer = planDestinationForRobot(1, originPursuer, finalDestinations, lastThetaPursuer, borderPoints, originalGraph, g, shortestPathPursuer, pathLengthsPursuer, path, max_k, size);
+                    // }
+
+                    // Update last angle theta of the pursuer and origin point
+                    lastThetaPursuer = path[1].points[path[1].points.size()-1].theta;
+                    originPursuer = shortestPathPursuer[index];
+
+                    break;
+                  } else {
+                    std::cout << "WITH THIS PATH THE PURSUER WON'T BE ABLE TO REACH THE EVADER\n";
+                  }
+                }
+              }
+            }
+            if (i == shortestPathEvaderTmp.size()) {
+              std::cout << "THE PURSUER WASN'T ABLE TO FIND A PATH TO REACH THE EVADER AT ITERATION " << z << "\n";
+            }
           }
         }
 
