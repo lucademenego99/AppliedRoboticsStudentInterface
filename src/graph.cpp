@@ -492,16 +492,6 @@ std::map<Point, double> Graph::shortestPathDict(Point origin, Point destination,
         }
     }
 
-    // Reconstruct the path using prev. Start from destination
-    std::vector<Point> path;
-    while(true){
-        path.push_back(destination);
-        if(destination == origin) break;
-        destination = prev.find(destination)->second;
-    }
-    // Reverse the path
-    reverse(path.begin(), path.end());
-
     return dist;
 }
 
