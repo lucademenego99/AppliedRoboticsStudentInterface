@@ -1,3 +1,13 @@
+/**
+ * @file dubins.hpp
+ * @brief Headers for the generation of paths composed by Dubins Curves, containing useful data structures
+ * @version 0.1
+ * @date 2022-01-06
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
+
 #ifndef DUBINSCURVES
 #define DUBINSCURVES
 

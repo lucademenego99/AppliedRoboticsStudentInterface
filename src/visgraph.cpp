@@ -1,3 +1,13 @@
+/**
+ * @file visgraph.cpp
+ * @brief Implementation of the visibility graph generation
+ * @version 0.1
+ * @date 2022-01-06
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
+
 #include <iostream>
 #include "visgraph.hpp"
 #include "open_edges.hpp"

@@ -1,3 +1,13 @@
+/**
+ * @file graphPrint.hpp
+ * @brief Useful functions to print generated graphs using opencv
+ * @version 0.1
+ * @date 2022-01-06
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
+
 #ifndef GRAPHPRINT_H
 #define GRAPHPRINT_H
 

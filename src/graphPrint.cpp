@@ -1,3 +1,13 @@
+/**
+ * @file graphPrint.cpp
+ * @brief Useful functions to print generated graphs using opencv
+ * @version 0.1
+ * @date 2022-01-06
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
+
 #include "graph.hpp" 
 #include <iostream>
 #include <opencv2/core/core.hpp>

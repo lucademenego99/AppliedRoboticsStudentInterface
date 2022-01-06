@@ -1,3 +1,13 @@
+/**
+ * @file utils.hpp
+ * @brief Functions used to calculate the Dubins Curves
+ * @version 0.1
+ * @date 2022-01-06
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
+
 #ifndef UTILS
 #define UTILS
 

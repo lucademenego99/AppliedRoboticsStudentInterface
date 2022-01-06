@@ -1,3 +1,13 @@
+/**
+ * @file dubins.cpp
+ * @brief Implementation of the generation of paths composed by Dubins Curves
+ * @version 0.1
+ * @date 2022-01-06
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
+
 #include "dubins.hpp"
 #include "visgraph.hpp"
 

@@ -1,3 +1,13 @@
+/**
+ * @file student_interface.cpp
+ * @brief Implementation of the student interface. The main function is planPath, called by the ROS component
+ * @version 0.1
+ * @date 2022-01-06
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
+
 #include "student_planning_interface.hpp"
 #include "student_planning_utils.hpp"
 #include "graph.hpp"

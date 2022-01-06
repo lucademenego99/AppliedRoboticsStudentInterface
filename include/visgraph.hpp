@@ -1,3 +1,13 @@
+/**
+ * @file visgraph.hpp
+ * @brief Headers for the visibility graph generation
+ * @version 0.1
+ * @date 2022-01-06
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
+
 #ifndef VISGRAPH
 #define VISGRAPH
 

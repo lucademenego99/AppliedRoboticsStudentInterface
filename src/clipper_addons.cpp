@@ -1,3 +1,13 @@
+/**
+ * @file clipper_addons.cpp
+ * @brief Useful functions extending the clipper library
+ * @version 0.1
+ * @date 2022-01-06
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
+
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>

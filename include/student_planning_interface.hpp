@@ -1,3 +1,13 @@
+/**
+ * @file student_planning_interface.hpp
+ * @brief Headers for the student planning interface, containing the planPath and different useful functions
+ * @version 0.1
+ * @date 2022-01-06
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
+
 #ifndef STUDENT_PLANNING
 #define STUDENT_PLANNING
 

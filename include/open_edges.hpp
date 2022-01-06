@@ -1,3 +1,13 @@
+/**
+ * @file open_edges.hpp
+ * @brief Headers of a binary search tree, used for the visibility graph generation
+ * @version 0.1
+ * @date 2022-01-06
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
+
 #ifndef OPENEDGES
 #define OPENEDGES
 

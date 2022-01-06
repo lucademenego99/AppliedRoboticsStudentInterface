@@ -1,3 +1,13 @@
+/**
+ * @file clipper_addons.hpp
+ * @brief Useful functions extending the clipper library
+ * @version 0.1
+ * @date 2022-01-06
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
+
 #ifndef CLIPPER_ADDONS
 #define CLIPPER_ADDONS
 

@@ -1,3 +1,13 @@
+/**
+ * @file open_edges.cpp
+ * @brief Implementation of a binary search tree, used for the visibility graph generation
+ * @version 0.1
+ * @date 2022-01-06
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
+
 #include "open_edges.hpp"
 #include "utils.hpp"
 #include "dubins.hpp"

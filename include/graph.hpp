@@ -1,3 +1,13 @@
+/**
+ * @file graph.hpp
+ * @brief Data structures used for the visibility graph generation
+ * @version 0.1
+ * @date 2022-01-06
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
+
 #ifndef GRAPH_H
 #define GRAPH_H
 #include <map>

@@ -1,3 +1,13 @@
+/**
+ * @file student_planning_utils.hpp
+ * @brief Basic data structures used by the ROS component
+ * @version 0.1
+ * @date 2022-01-06
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
+
 #ifndef STUDENT_UTILS
 #define STUDENT_UTILS
 
