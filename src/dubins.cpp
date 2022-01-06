@@ -17,6 +17,10 @@
 
 using namespace cv;
 
+/**
+ * @brief Namespace for Dubins Curves generation
+ * 
+ */
 namespace dubins
 {
     /**

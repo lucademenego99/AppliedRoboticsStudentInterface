@@ -17,6 +17,10 @@
 
 using namespace visgraph;
 
+/**
+ * @brief Namespace for the visibility graph generation
+ * 
+ */
 namespace visgraph
 {
     /**

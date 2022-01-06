@@ -21,6 +21,10 @@
 
 using namespace std;
 
+/**
+ * @brief Namespace for the visibility graph generation
+ * 
+ */
 namespace visgraph
 {
 
