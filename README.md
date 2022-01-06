@@ -4,18 +4,18 @@
 The documentation of the code can be found [HERE](https://codedocs.xyz/lucademenego99/AppliedRoboticsStudentInterface/).
 
 # Usage
-1. Build the simulator using `catkin build`, then `source ~/workspace/simulator/environment.sh`
-2. Build the ApplicationRoboticsStudentinterface with `cd build`, `cmake ..` and then `make`, then `source ~/workspace/simulator/environment.sh`
-3. Go to `cd $AR_config_dir`, `gedit default_implementation.config` and change the "planning" variable to false
+1. Build the simulator using `catkin build`, then `source ~/workspace/simulator/environment.sh` and `source ~/workspace/project/environment.sh`
+2. Build the ApplicationRoboticsStudentinterface with `cd build`, `cmake ..` and then `make`, then `source ~/workspace/simulator/environment.sh` and `source ~/workspace/project/environment.sh`
+3. Go to `cd $AR_config_dir`, `gedit default_implementation.config` and change the "planning" variable to false (This passage needs to be done only once)
 4. In four different terminals, go under the directory `workspace` and run the following commands, one for each terminal:
   - `AR_simulator n:=2` (n is the number of robots to spawn)
   - `AR_pipeline n:=2`
   - `AR_rviz n:=2`
   - `AR_plan`
 
-**[NOTE: ALWAY remember to source the environmet before AR commands]**
-
-After having run `AR_plan`, the planned path will be shown in rviz. In order to make the robot move, run `AR_run`.
+**[NOTE: ALWAY remember to source the environmet before AR commands, meaning that you need to run `source ~/workspace/simulator/environment.sh` and `source ~/workspace/project/environment.sh`]**
+5. Run `AR_plan` and the planned path both for the evader and the pursuer will be visible.
+6. Run `AR_run` to move the robots accordingly to the path that was described in the plan phase.
 
 
 # Structure of our solution
