@@ -22,24 +22,24 @@ namespace visgraph
         const int COLLINEAR = 0;
 
         /**
-        * @brief Computes the visible points given a starting point
+        * @brief Computes the visible points given a single starting point and a single destination
         * 
         * @param point Point we want to consider
         * @param graph Graph of the map
         * @param origin Starting point
         * @param destination Final point
-        * @return vector<Point> 
+        * @return vector<Point> All the visible points that can be seen from "point"
         */
         std::vector<Point> getVisibleVertices(Point from, Graph graph, Point origin = Point(-1, -1), Point destination = Point(-1, -1));
 
         /**
-         * @brief Computes the visible points given a starting point
+         * @brief Computes the visible points given multiple starting points and multiple destinations
          * 
          * @param point Point we want to consider
          * @param graph Graph of the map
          * @param origin Starting points
          * @param destination Final points
-         * @return vector<Point> 
+         * @return vector<Point> All the visible points that can be seen from "point"
          */
         std::vector<Point> getVisibleVerticesMultipleOD(Point point, Graph graph, std::vector<Point> origins, std::vector<Point> destinations);
 

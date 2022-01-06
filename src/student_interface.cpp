@@ -524,6 +524,7 @@ namespace student
       // *** Try to reach the destination *** //
       std::cout << "THERE IS ONE ONLY ROBOT\nTry to reach the gate\n";
 
+      //Vectors to be filled when trying to reach the destination
       std::vector<visgraph::Point> shortestPath;
       std::vector<double> pathLengths;
 
@@ -543,7 +544,7 @@ namespace student
     } else if (numberOfRobots == 2) {
       if(numberOfDestinations == 1) {
         // ********** TWO ROBOTS - PROJECT NUMBER 1 - PURSUER EVADER GAME ********** //
-        std::cout << "THERE ARE TWO ROBOTS\nPursuer Evader game\n";
+        std::cout << "THERE ARE TWO ROBOTS AND ONE EXIT GATE\nPursuer Evader game\n";
 
         std::vector<visgraph::Point> shortestPathEvader, shortestPathPursuer;
         std::vector<double> pathLengthsEvader, pathLengthsPursuer;
@@ -556,10 +557,12 @@ namespace student
           pols = enlargeAndJoinObstacles(polygons, altOffset);
           polygonsForVisgraph = pols[0];
           polygons = pols[1];
+          //Change the dimension of the borders, as they also need to be smaller
           addBorders(borderMaxX, borderMinX, borderMaxY, borderMinY, altOffset, variant, borderPoints, polygons);
           originalGraph = visgraph::Graph(polygons, false, true);
           g = visg.computeVisibilityGraphMultipleOD(polygonsForVisgraph, origins, destinations);
           bool foundPathFirst = reachDestinationForRobot(0, visgraph::Point(x[0], y[0]), destinations, theta[0], borderPoints, originalGraph, g, shortestPathEvader, pathLengthsEvader, path, max_k, size);
+          //We check if the robot was able to reach the destination with a smaller offset, otherwise we just output an error message
           if (!foundPathFirst) {
             std::cout << "NO PATH FOUND EVEN WITH A SMALLER OFFSET FOR THE EVADER!\n";
           }else{
@@ -583,9 +586,12 @@ namespace student
         // Algorithm for the pursuer evader game
         // We assume the evader is in position 0
         int i;
+        //We iterate over the shortestPath of the evader, we check every possible node
         for(i = 1; i < shortestPathEvader.size(); i++){
+          //Check if the distance of the pursuer in a certain node is inferior to the distance of the evader on the same node
           if (distancesPursuer[shortestPathEvader[i]] < distancesEvader[shortestPathEvader[i]]) {
             std::vector<visgraph::Point> finalDestinations;
+            //We push the node into the destinations
             finalDestinations.push_back(visgraph::Point(shortestPathEvader[i].x, shortestPathEvader[i].y));
             bool foundPathPursuer = reachDestinationForRobot(1, visgraph::Point(x[1], y[1]), finalDestinations, theta[1], borderPoints, originalGraph, g, shortestPathPursuer, pathLengthsPursuer, path, max_k, size);
             if (foundPathPursuer) {
@@ -603,6 +609,7 @@ namespace student
             }
           }
         }
+        //We were not able to identify a good path
         if (i == shortestPathEvader.size()) {
           std::cout << "THE PURSUER WASN'T ABLE TO FIND A PATH TO REACH THE EVADER\n";
         }
@@ -616,7 +623,7 @@ namespace student
         std::vector<visgraph::Point> shortestPath;
         std::vector<visgraph::Point> finalDestination;
 
-        // using random to decide the finalDestination
+        // We use random to decide the finalDestination
         std::random_device rd;
         std::default_random_engine eng(rd());
         std::uniform_int_distribution<int> disti(0, numberOfDestinations-1);
@@ -638,7 +645,8 @@ namespace student
         // if no valid destination, reduce the enlarge offset and try again
         if(counter == 50) {
           std::cout << "NO PATH FOUND FOR THE EVADER!\n";
-          // We compute again all the graps with a smaller offset, higher risk but shorter paths
+          std::cout << "WE TRY AGAIN, THIS TIMES WITH SMALLER POLYGONS\n";
+          // We compute again all the graphs with a smaller offset, higher risk but shorter paths
           pols = enlargeAndJoinObstacles(polygons, altOffset);
           polygonsForVisgraph = pols[0];
           polygons = pols[1];
@@ -646,6 +654,7 @@ namespace student
           originalGraph = visgraph::Graph(polygons, false, true);
           g = visg.computeVisibilityGraphMultipleOD(polygonsForVisgraph, origins, destinations);
           counter = 0;
+          //Again we try to find a good path to a destination
           for(counter == 0; counter < 50; counter++){
             // Choose a random destination
             finalDestination.pop_back();
@@ -722,13 +731,14 @@ namespace student
               // Get the last angle of the robot
               lastTheta = curvesEvader[pointCnt-2]->a3->dubins_line->th;
               // evaderThetas.push_back(lastTheta);
+              //Clear up some space
               for(int i = 0; i < shortestPathsEvader[shortestPathsEvader.size()-1].size()-1; i++) {
                 delete curvesEvader[i];
               }
               delete[] curvesEvader;
             }
           }
-          // Did we arrive at our destination? If so, break the loop and return
+          // Did we arrive at our destination? If so, break the loop and return, we save the last Theta and the final destination
           if(shortestPath[pointCnt-1] == finalDestination[0]) {
             destinationPointsEvader.push_back(finalDestination[0]);
             evaderThetas.push_back(lastTheta);
@@ -737,7 +747,7 @@ namespace student
 
           // Randomly choose the new destination and replan the path
           finalDestination.pop_back();
-          finalDestination.push_back(destinations[disti(eng)]);
+          finalDestination.push_back(destinations[disti(eng)]); //Randomly generated element
           std::cout<< "NEW DESTINATION CHOSEN: ";
           finalDestination[0].print();
 
@@ -930,25 +940,28 @@ namespace student
             std::vector<double> pathLengthsEvaderTmp1;
             for(int i = 0; i < shortestPathEvaderTmp1.size()-1; i++){
               double tmp = sqrt(pow(shortestPathEvaderTmp1[i+1].x - shortestPathEvaderTmp1[i].x, 2.0) + pow(shortestPathEvaderTmp1[i+1].y - shortestPathEvaderTmp1[i].y, 2.0));
-              std::cout << "\nTemp value: " << tmp << "\n";
+              //std::cout << "\nTemp value: " << tmp << "\n";
               pathLengthsEvaderTmp1.push_back(tmp);
             }
-            std::cout << "\nshortestPathEvaderTmp1 size " << pathLengthsEvaderTmp1.size();
-            std::cout << "\nPlanDest dimension1 " << variable1.size();
+            
+            //std::cout << "\nshortestPathEvaderTmp1 size " << pathLengthsEvaderTmp1.size();
+            //std::cout << "\nPlanDest dimension1 " << variable1.size();
 
             std::vector<visgraph::Point> shortestPathEvaderTmp2 = g.shortestPath(originEvader, destTmp2[0], borderPoints);
             std::vector<double> pathLengthsEvaderTmp2;
             for(int i = 0; i < shortestPathEvaderTmp2.size()-1; i++){
               double tmp = sqrt(pow(shortestPathEvaderTmp2[i+1].x - shortestPathEvaderTmp2[i].x, 2.0) + pow(shortestPathEvaderTmp2[i+1].y - shortestPathEvaderTmp2[i].y, 2.0));
-              std::cout << "\nTemp value: " << tmp << "\n";
+              //std::cout << "\nTemp value: " << tmp << "\n";
               pathLengthsEvaderTmp2.push_back(tmp);
             }
 
+            /* FOR DEBUGGING PURPOSES
             std::cout << "\nshortestPathEvaderTmp2 size " << pathLengthsEvaderTmp2.size();
             std::cout << "\nPlanDest dimension2 " << variable2.size();
 
             std::cout << "Is SPET1 true? " << !shortestPathEvaderTmp1.empty() << "\n";
             std::cout << "Is SPET2 true? " << !shortestPathEvaderTmp2.empty() << "\n";
+            */
             // Try to understand which destination is the actual one of the evader
             int numberOfSamePointsDest1 = 0, numberOfSamePointsDest2 = 0;
             for (int m = 0; m < z; m++) {

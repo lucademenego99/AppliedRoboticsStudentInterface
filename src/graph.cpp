@@ -252,7 +252,7 @@ return (xPoint >= borderPoints[0].x && xPoint <= borderPoints[1].x && yPoint >= 
 }
 
 /**
- * @brief Dijkstra Shortest path, multiple destinations. Consider also the border of the arena
+ * @brief Dijkstra Shortest path considering multiple destinations, takes into account also the border of the arena.
  * Reference: https://www.geeksforgeeks.org/dijkstras-shortest-path-algorithm-using-set-in-stl/
  * Complexity: O(E logV)
  * 
@@ -340,18 +340,18 @@ std::vector<Point> Graph::shortestPathMultipleD(Point origin, std::vector<Point>
 }
 
 /**
- * @brief Dijkstra Shortest path.
- * Reference: https://www.geeksforgeeks.org/dijkstras-shortest-path-algorithm-using-set-in-stl/
- * Complexity: O(E logV)
- * 
- * @param graph A map <Point, vector of adjacent edges>
- * @param origin The origin point in which we want to start
- * @param destination Our destination
- * @param borderPoints points of the borders of the arena
- * @return std::vector<Point> The complete shortest path from origin to destination
- */
+* @brief Computes Dijkstra Shortest path given the origin, a destination and the coordinates of the borders of the arena.
+* Reference: https://www.geeksforgeeks.org/dijkstras-shortest-path-algorithm-using-set-in-stl/
+* Complexity: O(E logV)
+* 
+* @param graph A map <Point, vector of adjacent edges>
+* @param origin The origin point in which we want to start
+* @param destination The destination we intend to reach
+* @param borderPoints Points that descrbe the borders of the arena
+* @return std::vector<Point> A map that represents the complete shortest path from origin to destination
+*/
 std::vector<Point> Graph::shortestPath(Point origin, Point destination, std::vector<Point> borderPoints) {
-    // Check the input
+    // Checks the input by verifying if the origin and the destination are part of the graph
     if(graph.find(origin) == graph.end() || graph.find(destination) == graph.end()) {
         std::cout << "ERROR: origin point or destination point not available in graph!" << std::endl;
         std::vector<Point> path;
@@ -423,7 +423,7 @@ std::vector<Point> Graph::shortestPath(Point origin, Point destination, std::vec
 }
 
 /**
- * @brief Dijkstra Shortest path.
+ * @brief Computes Dijkstra Shortest path and return a map that represents the complete shortest path from origin to destination.
  * Reference: https://www.geeksforgeeks.org/dijkstras-shortest-path-algorithm-using-set-in-stl/
  * Complexity: O(E logV)
  * 
@@ -434,7 +434,7 @@ std::vector<Point> Graph::shortestPath(Point origin, Point destination, std::vec
  * @return std::map<Point, double> The complete shortest path from origin to destination
  */
 std::map<Point, double> Graph::shortestPathDict(Point origin, Point destination, std::vector<Point> borderPoints) {
-    // Check the input
+    // Check the input by verifying if the origin and the destination are part of the graph
     if(graph.find(origin) == graph.end() || graph.find(destination) == graph.end()) {
         std::cout << "ERROR: origin point or destination point not available in graph!" << std::endl;
         std::map<Point, double> dist;
@@ -506,7 +506,7 @@ std::map<Point, double> Graph::shortestPathDict(Point origin, Point destination,
 }
 
 /**
- * @brief Dijkstra Shortest path, multiple destinations.
+ * @brief Computes Dijkstra Shortest path considering multiple destinations and return a map that represents the complete shortest path from origin to all possible destinations.
  * Reference: https://www.geeksforgeeks.org/dijkstras-shortest-path-algorithm-using-set-in-stl/
  * Complexity: O(E logV)
  * 
@@ -518,7 +518,7 @@ std::map<Point, double> Graph::shortestPathDict(Point origin, Point destination,
  */
 std::map<Point, double> Graph::shortestPathMultipleDDict(Point origin, std::vector<Point> destinations, std::vector<Point> borderPoints) 
 {
-    // Check the input
+    // Check the input by checking if the position of the origin point
     if(graph.find(origin) == graph.end()) {
         std::cout << "ERROR: origin point not available in graph!" << std::endl;
         std::map<Point, double> dist;

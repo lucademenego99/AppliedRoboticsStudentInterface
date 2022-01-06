@@ -133,45 +133,45 @@ namespace visgraph
         Graph(std::vector<std::vector<Point>> polygons, bool isVisibilityGraph = false, bool isOriginalGraph = false);
 
         /**
-        * @brief Dijkstra Shortest path.
+        * @brief Computes Dijkstra Shortest path given the origin, a destination and the coordinates of the borders of the arena.
         * Reference: https://www.geeksforgeeks.org/dijkstras-shortest-path-algorithm-using-set-in-stl/
         * Complexity: O(E logV)
         * 
         * @param graph A map <Point, vector of adjacent edges>
         * @param origin The origin point in which we want to start
-        * @param destination Our destination
-        * @param borderPoints points of the borders of the arena
-        * @return std::vector<Point> The complete shortest path from origin to destination
+        * @param destination The destination we intend to reach
+        * @param borderPoints Points that descrbe the borders of the arena
+        * @return std::vector<Point> A map that represents the complete shortest path from origin to destination
         */
         std::vector<Point> shortestPath(Point origin, Point destination, std::vector<Point> borderPoints);
 
         /**
-        * @brief Dijkstra Shortest path.
+        * @brief Computes Dijkstra Shortest path and return a map that represents the complete shortest path from origin to destination.
         * Reference: https://www.geeksforgeeks.org/dijkstras-shortest-path-algorithm-using-set-in-stl/
         * Complexity: O(E logV)
         * 
         * @param graph A map <Point, vector of adjacent edges>
         * @param origin The origin point in which we want to start
-        * @param destination Our destination
-        * @param borderPoints points of the borders of the arena
-        * @return std::map<Point, double> The complete shortest path from origin to destination
+        * @param destination The destination we intend to reach
+        * @param borderPoints Points that describe the borders of the arena
+        * @return std::map<Point, double> A map that represents the complete shortest path from origin to destination
         */
         std::map<Point, double> shortestPathDict(Point origin, Point destination, std::vector<Point> borderPoints);
 
         /**
-        * @brief Dijkstra Shortest path, multiple destinations.
+        * @brief Computes Dijkstra Shortest path considering multiple destinations and return a map that represents the complete shortest path from origin to all possible destinations.
         * Reference: https://www.geeksforgeeks.org/dijkstras-shortest-path-algorithm-using-set-in-stl/
         * Complexity: O(E logV)
         * 
         * @param graph A map <Point, vector of adjacent edges>
         * @param origin The origin point in which we want to start
-        * @param destinations All possible destinations
-        * @return std::map<Point, double> The complete shortest path from origin to destination
+        * @param destinations All possible destinations we intend to reach
+        * @return std::map<Point, double> A map that represents the complete shortest path from origin to destinations
         */
         std::map<Point, double> shortestPathMultipleDDict(Point origin, std::vector<Point> destinations, std::vector<Point> borderPoints);
 
         /**
-         * @brief Dijkstra Shortest path, multiple destinations. Consider also the border of the arena
+         * @brief Computes Dijkstra Shortest path considering multiple destinations, takes into account also the border of the arena
          * Reference: https://www.geeksforgeeks.org/dijkstras-shortest-path-algorithm-using-set-in-stl/
          * Complexity: O(E logV)
          * 
@@ -184,7 +184,7 @@ namespace visgraph
         std::vector<Point> shortestPathMultipleD(Point origin, std::vector<Point> destinations, std::vector<Point> borderPoints);
 
         /**
-        * @brief returns the adjacent edges to a certain point
+        * @brief Returns the adjacent edges to a certain point
         * 
         * @param point the point we want to consider
         * @param edges an empty list to fill with the edges that have been found

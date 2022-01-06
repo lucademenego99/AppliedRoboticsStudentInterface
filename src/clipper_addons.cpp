@@ -20,17 +20,20 @@ std::vector<visgraph::Point> enlarge(std::vector<visgraph::Point> points, double
 {
     ClipperLib::Path subj;
     ClipperLib::Paths solution;
+    //Conversion from visgraph::Point to IntPoint which is used by clipper
     for (int i = 0; i < points.size(); i++)
     {
         subj << ClipperLib::IntPoint(points[i].x*1000, points[i].y*1000);
     }
     
     ClipperLib::ClipperOffset co;
+    //Jtmiter "cuts" or "smooths" certain angles that can be generated
     co.AddPath(subj, ClipperLib::jtMiter, ClipperLib::etClosedPolygon);
-    co.Execute(solution, offset*1000.0);
+    co.Execute(solution, offset*1000.0); 
 
     CleanPolygons(solution);
 
+    //Conversion from IntPoint back to visgraph::Point
     std::vector<visgraph::Point> result;
     if (solution.size() > 0) {
         for (ClipperLib::IntPoint p : solution[0]) {
@@ -94,6 +97,7 @@ void printSolution(std::vector<ClipperLib::IntPoint> startingPoints, ClipperLib:
 bool intersect (dubins::DubinsPoint *subj, dubins::DubinsPoint *clip){
     ClipperLib::Path firstPoly;
     ClipperLib::Paths firstFinalPoly;
+    //Conversion of the first polygon from DubinsPoint to IntPoint
     for (int i = 0; i < sizeof(subj); i++){
         firstPoly << ClipperLib::IntPoint(subj[i].x*1000, subj[i].y*1000);
     }
@@ -101,17 +105,19 @@ bool intersect (dubins::DubinsPoint *subj, dubins::DubinsPoint *clip){
 
     ClipperLib::Path secondPoly;
     ClipperLib::Paths secondFinalPoly;
+    //Conversion of the first polygon from DubinsPoint to IntPoint
     for (int j = 0; j < sizeof(clip); j++){
         secondPoly << ClipperLib::IntPoint(clip[j].x*1000, clip[j].y*1000);
     }
     secondFinalPoly.push_back(secondPoly);
 
     ClipperLib::Clipper c;
-    //Need to make this function take as input points instead of paths, create paths
+    //We add to the clipper object the paths we want to analyze
     c.AddPaths(firstFinalPoly, ClipperLib::ptSubject, true);
     c.AddPaths(secondFinalPoly, ClipperLib::ptClip, true);
 
     ClipperLib::Paths solution;
+    //We compute the intersection and then return the dimension of the result
     c.Execute(ClipperLib::ctIntersection, solution, ClipperLib::pftNonZero, ClipperLib::pftNonZero);
 
     return solution.size()!=0;
@@ -134,6 +140,7 @@ std::vector<std::vector<visgraph::Point>> enlargeObstaclesWithTwoOffsets(std::ve
     }
     std::vector<visgraph::Point> bigSolution;
     std::vector<visgraph::Point> smallSolution;
+    //We enlarge the polygon by using an offset and an offset + (offset/variant)
     smallSolution = enlarge(newPath, offset);
     bigSolution = enlarge(newPath, offset + (offset/variant));
     //Take both solutions, push them back a vector, return it
@@ -157,6 +164,7 @@ std::vector<std::vector<std::vector<visgraph::Point>>> enlargeAndJoinObstacles(s
     std::vector<std::vector<visgraph::Point>> bigPolygons;
     std::vector<std::vector<visgraph::Point>> smallPolygons;
 
+    //We convert each polygon to a "slightly bigger" and a "bigger" version and then we push then into different vectors
     for (int i = 0; i < polygonsList.size(); i++){
         std::vector<std::vector<visgraph::Point>> results;
         results = enlargeObstaclesWithTwoOffsets(polygonsList[i], offset);
@@ -165,6 +173,7 @@ std::vector<std::vector<std::vector<visgraph::Point>>> enlargeAndJoinObstacles(s
         results.clear();
     }
 
+    //We join all the "bigPolygons"
     ClipperLib::Paths subj(bigPolygons.size()), solution;
 
     for (unsigned int i = 0; i < bigPolygons.size(); i++){
@@ -178,6 +187,7 @@ std::vector<std::vector<std::vector<visgraph::Point>>> enlargeAndJoinObstacles(s
 
     CleanPolygons(solution);
 
+    //We join also all the "smaller" polygons
     ClipperLib::Paths subj1(smallPolygons.size()), solution1;
 
     for (unsigned int i = 0; i < smallPolygons.size(); i++){
@@ -192,6 +202,7 @@ std::vector<std::vector<std::vector<visgraph::Point>>> enlargeAndJoinObstacles(s
 
     CleanPolygons(solution1);
 
+    //We return all the enlarged and joined polygons
     std::vector<std::vector<std::vector<visgraph::Point>>> returnValues;
 
     std::vector<std::vector<visgraph::Point>> intermediateValues;
