@@ -165,11 +165,6 @@ namespace visgraph
         {
             if (!(p == point))
             {
-                // if (getAngle(point, p) > M_PI)
-                // {
-                //     break;
-                // }
-
                 // Update open edges - remove clock wise edges because we already considered them (remember we are moving counter-clockwise)
                 if (openEdges.openEdges.size() > 0)
                 {
@@ -316,11 +311,6 @@ namespace visgraph
         {
             if (!(p == point))
             {
-                // if (getAngle(point, p) > M_PI)
-                // {
-                //     break;
-                // }
-
                 // Update open edges - remove clock wise edges because we already considered them (remember we are moving counter-clockwise)
                 if (openEdges.openEdges.size() > 0)
                 {
