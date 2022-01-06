@@ -10,6 +10,12 @@
 #include "graphPrint.hpp"
 #include "utils.hpp"
 
+/**
+ * @brief Basic student namespace
+ * 
+ * This namespace contains all the functions used to plan the path for the ROS environment
+ * 
+ */
 namespace student
 {
    /**

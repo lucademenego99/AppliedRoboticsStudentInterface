@@ -12,6 +12,12 @@
 #include <iostream>
 #include <random>
 
+/**
+ * @brief Basic student namespace
+ * 
+ * This namespace contains all the functions used to plan the path for the ROS environment
+ * 
+ */
 namespace student
 {
 
@@ -677,9 +683,6 @@ namespace student
         dubins::Dubins dubins = dubins::Dubins(max_k, size);
         int pointCnt = 1;
 
-        std::cout<< "FIRST DESTINATION: ";
-        finalDestination[0].print();
-
         double lastTheta = theta[0];  // Keep the last angle of the robot
         counter = 0;  // Keep a counter to limit the number of iterations of the do while
 
@@ -748,16 +751,12 @@ namespace student
           // Randomly choose the new destination and replan the path
           finalDestination.pop_back();
           finalDestination.push_back(destinations[disti(eng)]); //Randomly generated element
-          std::cout<< "NEW DESTINATION CHOSEN: ";
-          finalDestination[0].print();
 
           // Calculate the new path from the current point to the new destination
           origin = shortestPath[pointCnt-1];
           shortestPath = g.shortestPath(origin, finalDestination[0], borderPoints);
 
         } while(counter < 100);
-
-        std::cout << "PATH FOR EVADER READY\n";
 
         // Now we define the pursuer's path
         // In order to simulate the fact that the pursuer should not be able to predict the future,
@@ -932,36 +931,23 @@ namespace student
             std::map<visgraph::Point, double> distancesPursuer = g.shortestPathMultipleDDict(originPursuer, destTmp1, borderPoints);
 
             // Calculate the shortest path and the path lengths of the evader when going to each of the destinations
-            std::vector<visgraph::Point> shortestPathEvaderTmp, variable1, variable2;
-            std::vector<double> pathLengthsEvaderTmp, variable11, variable22;
-            dubins::DubinsCurve **tmp1 = planDestinationForRobot(0, originEvader, destTmp1, evaderThetas[z], borderPoints, originalGraph, g, variable1, variable11, path, max_k, size);
-            dubins::DubinsCurve **tmp2 = planDestinationForRobot(0, originEvader, destTmp2, evaderThetas[z], borderPoints, originalGraph, g, variable2, variable22, path, max_k, size);
+            std::vector<visgraph::Point> shortestPathEvaderTmp;
+            std::vector<double> pathLengthsEvaderTmp;
             std::vector<visgraph::Point> shortestPathEvaderTmp1 = g.shortestPath(originEvader, destTmp1[0], borderPoints);
             std::vector<double> pathLengthsEvaderTmp1;
             for(int i = 0; i < shortestPathEvaderTmp1.size()-1; i++){
               double tmp = sqrt(pow(shortestPathEvaderTmp1[i+1].x - shortestPathEvaderTmp1[i].x, 2.0) + pow(shortestPathEvaderTmp1[i+1].y - shortestPathEvaderTmp1[i].y, 2.0));
-              //std::cout << "\nTemp value: " << tmp << "\n";
               pathLengthsEvaderTmp1.push_back(tmp);
             }
             
-            //std::cout << "\nshortestPathEvaderTmp1 size " << pathLengthsEvaderTmp1.size();
-            //std::cout << "\nPlanDest dimension1 " << variable1.size();
 
             std::vector<visgraph::Point> shortestPathEvaderTmp2 = g.shortestPath(originEvader, destTmp2[0], borderPoints);
             std::vector<double> pathLengthsEvaderTmp2;
             for(int i = 0; i < shortestPathEvaderTmp2.size()-1; i++){
               double tmp = sqrt(pow(shortestPathEvaderTmp2[i+1].x - shortestPathEvaderTmp2[i].x, 2.0) + pow(shortestPathEvaderTmp2[i+1].y - shortestPathEvaderTmp2[i].y, 2.0));
-              //std::cout << "\nTemp value: " << tmp << "\n";
               pathLengthsEvaderTmp2.push_back(tmp);
             }
 
-            /* FOR DEBUGGING PURPOSES
-            std::cout << "\nshortestPathEvaderTmp2 size " << pathLengthsEvaderTmp2.size();
-            std::cout << "\nPlanDest dimension2 " << variable2.size();
-
-            std::cout << "Is SPET1 true? " << !shortestPathEvaderTmp1.empty() << "\n";
-            std::cout << "Is SPET2 true? " << !shortestPathEvaderTmp2.empty() << "\n";
-            */
             // Try to understand which destination is the actual one of the evader
             int numberOfSamePointsDest1 = 0, numberOfSamePointsDest2 = 0;
             for (int m = 0; m < z; m++) {
@@ -980,6 +966,7 @@ namespace student
               shortestPathEvaderTmp = shortestPathEvaderTmp2;
               pathLengthsEvaderTmp = pathLengthsEvaderTmp2;
             } else {
+
               // Move closer to the destination that is closer to the evader
               // Check the closest destination to the evader
               double d1 = (pow(destinations[0].x, 2) - pow(destinationPointsEvader[z].x, 2)) + (pow(destinations[0].y, 2) - pow(destinationPointsEvader[z].y, 2));
@@ -1023,12 +1010,9 @@ namespace student
                   // Check if the length of the multipoint path is really less than the one of the evader
                   double completePathLengthPursuer = pathLengthsPursuer[pathLengthsPursuer.size()-1]; 
                   double completePathLengthEvader = pathLengthsEvaderTmp[i-1];
-                  std::cout << "PATH FOUND FOR PURSUER WITH LENGTH: " << completePathLengthPursuer << " WHERE EVADER'S ONE IS " << completePathLengthEvader << "\n";
                   if (completePathLengthPursuer < completePathLengthEvader || i == shortestPathEvaderTmp.size()-1) {
 
                     // Even the dubins path is smaller than the one of the evader
-                    std::cout << "WITH THIS PATH THE PURSUER WILL BE ABLE TO REACH THE EVADER\n";
-
                     int index = pathLengthsPursuer.size();
                     
                     // Check in which node the pursuer should stop. We stop when the length of the path
@@ -1058,15 +1042,13 @@ namespace student
                     delete[] curvesPursuer;
 
                     break;
-                  } else {
-                    std::cout << "WITH THIS PATH THE PURSUER WON'T BE ABLE TO REACH THE EVADER\n";
                   }
                 }
               }
             }
-            if (i == shortestPathEvaderTmp.size()) {
-              std::cout << "THE PURSUER WASN'T ABLE TO FIND A PATH TO REACH THE EVADER AT ITERATION " << z << "\n";
-            }
+            // if (i == shortestPathEvaderTmp.size()) {
+            //   std::cout << "THE PURSUER WASN'T ABLE TO FIND A PATH TO REACH THE EVADER AT ITERATION " << z << "\n";
+            // }
           }
         }
 
@@ -1075,32 +1057,6 @@ namespace student
       std::cout << "THERE ARE THREE ROBOTS - Project Number 2 Not Done\n";
     }
 
-    // ************************ DEBUG - Test a simple shortest path ******************************** //
-    // visgraph::Point destination = visgraph::Point(borderMinX + 0.2, borderMaxY - 0.2);
-    // dubins::Dubins dubins = dubins::Dubins(max_k, size);
-    // dubins::DubinsCurve *curve = dubins.findShortestPath(origin.x, origin.y, theta[0], destination.x, destination.y, M_PI);
-    // int npts = curve->a1->L/size;
-    // for (int i = 0; i < npts; i++) {
-    //   double s = curve->a1->L/npts * i;
-    //   dubins::DubinsLine *tmp = new dubins::DubinsLine(s, curve->a1->x0, curve->a1->y0, curve->a1->th0, curve->a1->k);
-    //   path[0].points.emplace_back(s, tmp->x, tmp->y, tmp->th, curve->a1->k);
-    //   delete tmp;
-    // }
-    // npts = curve->a2->L/size;
-    // for (int i = 0; i < npts; i++) {
-    //   double s = curve->a2->L/npts * i;
-    //   dubins::DubinsLine *tmp = new dubins::DubinsLine(s, curve->a2->x0, curve->a2->y0, curve->a2->th0, curve->a2->k);
-    //   path[0].points.emplace_back(s, tmp->x, tmp->y, tmp->th, curve->a2->k);
-    //   delete tmp;
-    // }
-    // npts = curve->a3->L/size;
-    // for (int i = 0; i < npts; i++) {
-    //   double s = curve->a3->L/npts * i;
-    //   dubins::DubinsLine *tmp = new dubins::DubinsLine(s, curve->a3->x0, curve->a3->y0, curve->a3->th0, curve->a3->k);
-    //   path[0].points.emplace_back(s, tmp->x, tmp->y, tmp->th, curve->a3->k);
-    //   delete tmp;
-    // }
-    
     return true;
   }
 
