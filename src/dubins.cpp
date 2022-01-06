@@ -401,8 +401,10 @@ namespace dubins
                 if (!areThereCollisions) {
                     best_L = current_L;
                     pidx = i;
-                    if (best_curve_segments != nullptr)
+                    if (best_curve_segments != nullptr) {
                         delete best_curve_segments;
+                        best_curve_segments = nullptr;
+                    }
                     best_curve_segments = new CurveSegmentsResult(true, curve_segments->s1, curve_segments->s2, curve_segments->s3);
                 }
             }
@@ -437,6 +439,7 @@ namespace dubins
         }
         delete scaled_parameters;
         delete best_curve_segments;
+        std::vector<visgraph::Edge>().swap(edges);
         return curve;
     };
 
@@ -449,14 +452,13 @@ namespace dubins
      */
     double *Dubins::multipointShortestPathAngles(DubinsPoint **points, unsigned int numberOfPoints, visgraph::Graph &graph)
     {
-        std::vector<visgraph::Edge> edges = graph.getEdges();
-        std::cout << "INPUT WITH " << numberOfPoints << " POINTS: \n";
-        std::cout << "X\tY\tTHETA\n";
-        for (int i = 0; i < numberOfPoints; i++)
-        {
-            std::cout << points[i]->x << "\t" << points[i]->y << "\t" << points[i]->th << "\n";
-        }
-        std::cout << "\n";
+        // std::cout << "INPUT WITH " << numberOfPoints << " POINTS: \n";
+        // std::cout << "X\tY\tTHETA\n";
+        // for (int i = 0; i < numberOfPoints; i++)
+        // {
+        //     std::cout << points[i]->x << "\t" << points[i]->y << "\t" << points[i]->th << "\n";
+        // }
+        // std::cout << "\n";
 
         // NOTES
         // Dj(th_j, th_j+1) is the length of the optimal solution of the two points dubins problem connecting P_j with P_j+1
@@ -473,7 +475,7 @@ namespace dubins
         double *minimizingAngles = new double[numberOfPoints];
 
         const int K = std::extent<decltype(multipointAngles)>::value;
-        std::cout << "VALUE OF K: " << K << "\n\n";
+        // std::cout << "VALUE OF K: " << K << "\n\n";
 
         // I create an empty matrix L that will store intermediate results
         double **L = new double *[numberOfPoints];
@@ -535,7 +537,7 @@ namespace dubins
         // ALGORITHM - ITERATIVE COMPUTATION
         for (int n = numberOfPoints - 3; n >= 0; n--)
         {
-            std::cout << "CALCULATING FOR n=" << n << "\n";
+            // std::cout << "CALCULATING FOR n=" << n << "\n";
             for (unsigned int i = 0; i < K; i++)
             {
                 for (unsigned int j = 0; j < K; j++)
@@ -563,41 +565,41 @@ namespace dubins
         }
 
         // DEBUG PRINT
-        std::cout << "VALUES OF L:\n";
-        std::cout << "\t";
-        for (int i = 0; i < K; i++)
-        {
-            std::cout << "k=" << i << "\t";
-        }
-        std::cout << "\n";
-        for (int n = 0; n < numberOfPoints; n++)
-        {
-            std::cout << "POINT=" << n << "\t";
-            for (int i = 0; i < K; i++)
-            {
-                std::cout << L[n][i] << "\t";
-            }
-            std::cout << "\n";
-        }
-        std::cout << "\n\n";
+        // std::cout << "VALUES OF L:\n";
+        // std::cout << "\t";
+        // for (int i = 0; i < K; i++)
+        // {
+        //     std::cout << "k=" << i << "\t";
+        // }
+        // std::cout << "\n";
+        // for (int n = 0; n < numberOfPoints; n++)
+        // {
+        //     std::cout << "POINT=" << n << "\t";
+        //     for (int i = 0; i < K; i++)
+        //     {
+        //         std::cout << L[n][i] << "\t";
+        //     }
+        //     std::cout << "\n";
+        // }
+        // std::cout << "\n\n";
 
-        std::cout << "VALUES OF S:\n";
-        std::cout << "\t";
-        for (int i = 0; i < K; i++)
-        {
-            std::cout << "k=" << i << "\t";
-        }
-        std::cout << "\n";
-        for (int n = 0; n < numberOfPoints; n++)
-        {
-            std::cout << "POINT=" << n << "\t";
-            for (int i = 0; i < K; i++)
-            {
-                std::cout << S[n][i] << "\t";
-            }
-            std::cout << "\n";
-        }
-        std::cout << "\n\n";
+        // std::cout << "VALUES OF S:\n";
+        // std::cout << "\t";
+        // for (int i = 0; i < K; i++)
+        // {
+        //     std::cout << "k=" << i << "\t";
+        // }
+        // std::cout << "\n";
+        // for (int n = 0; n < numberOfPoints; n++)
+        // {
+        //     std::cout << "POINT=" << n << "\t";
+        //     for (int i = 0; i < K; i++)
+        //     {
+        //         std::cout << S[n][i] << "\t";
+        //     }
+        //     std::cout << "\n";
+        // }
+        // std::cout << "\n\n";
 
         // Find the minimum length and the corresponding index in the first row of L
         unsigned int minIndex = -1;
@@ -615,7 +617,7 @@ namespace dubins
             return nullptr;
         }
 
-        std::cout << "MINIMUM LENGTH FOUND: " << L[0][minIndex] << "\n\n";
+        // std::cout << "MINIMUM LENGTH FOUND: " << L[0][minIndex] << "\n\n";
 
         minimizingAngles[0] = multipointAngles[minIndex];
         for (int i = 0; i < numberOfPoints - 2; i++)
@@ -625,12 +627,12 @@ namespace dubins
         }
         minimizingAngles[numberOfPoints - 1] = points[numberOfPoints - 1]->th;
 
-        std::cout << "MINIMIZING ANGLES: \n";
-        for (int i = 0; i < numberOfPoints; i++)
-        {
-            std::cout << " -> " << minimizingAngles[i] << "\n";
-        }
-        std::cout << "\n\n";
+        // std::cout << "MINIMIZING ANGLES: \n";
+        // for (int i = 0; i < numberOfPoints; i++)
+        // {
+        //     std::cout << " -> " << minimizingAngles[i] << "\n";
+        // }
+        // std::cout << "\n\n";
 
         return minimizingAngles;
     };
@@ -644,27 +646,33 @@ namespace dubins
      */
     DubinsCurve **Dubins::multipointShortestPath(DubinsPoint **points, unsigned int numberOfPoints, visgraph::Graph &graph)
     {
-        DubinsPoint **newPoints = new DubinsPoint*[numberOfPoints];
-        for (int i = 0; i < numberOfPoints; i++) {
-            newPoints[i] = points[numberOfPoints - i - 1];
-        }
-        newPoints[numberOfPoints-1]->th = mod2pi(points[0]->th + M_PI);
-        // Get the optimal angles for each point (dynamic programming iterative procedure)
-        double *angles = multipointShortestPathAngles(newPoints, numberOfPoints, graph);
-        if (angles == nullptr) {
-            return nullptr;
-        }
-
-        // Now that we have everything we need, calculate the optimal multipoint shortest path
-        DubinsCurve **curves = new DubinsCurve*[numberOfPoints-1];
-        for (int i = 0; i < numberOfPoints-1; i++) {
-            int index = numberOfPoints-i-1;
-            curves[i] = findShortestPathCollisionDetection(newPoints[index]->x, newPoints[index]->y, mod2pi(angles[index] + M_PI), newPoints[index-1]->x, newPoints[index-1]->y, mod2pi(angles[index-1] + M_PI), graph);
-            if (curves[i] == nullptr) {
+        if (numberOfPoints > 1) {
+            DubinsPoint **newPoints = new DubinsPoint*[numberOfPoints];
+            for (int i = 0; i < numberOfPoints; i++) {
+                newPoints[i] = points[numberOfPoints - i - 1];
+            }
+            newPoints[numberOfPoints-1]->th = mod2pi(points[0]->th + M_PI);
+            // Get the optimal angles for each point (dynamic programming iterative procedure)
+            double *angles = multipointShortestPathAngles(newPoints, numberOfPoints, graph);
+            if (angles == nullptr) {
+                delete[] newPoints;
                 return nullptr;
             }
+
+            // Now that we have everything we need, calculate the optimal multipoint shortest path
+            DubinsCurve **curves = new DubinsCurve*[numberOfPoints-1];
+            for (int i = 0; i < numberOfPoints-1; i++) {
+                int index = numberOfPoints-i-1;
+                curves[i] = findShortestPathCollisionDetection(newPoints[index]->x, newPoints[index]->y, mod2pi(angles[index] + M_PI), newPoints[index-1]->x, newPoints[index-1]->y, mod2pi(angles[index-1] + M_PI), graph);
+                if (curves[i] == nullptr) {
+                    delete[] newPoints;
+                    return nullptr;
+                }
+            }
+            delete[] newPoints;
+            return curves;
         }
-        return curves;
+        return nullptr;
     }
 
     /**

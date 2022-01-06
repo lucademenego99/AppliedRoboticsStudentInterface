@@ -238,17 +238,120 @@ Edge Graph::containsE (Edge e) {
 }
 
 /**
- * @brief Dijkstra Shortest path.
+ * @brief Check if a certain points (x,y) is inside the arena
+ * Points are in the order bottom-left, bottom-right, top-right, top-left
+ * 
+ * @param borderPoints Points representing the arena, in order bottom-left, bottom-right, top-right, top-left
+ * @param xPoint X of the point we are considering
+ * @param yPoint Y of the point we are considering
+ * @return true If the point lies inside the arena
+ * @return false If the point does not lie inside the arena
+ */
+bool isInsideArena(std::vector<visgraph::Point> borderPoints, double xPoint, double yPoint) {
+return (xPoint >= borderPoints[0].x && xPoint <= borderPoints[1].x && yPoint >= borderPoints[0].y && yPoint <= borderPoints[2].y);
+}
+
+/**
+ * @brief Dijkstra Shortest path considering multiple destinations, takes into account also the border of the arena.
  * Reference: https://www.geeksforgeeks.org/dijkstras-shortest-path-algorithm-using-set-in-stl/
  * Complexity: O(E logV)
  * 
  * @param graph A map <Point, vector of adjacent edges>
  * @param origin The origin point in which we want to start
- * @param destination Our destination
+ * @param destinations All possible destinations
+ * @param borderPoints points of the borders of the arena
  * @return std::vector<Point> The complete shortest path from origin to destination
  */
-std::vector<Point> Graph::shortestPath(Point origin, Point destination) {
+std::vector<Point> Graph::shortestPathMultipleD(Point origin, std::vector<Point> destinations, std::vector<Point> borderPoints) 
+{
     // Check the input
+    if(graph.find(origin) == graph.end()) {
+        std::cout << "ERROR: origin point not available in graph!" << std::endl;
+        std::vector<Point> path;
+        return path;
+    }
+
+    // Create a map to store the distances for all points
+    std::map<Point, double> dist;
+    // Create a map to reconstruct the final solution
+    std::map<Point, Point> prev;
+    // Create a set to store vertices that are being processed
+    std::set<std::pair<double, Point>> setds;
+
+    // Insert the origin point to start the algorithm
+    setds.insert(std::make_pair(0, origin));
+    dist[origin] = 0;
+
+    // Loop until all shortest distances are finalized
+    while(!setds.empty()) {
+        // First vertex in the set - the min distance vertex
+        std::pair<double, Point> tmp = *(setds.begin());
+        setds.erase(setds.begin());
+
+        Point u = tmp.second;
+
+        // Loop through all adjacent vertices of the point u
+        for (Edge e : graph[u]) {
+            Point v = e.getAdjacent(u);
+            // The weight is simply the distance between the points
+            double weight = e.weight();
+
+            // If the point is not inside the arena, put weight INFINITY so Dijkstra won't use it
+            if (!isInsideArena(borderPoints, v.x, v.y)) {
+                weight = INFINITY;
+            }
+
+            // If there is a shortest path from v through u (or it's the first one we find)
+            if (!dist.count(v) || dist[v] > dist[u]+weight) {
+                // If we already had a distance from v through u, erase it (then we will insert the new one)
+                if (dist.count(v)) {
+                    setds.erase(setds.find(std::make_pair(dist[v], v)));
+                    prev.erase(prev.find(v));
+                }
+                
+                // Update the distance from the point v
+                dist[v] = dist[u] + weight;
+                setds.insert(std::make_pair(dist[v], v));
+                prev.insert(std::make_pair(v,u));
+            }
+        }
+    }
+
+    // Check the best destination available
+    Point bestDestination = Point(-1, -1);
+    double shortestDistance = INFINITY;
+    for (int i = 0; i < destinations.size(); i++) {
+        if (dist[destinations[i]] < shortestDistance) {
+            shortestDistance = dist[destinations[i]];
+            bestDestination = destinations[i];
+        }
+    }
+    // Reconstruct the path using prev and starting from the best destination found
+    std::vector<Point> path;
+    while(true){
+        path.push_back(bestDestination);
+        if(bestDestination == origin) break;
+        bestDestination = prev.find(bestDestination)->second;
+    }
+    // Reverse the path
+    reverse(path.begin(), path.end());
+
+    return path;
+}
+
+/**
+* @brief Computes Dijkstra Shortest path given the origin, a destination and the coordinates of the borders of the arena.
+* Reference: https://www.geeksforgeeks.org/dijkstras-shortest-path-algorithm-using-set-in-stl/
+* Complexity: O(E logV)
+* 
+* @param graph A map <Point, vector of adjacent edges>
+* @param origin The origin point in which we want to start
+* @param destination The destination we intend to reach
+* @param borderPoints Points that descrbe the borders of the arena
+* @return std::vector<Point> A map that represents the complete shortest path from origin to destination
+*/
+std::vector<Point> Graph::shortestPath(Point origin, Point destination, std::vector<Point> borderPoints) {
+    // Checks the input by verifying if the origin and the destination are part of the graph
     if(graph.find(origin) == graph.end() || graph.find(destination) == graph.end()) {
         std::cout << "ERROR: origin point or destination point not available in graph!" << std::endl;
         std::vector<Point> path;
@@ -285,6 +388,11 @@ std::vector<Point> Graph::shortestPath(Point origin, Point destination) {
             // The weight is simply the distance between the points
             double weight = e.weight();
 
+            // If the point is not inside the arena, put weight INFINITY so Dijkstra won't use it
+            if (!isInsideArena(borderPoints, v.x, v.y)) {
+                weight = INFINITY;
+            }
+
             // If there is a shortest path from v through u (or it's the first one we find)
             if (!dist.count(v) || dist[v] > dist[u]+weight) {
                 // If we already had a distance from v through u, erase it (then we will insert the new one)
@@ -312,4 +420,143 @@ std::vector<Point> Graph::shortestPath(Point origin, Point destination) {
     reverse(path.begin(), path.end());
 
     return path;
+}
+
+/**
+ * @brief Computes Dijkstra Shortest path and return a map that represents the complete shortest path from origin to destination.
+ * Reference: https://www.geeksforgeeks.org/dijkstras-shortest-path-algorithm-using-set-in-stl/
+ * Complexity: O(E logV)
+ * 
+ * @param graph A map <Point, vector of adjacent edges>
+ * @param origin The origin point in which we want to start
+ * @param destination Our destination
+ * @param borderPoints Points of the borders of the arena
+ * @return std::map<Point, double> The complete shortest path from origin to destination
+ */
+std::map<Point, double> Graph::shortestPathDict(Point origin, Point destination, std::vector<Point> borderPoints) {
+    // Check the input by verifying if the origin and the destination are part of the graph
+    if(graph.find(origin) == graph.end() || graph.find(destination) == graph.end()) {
+        std::cout << "ERROR: origin point or destination point not available in graph!" << std::endl;
+        std::map<Point, double> dist;
+        return dist;
+    }
+
+    // Create a map to store the distances for all points
+    std::map<Point, double> dist;
+    // Create a map to reconstruct the final solution
+    std::map<Point, Point> prev;
+    // Create a set to store vertices that are being processed
+    std::set<std::pair<double, Point>> setds;
+
+    // Insert the origin point to start the algorithm
+    setds.insert(std::make_pair(0, origin));
+    dist[origin] = 0;
+
+    // Loop until all shortest distances are finalized (or until the destination is found)
+    while(!setds.empty()) {
+        // First vertex in the set - the min distance vertex
+        std::pair<double, Point> tmp = *(setds.begin());
+        setds.erase(setds.begin());
+
+        Point u = tmp.second;
+
+        // If we reached the destination, we can stop
+        if(u == destination) {
+            break;
+        }
+
+        // Loop through all adjacent vertices of the point u
+        for (Edge e : graph[u]) {
+            Point v = e.getAdjacent(u);
+            // The weight is simply the distance between the points
+            double weight = e.weight();
+
+            // If the point is not inside the arena, put weight INFINITY so Dijkstra won't use it
+            if (!isInsideArena(borderPoints, v.x, v.y)) {
+                weight = INFINITY;
+            }
+
+            // If there is a shortest path from v through u (or it's the first one we find)
+            if (!dist.count(v) || dist[v] > dist[u]+weight) {
+                // If we already had a distance from v through u, erase it (then we will insert the new one)
+                if (dist.count(v)) {
+                    setds.erase(setds.find(std::make_pair(dist[v], v)));
+                    prev.erase(prev.find(v));
+                }
+                
+                // Update the distance from the point v
+                dist[v] = dist[u] + weight;
+                setds.insert(std::make_pair(dist[v], v));
+                prev.insert(std::make_pair(v,u));
+            }
+        }
+    }
+
+    return dist;
+}
+
+/**
+ * @brief Computes Dijkstra Shortest path considering multiple destinations and return a map that represents the complete shortest path from origin to all possible destinations.
+ * Reference: https://www.geeksforgeeks.org/dijkstras-shortest-path-algorithm-using-set-in-stl/
+ * Complexity: O(E logV)
+ * 
+ * @param graph A map <Point, vector of adjacent edges>
+ * @param origin The origin point in which we want to start
+ * @param destinations All possible destinations
+ * @param borderPoints Points of the borders of the arena
+ * @return std::map<Point, double> The complete shortest path from origin to destination
+ */
+std::map<Point, double> Graph::shortestPathMultipleDDict(Point origin, std::vector<Point> destinations, std::vector<Point> borderPoints) 
+{
+    // Check the input by checking if the position of the origin point
+    if(graph.find(origin) == graph.end()) {
+        std::cout << "ERROR: origin point not available in graph!" << std::endl;
+        std::map<Point, double> dist;
+        return dist;
+    }
+
+    // Create a map to store the distances for all points
+    std::map<Point, double> dist;
+    
+    // Create a set to store vertices that are being processed
+    std::set<std::pair<double, Point>> setds;
+
+    // Insert the origin point to start the algorithm
+    setds.insert(std::make_pair(0, origin));
+    dist[origin] = 0;
+
+    // Loop until all shortest distances are finalized
+    while(!setds.empty()) {
+        // First vertex in the set - the min distance vertex
+        std::pair<double, Point> tmp = *(setds.begin());
+        setds.erase(setds.begin());
+
+        Point u = tmp.second;
+
+        // Loop through all adjacent vertices of the point u
+        for (Edge e : graph[u]) {
+            Point v = e.getAdjacent(u);
+            // The weight is simply the distance between the points
+            double weight = e.weight();
+
+            // If the point is not inside the arena, put weight INFINITY so Dijkstra won't use it
+            if (!isInsideArena(borderPoints, v.x, v.y)) {
+                weight = INFINITY;
+            }
+
+            // If there is a shortest path from v through u (or it's the first one we find)
+            if (!dist.count(v) || dist[v] > dist[u]+weight) {
+                // If we already had a distance from v through u, erase it (then we will insert the new one)
+                if (dist.count(v)) {
+                    setds.erase(setds.find(std::make_pair(dist[v], v)));
+                }
+                
+                // Update the distance from the point v
+                dist[v] = dist[u] + weight;
+                setds.insert(std::make_pair(dist[v], v));
+            }
+        }
+    }
+
+    return dist;
 }

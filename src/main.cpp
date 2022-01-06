@@ -15,13 +15,15 @@ void multipointDubinsAndVisgraphTest(Dubins dubins);
 void intersectionsTest(Dubins dubins);
 void openEdgesTest();
 
+//File used mainly for debugging prior to the use of the simulator.
+
 int main(int argc, char *argv[])
 {
     Dubins dubins = Dubins(1.9, 0.005);
 
     // shortestPathDubinsTest(dubins);
 
-    multipointDubinsAndVisgraphTest(dubins);
+    // multipointDubinsAndVisgraphTest(dubins);
 
     // intersectionsTest(dubins);
 
@@ -30,6 +32,7 @@ int main(int argc, char *argv[])
     return 0;
 }
 
+/*
 void openEdgesTest() {
     visgraph::OpenEdges openEdges = visgraph::OpenEdges();
     visgraph::Edge edgeNull = openEdges.getEdge(3);
@@ -255,3 +258,5 @@ void intersectionsTest(Dubins dubins)
     //     }
     // }
 }
+
+*/

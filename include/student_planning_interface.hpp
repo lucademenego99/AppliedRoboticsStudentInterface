@@ -32,14 +32,6 @@ namespace student
                  const Polygon &gate, const float x, const float y, const float theta,
                  Path &path,
                  const std::string &config_folder);
-   /**
-     * @brief NAME STILL TO BE DEFINED, generates an original graph and a visibility graph starting from a vector of polygons
-     * 
-     * @param polygons Obstables present in the map
-     * @param visg Visibility graph we need to obtain
-     * @param g Graph we need to generate starting from the obstacles
-     */
-   void unnamedFunction(std::vector<std::vector<visgraph::Point>> polygons, visgraph::VisGraph visg, visgraph::Graph g);
 
   /**
    * @brief fulfill the path for the robots
@@ -51,6 +43,135 @@ namespace student
    * @param robotId ID for the robot to be controlled
    */
   void fillPath(dubins::DubinsCurve **curves, std::vector<Path>& path, int pathSize, double size, int robotId);
+
+  /**
+   * @brief Check if a certain points (x,y) is inside the arena
+   * Points are in the order bottom-left, bottom-right, top-right, top-left
+   * 
+   * @param borderPoints Points representing the arena, in order bottom-left, bottom-right, top-right, top-left
+   * @param xPoint X of the point we are considering
+   * @param yPoint Y of the point we are considering
+   * @return true If the point lies inside the arena
+   * @return false If the point does not lie inside the arena
+   */
+  bool isInsideArena(std::vector<visgraph::Point> borderPoints, double xPoint, double yPoint);
+
+  /**
+   * @brief Find out the number of robots based on the values of their position
+   * 
+   * @param x x positions of the robots
+   * @param y y positions of the robots
+   * @return int number of robots
+   */
+  int checkNumberOfRobots(std::vector<float> x, std::vector<float> y);
+
+  /**
+   * @brief Given the coordinates of the destination square, find a point that lies within the arena
+   * 
+   * @param borderPoints Points representing the arena, in order bottom-left, bottom-right, top-right, top-left
+   * @param obstaclesGraph graph containing the enlarged obstacles, to find out which part of the destination gate is available
+   * @param minX Minimum x of the destination square
+   * @param maxX Maximum x of the destination square
+   * @param minY Minimum y of the destination square
+   * @param maxY Maximum y of the destination square
+   * @return visgraph::Point A point that lies within the arena and that is on an edge of the destination square
+   */
+  visgraph::Point findValidDestinationPoint(std::vector<visgraph::Point> borderPoints, visgraph::Graph obstaclesGraph, double minX, double maxX, double minY, double maxY);
+
+  /**
+   * @brief Find the 4 border points
+   * 
+   * @param borders Polygon representing the border
+   * @param borderMaxX Max x point - passed by ref.
+   * @param borderMinX Min x point - passed by ref.
+   * @param borderMaxY Max y point - passed by ref.
+   * @param borderMinY Min y point - passed by ref.
+   */
+  void findBorderPoints(const Polygon &borders, double &borderMaxX, double &borderMinX, double &borderMaxY, double &borderMinY);
+
+  /**
+   * @brief Find the 4 destination points given a destination polygon
+   * 
+   * @param gate Polygon representing our gate
+   * @param maxX Max x point - passed by ref.
+   * @param minX Min x point - passed by ref.
+   * @param maxY Max y point - passed by ref.
+   * @param minY Min y point - passed by ref.
+   */
+  void findDestinationPoints(const Polygon &gate, double &maxX, double &minX, double &maxY, double &minY);
+
+  /**
+   * @brief Convert the obstacles into a structure our algorithms comprehend
+   * 
+   * @param obstacle_list List of the obstacles as vector of polygons
+   * @return std::vector<std::vector<visgraph::Point>> List of obstacles represented as vectors of visgraph::Point
+   */
+  std::vector<std::vector<visgraph::Point>> getObstacles(const std::vector<Polygon>& obstacle_list);
+
+  /**
+   * @brief Add borders increased in size by a certain factor to the polygons vector
+   * 
+   * @param borderMaxX Max x point
+   * @param borderMinX Min x point
+   * @param borderMaxY Max y point
+   * @param borderMinY Min y point
+   * @param offset Offset by which we want to increase the size of the borders
+   * @param variant Another value used to determine how much we want to increase the size of the borders
+   * @param borderPoints Vector keeping the 4 border points - passed by ref.
+   * @param polygons Add the borders to this vector, then they will be used for collision detection - passed by ref.
+   */
+  void addBorders(double borderMaxX, double borderMinX, double borderMaxY, double borderMinY, double offset, double variant, std::vector<visgraph::Point> &borderPoints, std::vector<std::vector<visgraph::Point>> &polygons);
+
+  /**
+   * @brief Given the coordinates of the destination square, find a point that lies within the arena
+   * 
+   * @param borderPoints Points representing the arena, in order bottom-left, bottom-right, top-right, top-left
+   * @param minX Minimum x of the destination square
+   * @param maxX Maximum x of the destination square
+   * @param minY Minimum y of the destination square
+   * @param maxY Maximum y of the destination square
+   * @return visgraph::Point A point that lies within the arena and that is on an edge of the destination square
+   */
+  visgraph::Point findValidDestinationPoint(std::vector<visgraph::Point> borderPoints, double minX, double maxX, double minY, double maxY);
+
+  /**
+   * @brief Plan to reach a certain destination points with a certain robot
+   * 
+   * @param robot Robot ID
+   * @param origin Origin point
+   * @param destination Destination Point
+   * @param theta Robot's starting angle
+   * @param borderPoints points of the borders of the arena
+   * @param originalGraph Obstacles for collision detection
+   * @param g Obstacles for the shortestPath
+   * @param path Path to fill - passed by ref.
+   * @param shortestPath Calculated shortest path
+   * @param pathLengths Lengths of the dubins path from source to all intermediate points
+   * @param max_k Curvature of the robot
+   * @param size Discritizer size for the path generation
+   * @return dubins::DubinsCurve** Curves planned
+   */
+  dubins::DubinsCurve **planDestinationForRobot(int robot, visgraph::Point origin, std::vector<visgraph::Point> destinations, double theta, std::vector<visgraph::Point> borderPoints, visgraph::Graph originalGraph, visgraph::Graph g, std::vector<visgraph::Point> &shortestPath, std::vector<double> &pathLengths, std::vector<Path> &path, double max_k, double size);
+
+  /**
+   * @brief Reach a certain destination points with a certain robot
+   * 
+   * @param robot Robot ID
+   * @param origin Origin point
+   * @param destination Destination Point
+   * @param theta Robot's starting angle
+   * @param borderPoints points of the borders of the arena
+   * @param originalGraph Obstacles for collision detection
+   * @param g Obstacles for the shortestPath
+   * @param path Path to fill - passed by ref.
+   * @param shortestPath Calculated shortest path
+   * @param pathLengths Lengths of the dubins path from source to all intermediate points
+   * @param max_k Curvature of the robot
+   * @param size Discritizer size for the path generation
+   * @return true If a path has been found
+   * @return false If a path hasn't been found
+   */
+  bool reachDestinationForRobot(int robot, visgraph::Point origin, std::vector<visgraph::Point> destinations, double theta, std::vector<visgraph::Point> borderPoints, visgraph::Graph originalGraph, visgraph::Graph g, std::vector<visgraph::Point> &shortestPath, std::vector<double> &pathLengths, std::vector<Path> &path, double max_k, double size);
 
 }
 

@@ -50,8 +50,7 @@ namespace dubins
 
       ~DubinsArc()
       {
-         if (dubins_line)
-            delete dubins_line;
+         delete dubins_line;
       }
    };
 
@@ -77,12 +76,9 @@ namespace dubins
 
       ~DubinsCurve()
       {
-         if (a1)
-            delete a1;
-         if (a2)
-            delete a2;
-         if (a3)
-            delete a3;
+         delete a1;
+         delete a2;
+         delete a3;
       }
    };
 
