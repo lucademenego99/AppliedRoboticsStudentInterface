@@ -3,7 +3,7 @@
 
 The documentation of the code can be found [HERE](https://codedocs.xyz/lucademenego99/AppliedRoboticsStudentInterface/).
 
-The paper containing the details about the project and the design choices, instead, can be found [HERE]().
+The paper containing the details about the project and the design choices, instead, can be found [HERE](https://drive.google.com/file/d/13VmdseBuvCikWoQMT51e96tL92T0FThe/view?usp=sharing).
 
 # Usage
 1. Build the simulator using `catkin build`, then `source ~/workspace/simulator/environment.sh` and `source ~/workspace/project/environment.sh`
@@ -27,4 +27,4 @@ The main elements implemented in order to fulfill the project requirements are:
 - **Dijkstra Shortest Path**: it was implemented using C++ STL sets, which are self-balancing binary search trees. Final complexity: `O(E logV)`, where E is the number of edges and V is the number of vertices of the graph.
 - **Multipoint Markov-Dubins Problem**: solved with an Iterative Dynamic Programming approach, explained during class. Final complexity: `O(n k^2)`, where n is the number of points and k is the number of discretised angles.
 - **Collision detection**: solved with a basic algorithm to check Arc-Segment intersections, that must be run at each iteration of the Dubins shortest path calculation.
-- **Pursuer-Evader game**: a simulation of a pursuer-evader game, in which one robot - the pursuer - tries to escape to a destination, while another robot - the pursuer - has to intercept it. The details on the developed algorithm can be found on the report linked above.
+- **Pursuer-Evader game**: a simulation of a pursuer-evader game, in which one robot - the evader - tries to escape to a destination, while another robot - the pursuer - has to intercept it. The details on the developed algorithm can be found on the report linked above.
