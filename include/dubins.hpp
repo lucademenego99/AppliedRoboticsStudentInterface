@@ -347,7 +347,7 @@ namespace dubins
        * @param p3 First point used to define the second segment
        * @param p4 Second point used to define the second segment
        * @param pts Array of intersection points this function has found (passed by ref.)
-       * @param ts ??? (passed by ref.)
+       * @param ts Coefficients to normalize the segment (passed by ref.)
        * @return true If an intersection has been found
        * @return false If an intersection has not been found
        */

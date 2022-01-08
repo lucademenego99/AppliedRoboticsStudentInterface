@@ -15,14 +15,36 @@
 
 namespace visgraph
 {
+    /**
+     * @brief Point class used for the visibility graph generation
+     * 
+     */
     class Point
     {
     public:
-        //Attributes
+        
+        /**
+         * @brief X coordinate of the point
+         * 
+         */
         double x;
+
+        /**
+         * @brief Y coordinate of the point
+         * 
+         */
         double y;
+
+        /**
+         * @brief ID of the polygon that contains this point
+         * 
+         */
         int polygonId;
 
+        /**
+         * @brief Scale factor used for the calculations to avoid double precision problems
+         * 
+         */
         int SCALE_FACTOR = 1000;
 
         /**
@@ -56,15 +78,43 @@ namespace visgraph
         * 
         */
         void rescaleToOriginal();
+
+        /**
+         * @brief Override the operator <
+         * 
+         * @param ob Point to compare
+         * @return true If this point is smaller than ob
+         * @return false If ob is smaller than this point
+         */
         bool operator<(const Point &ob) const;
+
+        /**
+         * @brief Override the operator ==
+         * 
+         * @param ob Point to compare
+         * @return true If this point is equal to ob
+         * @return false If this point is not equal to ob
+         */
         bool operator==(const Point &ob) const;
     };
 
+    /**
+     * @brief Edge class used for the visibility graph generation
+     * 
+     */
     class Edge
     {
     public:
-        //Attributes
+        /**
+         * @brief First point of the edge
+         * 
+         */
         Point p1;
+        
+        /**
+         * @brief Second point of the edge
+         * 
+         */
         Point p2;
 
         /**
@@ -105,6 +155,14 @@ namespace visgraph
         * 
         */
         void print();
+
+        /**
+         * @brief Override operator ==
+         * 
+         * @param ob Edge to compare
+         * @return true If this edge is equal to ob
+         * @return false If this edge is not equal to ob
+         */
         bool operator==(const Edge &ob) const;
     };
 
@@ -120,18 +178,41 @@ namespace visgraph
      */
     typedef std::map<int, std::vector<Edge>> DictP;
 
+    /**
+     * @brief Graph class used for the visibility graph generation
+     * 
+     * Used both to express a visibility graph and a normal graph of obstacles
+     * We can understand what was it used for based on the isVisibilityGraph variable
+     * 
+     */
     class Graph
     {
     public:
-        //Attributes
-        //Struct for graph
+        
+        /**
+         * @brief Maps points to edges
+         * 
+         */
         DictG graph;
-        //Set of edges
+        
+        /**
+         * @brief Set of edges of this graph
+         * 
+         */
         std::vector<Edge> edges;
+
         int pid;
-        //Struct for polygons
+
+        /**
+         * @brief Maps Polygon IDs to the actual polygons
+         * 
+         */
         DictP polygons;
-        // Is this graph a visibility graph
+        
+        /**
+         * @brief Is this a visibility graph or a normal graph with some obstacles?
+         * 
+         */
         bool isVisibilityGraph;
 
         /**

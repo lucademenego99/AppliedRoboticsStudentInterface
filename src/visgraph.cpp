@@ -449,14 +449,14 @@ namespace visgraph
     }
 
     /**
-     * @brief Is the edge from point p1 to point p2 interior to any polygon?
-     * 
-     * @param p1 
-     * @param p2 
-     * @param graph 
-     * @return true The edge [p1, p2] is interior to a polygon
-     * @return false The edge [p1, p2] is not interior to a polygon
-     */
+    * @brief Is the edge from point p1 to point p2 interior to any polygon?
+    * 
+    * @param p1 First point we are considering
+    * @param p2 Second point we are considering
+    * @param graph The graph containing all the polygons
+    * @return true The edge [p1, p2] is interior to a polygon
+    * @return false The edge [p1, p2] is not interior to a polygon
+    */
     bool VisGraph::edgeInPolygon(Point p1, Point p2, Graph graph)
     {
         if (p1.polygonId != p2.polygonId)
@@ -577,12 +577,12 @@ namespace visgraph
     }
 
     /**
-     * @brief 
-     * 
-     * @param center 
-     * @param point 
-     * @return double 
-     */
+    * @brief Get the angle between a point and the half line we are considering
+    * 
+    * @param center Point from which we want to find the visible vertices
+    * @param point Point we are currently considering
+    * @return double Value of the calculated angle
+    */
     double VisGraph::getAngle(Point center, Point point)
     {
         double dx = point.x - center.x;
@@ -607,13 +607,13 @@ namespace visgraph
     }
 
     /**
-     * @brief Returns the radiant value of an angle given three points
-     * 
-     * @param a 
-     * @param b 
-     * @param c 
-     * @return double 
-     */
+    * @brief Calculate the angle used to sort the edges in the OpenEdges structure, based on the point we are currently considering and a certain edge composed of the points b and c
+    * 
+    * @param a Point we are currently considering
+    * @param b First point of the edge
+    * @param c Second point of the edge
+    * @return double Angle value in radians
+    */
     double VisGraph::getAngle2(Point a, Point b, Point c)
     {
         double aValue = pow(b.x - c.x, 2) + pow(b.y - c.y, 2);

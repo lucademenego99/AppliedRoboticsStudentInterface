@@ -30,9 +30,28 @@ namespace visgraph
     class VisGraph
     {
     private:
+        /**
+         * @brief Value to simulate a line starting from a certain point P and going to infinity (positive x axis)
+         * 
+         */
         double INF = 100000;
+
+        /**
+         * @brief CounterClockwise value
+         * 
+         */
         const int CCW = 1;
+
+        /**
+         * @brief Clockwise value
+         * 
+         */
         const int CW = -1;
+
+        /**
+         * @brief Collinear points value
+         * 
+         */
         const int COLLINEAR = 0;
 
         /**
@@ -58,20 +77,20 @@ namespace visgraph
         std::vector<Point> getVisibleVerticesMultipleOD(Point point, Graph graph, std::vector<Point> origins, std::vector<Point> destinations);
 
         /**
-        * @brief 
+        * @brief Get the angle between a point and the half line we are considering
         * 
-        * @param center 
-        * @param point 
-        * @return double 
+        * @param center Point from which we want to find the visible vertices
+        * @param point Point we are currently considering
+        * @return double Value of the calculated angle
         */
         double getAngle(Point center, Point p);
 
         /**
         * @brief Is the edge from point p1 to point p2 interior to any polygon?
         * 
-        * @param p1 
-        * @param p2 
-        * @param graph 
+        * @param p1 First point we are considering
+        * @param p2 Second point we are considering
+        * @param graph The graph containing all the polygons
         * @return true The edge [p1, p2] is interior to a polygon
         * @return false The edge [p1, p2] is not interior to a polygon
         */
@@ -156,12 +175,12 @@ namespace visgraph
         int getOrientation(Point p, Point q, Point r);
 
         /**
-        * @brief Returns the radiant value of an angle given three points
+        * @brief Calculate the angle used to sort the edges in the OpenEdges structure, based on the point we are currently considering and a certain edge composed of the points b and c
         * 
-        * @param a 
-        * @param b 
-        * @param c 
-        * @return double 
+        * @param a Point we are currently considering
+        * @param b First point of the edge
+        * @param c Second point of the edge
+        * @return double Angle value in radians
         */
         double getAngle2(Point a, Point b, Point c);
 

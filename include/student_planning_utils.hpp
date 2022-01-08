@@ -16,6 +16,10 @@
 #include <vector>
 #include <cstddef>
 
+/**
+ * @brief Base point used in the student interface, input of the planPath function
+ * 
+ */
 struct Point 
 {
   float x, y;
@@ -25,13 +29,13 @@ struct Point
 };
 
 /**
- * @brief A polygon, expessed as a list of 2D points
+ * @brief A polygon, expessed as a list of 2D points, input of the planPath function
  * 
  */
 typedef std::vector<Point> Polygon;
 
 /**
- * @brief A configuration of the robot along the path, represented by x, y, orientation and curvature
+ * @brief A configuration of the robot along the path, represented by x, y, orientation and curvature, input of the planPath function
  * 
  */
 struct Pose
@@ -53,7 +57,7 @@ struct Pose
 };
 
 /**
- * @brief A sequence of sampled robot configurations composing a (discretization of the) path
+ * @brief A sequence of sampled robot configurations composing a (discretization of the) path, input of the planPath function
  * 
  */
 struct Path

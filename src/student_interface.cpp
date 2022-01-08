@@ -587,12 +587,6 @@ namespace student
         } else {
           std::cout << "PATH FOUND FOR EVADER WITH LENGTH: " << pathLengthsEvader[pathLengthsEvader.size()-1] << "\n";
         }
-        
-        // DEBUG - Try to reach the closer destination with the pursuer
-        // bool foundPathSecond = reachDestinationForRobot(1, visgraph::Point(x[1], y[1]), destinations, theta[1], borderPoints, originalGraph, g, path, max_k, size);
-        // if (!foundPathSecond) {
-        //   std::cout << "NO PATH FOUND FOR SECOND ROBOT!\n";
-        // }
 
 
         // ********** PURSUER - Find the path to intercept the evader ********** //
@@ -1056,9 +1050,6 @@ namespace student
                 }
               }
             }
-            // if (i == shortestPathEvaderTmp.size()) {
-            //   std::cout << "THE PURSUER WASN'T ABLE TO FIND A PATH TO REACH THE EVADER AT ITERATION " << z << "\n";
-            // }
           }
         }
 

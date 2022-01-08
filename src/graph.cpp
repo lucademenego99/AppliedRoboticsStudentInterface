@@ -60,10 +60,24 @@ void Point::rescaleToOriginal() {
     y /= (1.0 * SCALE_FACTOR);
 }
 
+/**
+ * @brief Override the operator <
+ * 
+ * @param ob Point to compare
+ * @return true If this point is smaller than ob
+ * @return false If ob is smaller than this point
+ */
 bool Point::operator<(const Point &ob) const {
     return x < ob.x || (x == ob.x && y < ob.y);
 }
 
+/**
+ * @brief Override the operator ==
+ * 
+ * @param ob Point to compare
+ * @return true If this point is equal to ob
+ * @return false If this point is not equal to ob
+ */
 bool Point::operator==(const Point &ob) const{
     return ob.x == x && ob.y == y && ob.polygonId == polygonId;
 }
@@ -113,6 +127,13 @@ void Edge::print (){
     std::cout << "Edge((" << p1.x << "," << p1.y << ")(" << p2.x << "," << p2.y << "))\n";
 }
 
+/**
+ * @brief Override operator ==
+ * 
+ * @param ob Edge to compare
+ * @return true If this edge is equal to ob
+ * @return false If this edge is not equal to ob
+ */
 bool Edge::operator==(const Edge &ob) const{
     return ob.p1 == p1 && ob.p2 == p2;
 }
@@ -157,6 +178,7 @@ Graph::Graph (std::vector<std::vector<Point>> shapes, bool isVisGraph, bool isOr
         }
     }
 }
+
 /**
  * @brief returns the adjacent edges to a certain point
  * @param point the point we want to consider
@@ -170,6 +192,7 @@ std::vector<Point> Graph::getAdjacentPoints(Point point){
     }
     return points;
 }
+
 /**
  * @brief returns a list of all the points in the map
  * @param points the empty vector of points
@@ -182,6 +205,7 @@ std::vector<Point> Graph::getPoints(){
     }
     return points;
 }
+
 /**
  * @brief returns all the edges
  * @param edges the empty vector of edges
@@ -193,6 +217,7 @@ std::vector<Edge> Graph::getEdges(){
     }
     return results;
 }
+
 /**
  * @brief adds an edge to the list of edges
  * @param edge the one we want to insert
@@ -208,6 +233,7 @@ void Graph::addEdge(Edge edge){
     graph[edge.p2].push_back(edge);
     edges.push_back(edge);
 }
+
 /**
  * @brief get every edge associated to a point
  * @param point point we want to search
@@ -221,6 +247,7 @@ std::vector<Edge> Graph::getItems(Point point){
     }
     return edges;
 }
+
 /** 
  * @brief checks if the map contains a point, if it does returns the edges of that point
  * @param point the point we need to check
@@ -233,6 +260,7 @@ std::vector<Edge> Graph::containsP(Point point){
     }
     return edges;
 }
+
 /**
  * @brief checks if the vector of edges contains a specific edge, returns it after retrieving it
  * @param e the edge we are looking for

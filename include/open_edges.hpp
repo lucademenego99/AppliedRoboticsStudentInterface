@@ -17,6 +17,12 @@
 
 namespace visgraph
 {
+    /**
+     * @brief Binary search tree used for the visibility graph generation
+     * 
+     * It's at the core of the visibility graph generation algorithm, and it contains the edges sorted based on the angle they form with the point we are currently considering
+     * 
+     */
     class OpenEdges
     {
     private:
@@ -44,7 +50,16 @@ namespace visgraph
         bool lessThan(Point p1, Point p2, Edge edge1, Edge edge2);
 
     public:
+        /**
+         * @brief Vector containing the sorted OpenEdges
+         * 
+         */
         std::vector<Edge> openEdges;
+
+        /**
+         * @brief Visibility Graph utilities
+         * 
+         */
         VisGraph visGraph = VisGraph();
 
         /**
