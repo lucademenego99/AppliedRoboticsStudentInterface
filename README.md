@@ -3,7 +3,7 @@
 
 The documentation of the code can be found [HERE](https://codedocs.xyz/lucademenego99/AppliedRoboticsStudentInterface/).
 
-The paper containing the details about the project and the design choices, instead, can be found [HERE](https://drive.google.com/file/d/13VmdseBuvCikWoQMT51e96tL92T0FThe/view?usp=sharing).
+The paper containing the details about the project and the design choices, instead, can be found [HERE](https://drive.google.com/file/d/1GE572y4QuDZ5YxA17OdB__hhHqjz6_-L/view?usp=sharing).
 
 # Usage
 1. Build the simulator using `catkin build`, then `source ~/workspace/simulator/environment.sh` and `source ~/workspace/project/environment.sh`
